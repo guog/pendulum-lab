@@ -37,3 +37,20 @@ test('accepts footer after closed code fences and comments', () => {
     validateProvenance('```text\n\nexample\n```\n\n<!-- hidden -->\n\n' + aiFooter),
   )
 })
+
+for (const [name, body] of [
+  ['inline comment marker', 'Document the `<!--` marker.'],
+  ['indented code comment marker', '    <!--'],
+  ['multiline code span', 'Use ``an example\nwith <!-- marker`` here.'],
+]) {
+  test(`accepts visible footer after ${name}`, () => {
+    assert.doesNotThrow(() => validateProvenance(body + '\n\n' + aiFooter))
+  })
+}
+for (const [name, body] of [
+  ['quoted disclosure', '> Assisted-by: LLM\n> AI-Agent: Codex'],
+  ['indented disclosure', '    Assisted-by: LLM\n    AI-Agent: Codex'],
+  ['hidden closed comment', 'Body\n\n<!--\n\nAssisted-by: LLM\nAI-Agent: Codex -->'],
+]) {
+  test(`rejects ${name}`, () => assert.throws(() => validateProvenance(body)))
+}
