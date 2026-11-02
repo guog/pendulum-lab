@@ -1,0 +1,2 @@
+npx --no -- commitlint --edit "$1"
+node scripts/check-provenance.mjs --edit "$1"

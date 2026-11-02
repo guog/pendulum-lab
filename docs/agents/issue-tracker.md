@@ -1,7 +1,7 @@
 # Issue tracker: GitHub
 
 本仓库的任务和规格存放在 guog/pendulum-lab 的 GitHub Issues。
-使用 gh CLI 操作。
+使用 gh CLI 操作。创建或修改 Issue、PR 和评论时，按 `docs/agents/ai-provenance.md` 在正文末尾添加来源尾注。
 
 ## 操作约定
 
@@ -23,6 +23,7 @@ gh 支持的命令或 gh api 操作。API 中要求的数据库 id 通过
 `gh api repos/guog/pendulum-lab/issues/<number> --jq .id` 获取。
 
 原生功能不可用时：
+
 - 子任务正文顶部写 `Part of #<parent>`，父任务正文维护子任务列表。
 - 被阻塞任务正文顶部写 `Blocked by: #<number>, #<number>`。
 
@@ -43,7 +44,7 @@ gh 支持的命令或 gh api 操作。API 中要求的数据库 id 通过
 
 - Map：使用 wayfinder:map 标签的单个 Issue，维护 Notes、
   Decisions-so-far 和 Fog。
-- Child ticket：作为 Map 的子任务，使用 wayfinder:<type> 标签；
+- Child ticket：作为 Map 的子任务，使用 `wayfinder:<type>` 标签；
   type 为 research、prototype、grilling 或 task。
 - Frontier：按 Map 中的顺序，选择首个未关闭、没有未关闭阻塞项、
   且尚未分配负责人的子任务。

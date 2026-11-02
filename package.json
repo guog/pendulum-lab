@@ -1,0 +1,31 @@
+{
+  "name": "pendulum-lab",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Repository tooling for the pendulum simulation requirements project",
+  "type": "module",
+  "engines": {
+    "node": ">=24 <27"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "check": "npm run format:check && npm run lint:docs && npm run test:tooling",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:docs": "markdownlint-cli2",
+    "lint:commit": "commitlint",
+    "test:tooling": "node --test scripts/*.test.mjs"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
+    "husky": "9.1.7",
+    "markdownlint-cli2": "0.24.0",
+    "mdast-util-from-markdown": "2.1.0",
+    "prettier": "3.9.10"
+  },
+  "overrides": {
+    "re2js": "2.8.7",
+    "katex": "0.18.2"
+  }
+}
