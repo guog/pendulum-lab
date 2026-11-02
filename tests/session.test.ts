@@ -204,3 +204,42 @@ test('一次推进与分批推进产生相同的10秒原始轨迹，完整结束
   assert.equal(whole.read().samples.length, 1001)
   assert.deepEqual(batched.read().samples, whole.read().samples)
 })
+
+test('触边事件独立携带四状态与违规条件，含初始触边', () => {
+  for (const position of [1.5, 1.4999]) {
+    const config = createConfig('simple', 'equilibrium')
+    config.physics.gravity_m_s2 = 0
+    config.initial_state.cart_x_m = position
+    config.initial_state.cart_v_m_s = 0.2
+    const session = createSession(config)
+    session.start()
+    session.advance(0.016)
+    const output = session.read()
+    assert.deepEqual(output.events.at(-1)?.payload, {
+      ...output.state,
+      condition: 'abs(cart_x_m) >= track_length_m / 2',
+      track_limit_m: 1.5,
+    })
+  }
+})
+
+test('导出请求逐次记事件且不添加重复样本，不冒称写盘已成功', async () => {
+  const session = createSession(createConfig('standard', 'release'))
+  session.start()
+  session.advance(0.016)
+  session.pause()
+  const original = session.read()
+  await session.exportEvidence()
+  const bundle = await session.exportEvidence()
+  const output = session.read()
+  assert.deepEqual(output.samples, original.samples)
+  assert.equal(output.sim_time_s, original.sim_time_s)
+  const exports = output.events.filter((event) => event.event_type === 'export')
+  assert.equal(exports.length, 2)
+  assert.ok(exports.every((event) => event.sim_time_s === original.sim_time_s))
+  assert.deepEqual(exports[0]?.payload, { stage: 'requested', persistence_confirmed: false })
+  const exportedEvents = bundle.files['events/part-000001.jsonl']!.trim()
+    .split('\n')
+    .map((line) => JSON.parse(line))
+  assert.equal(exportedEvents.filter((event) => event.event_type === 'export').length, 2)
+})

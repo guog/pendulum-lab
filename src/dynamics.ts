@@ -25,7 +25,7 @@ export type Physics = {
 
 type Vector = [number, number, number, number, number]
 
-export function integrate(state: State, physics: Physics, dt: number) {
+function massProperties(physics: Physics) {
   const mass = physics.cart_mass_kg + physics.rod_mass_kg + physics.counterweight_mass_kg
   const moment =
     (physics.rod_mass_kg * physics.rod_length_m) / 2 +
@@ -33,6 +33,11 @@ export function integrate(state: State, physics: Physics, dt: number) {
   const inertia =
     (physics.rod_mass_kg * physics.rod_length_m ** 2) / 3 +
     physics.counterweight_mass_kg * physics.counterweight_position_m ** 2
+  return { mass, moment, inertia }
+}
+
+export function integrate(state: State, physics: Physics, dt: number) {
+  const { mass, moment, inertia } = massProperties(physics)
   function derivative([, velocity, theta, omega]: Vector): Vector {
     const sine = theta % Math.PI === 0 ? 0 : Math.sin(theta)
     const coupling = moment * Math.cos(theta)
@@ -84,13 +89,7 @@ export function integrate(state: State, physics: Physics, dt: number) {
 }
 
 export function energy(state: State, physics: Physics) {
-  const mass = physics.cart_mass_kg + physics.rod_mass_kg + physics.counterweight_mass_kg
-  const moment =
-    (physics.rod_mass_kg * physics.rod_length_m) / 2 +
-    physics.counterweight_mass_kg * physics.counterweight_position_m
-  const inertia =
-    (physics.rod_mass_kg * physics.rod_length_m ** 2) / 3 +
-    physics.counterweight_mass_kg * physics.counterweight_position_m ** 2
+  const { mass, moment, inertia } = massProperties(physics)
   const v = state.cart_v_m_s
   const omega = state.theta_dot_rad_s
   const cosine = Math.cos(state.theta_unwrapped_rad)

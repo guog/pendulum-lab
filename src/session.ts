@@ -39,6 +39,12 @@ export function createSession(input: ExperimentConfig) {
       payload,
     })
   }
+  const boundaryEvent = () =>
+    event('boundary', {
+      ...state,
+      condition: 'abs(cart_x_m) >= track_length_m / 2',
+      track_limit_m: config.physics.track_length_m / 2,
+    })
   const sample = () => {
     if (samples.at(-1)?.sim_time_s !== time())
       samples.push({
@@ -79,7 +85,7 @@ export function createSession(input: ExperimentConfig) {
       sample()
       if (Math.abs(state.cart_x_m) >= config.physics.track_length_m / 2) {
         status = 'stopped'
-        event('boundary', { cart_x_m: state.cart_x_m })
+        boundaryEvent()
       }
     },
     advance(duration_s: number) {
@@ -123,7 +129,7 @@ export function createSession(input: ExperimentConfig) {
           state = endpoint.state
           dissipated += endpoint.dissipated_delta_J
           status = 'stopped'
-          event('boundary', { cart_x_m: state.cart_x_m })
+          boundaryEvent()
           sample()
           break
         }
@@ -179,6 +185,7 @@ export function createSession(input: ExperimentConfig) {
     },
     async exportEvidence() {
       if (status === 'ready' || status === 'running') throw new Error('请先暂停或结束实验再导出')
+      event('export', { stage: 'requested', persistence_confirmed: false })
       return buildEvidence(this.read())
     },
   }

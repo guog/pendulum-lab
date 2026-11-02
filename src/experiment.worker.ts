@@ -74,13 +74,16 @@ context.onmessage = async ({ data: { request_id, command } }) => {
         session.reset()
         runningWallMs = 0
         break
-      case 'export':
+      case 'export': {
+        const bundle = await session.exportEvidence()
+        snapshot()
         context.postMessage({
           type: 'evidence',
           request_id,
-          bundle: await session.exportEvidence(),
+          bundle,
         })
         return
+      }
     }
     snapshot(request_id)
   } catch (error) {

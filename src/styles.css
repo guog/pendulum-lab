@@ -78,7 +78,7 @@ button.text-button:hover:not(:disabled) {
   background: #e8eeea;
 }
 :focus-visible {
-  outline: 3px solid #8dbaaa;
+  outline: 3px solid var(--accent);
   outline-offset: 3px;
 }
 a {

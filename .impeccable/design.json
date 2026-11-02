@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-02T13:30:42.076619Z",
+  "title": "Design System: Pendulum Lab",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Action green"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Dark green text"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted green text"
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Pale page"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "White measurement surface"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Subtle divider"
+      },
+      "x": {
+        "displayName": "Position blue"
+      },
+      "v": {
+        "displayName": "Velocity teal"
+      },
+      "theta": {
+        "displayName": "Angle ochre"
+      },
+      "omega": {
+        "displayName": "Angular velocity purple"
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Main heading",
+        "purpose": "Workbench title."
+      },
+      "body": {
+        "displayName": "System sans serif",
+        "purpose": "Inherited interface text with Chinese system fallbacks."
+      },
+      "clock": {
+        "displayName": "Simulation clock",
+        "purpose": "Prominent tabular simulation time."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "button-background",
+        "value": "background 160ms ease-out",
+        "purpose": "Button background state changes; disabled under prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "desktop-compact",
+        "value": "1150px"
+      },
+      {
+        "name": "narrow",
+        "value": "760px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary run action.",
+      "html": "<button class=\"ds-primary\">开始基准</button>",
+      "css": ".ds-primary{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;min-height:40px;border-radius:6px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:white;padding:8px 16px;font-weight:600;transition:background 160ms ease-out;} .ds-primary:hover:not(:disabled){background:#0b5044;} .ds-primary:active:not(:disabled){background:#063e34;} .ds-primary:disabled{cursor:not-allowed;opacity:.45;} .ds-primary:focus-visible{outline:3px solid var(--accent);outline-offset:3px;} @media(prefers-reduced-motion:reduce){.ds-primary{transition:none;}}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary pause, stop, and evidence-export actions.",
+      "html": "<button class=\"ds-secondary\">导出并校验</button>",
+      "css": ".ds-secondary{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;min-height:40px;border-radius:6px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:white;padding:8px 16px;font-weight:600;transition:background 160ms ease-out;} .ds-secondary:hover:not(:disabled){background:#0b5044;} .ds-secondary:active:not(:disabled){background:#063e34;} .ds-secondary:disabled{cursor:not-allowed;opacity:.45;} .ds-secondary{color:var(--ink);background:white;border-color:#aebdb5;} .ds-secondary:hover:not(:disabled){background:#edf3ef;} .ds-secondary:focus-visible{outline:3px solid var(--accent);outline-offset:3px;} @media(prefers-reduced-motion:reduce){.ds-secondary{transition:none;}}"
+    },
+    {
+      "name": "Text button",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Low-emphasis reset and download-copy actions.",
+      "html": "<button class=\"ds-text\">重置</button>",
+      "css": ".ds-text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;min-height:40px;border-radius:6px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:white;padding:8px 16px;font-weight:600;transition:background 160ms ease-out;} .ds-text:hover:not(:disabled){background:#0b5044;} .ds-text:active:not(:disabled){background:#063e34;} .ds-text:disabled{cursor:not-allowed;opacity:.45;} .ds-text{color:var(--muted);background:transparent;border-color:transparent;} .ds-text:hover:not(:disabled){color:var(--ink);background:#e8eeea;} .ds-text:focus-visible{outline:3px solid var(--accent);outline-offset:3px;} @media(prefers-reduced-motion:reduce){.ds-text{transition:none;}}"
+    },
+    {
+      "name": "Preset select",
+      "kind": "input",
+      "refersTo": "select",
+      "description": "Native labeled selector for experiment settings.",
+      "html": "<label class=\"ds-field-label\" for=\"ds-preset\">基础工况</label><select class=\"ds-select\" id=\"ds-preset\"><option>简单</option><option selected>标准</option></select>",
+      "css": ".ds-field-label{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;display:block;color:var(--ink);font-size:13px;font-weight:600;margin:18px 0 8px;} .ds-select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;width:100%;min-height:40px;padding:7px 32px 7px 10px;color:var(--ink);background-color:white;border:1px solid #acbcb3;border-radius:6px;} .ds-select:hover:not(:disabled){border-color:#557a6c;} .ds-select:disabled{color:var(--muted);background-color:#f4f6f3;} .ds-select:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}"
+    },
+    {
+      "name": "Run status",
+      "kind": "custom",
+      "refersTo": "status",
+      "description": "Noninteractive textual run state.",
+      "html": "<span class=\"ds-status\" role=\"status\">准备就绪</span>",
+      "css": ".ds-status{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;display:inline-block;color:#235e4d;font-size:13px;background:#e2eee7;border-radius:5px;padding:7px 11px;white-space:nowrap;}"
+    },
+    {
+      "name": "Signal panel",
+      "kind": "card",
+      "refersTo": "signal",
+      "description": "Measurement caption and current numeric output; trace drawing requires the application canvas renderer.",
+      "html": "<figure class=\"ds-signal\"><figcaption class=\"ds-caption\"><span>滑块位置 x <small class=\"ds-unit\">m</small></span><output class=\"ds-value\">0.0000</output></figcaption><canvas class=\"ds-chart\" role=\"img\" aria-label=\"滑块位置随仿真时间变化曲线\"></canvas></figure>",
+      "css": ".ds-signal{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;color:var(--ink);margin:0;padding:14px 15px 8px;background:white;border:1px solid var(--line);border-radius:12px;min-width:0;} .ds-caption{display:flex;justify-content:space-between;gap:8px;font-size:12px;} .ds-unit{color:var(--muted);font-size:11px;margin-left:4px;} .ds-value{color:var(--x);font-variant-numeric:tabular-nums;font-weight:600;} .ds-chart{display:block;width:100%;height:134px;}"
+    },
+    {
+      "name": "Scope notice",
+      "kind": "custom",
+      "refersTo": "notice",
+      "description": "Textual explanation of the implemented experiment scope.",
+      "html": "<p class=\"ds-notice\">本次仅自由运动基准。自动起摆与目录持续保存尚未进入本切片；不代表控制验收通过。</p>",
+      "css": ".ds-notice{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;margin:22px 0 0;padding:12px;background:#fff5dc;border-radius:6px;color:#74500e;font-size:12px;line-height:1.7;}"
+    },
+    {
+      "name": "File picker",
+      "kind": "input",
+      "description": "Native file selector for checking an exported JSON evidence package.",
+      "html": "<label class=\"ds-file-label\" for=\"ds-file\">校验已导出的文件</label><input class=\"ds-file\" id=\"ds-file\" type=\"file\" accept=\".json,application/json\" />",
+      "css": ".ds-file-label{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;display:block;margin:12px 0 8px;color:var(--muted);font-size:12px;} .ds-file{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;width:100%;font-size:11px;color:var(--muted);} .ds-file:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}"
+    },
+    {
+      "name": "Configuration disclosure",
+      "kind": "custom",
+      "description": "Native disclosure for the full configuration and version.",
+      "html": "<details class=\"ds-details\"><summary class=\"ds-summary\">完整配置与版本</summary><pre class=\"ds-config\">配置与版本由当前实验提供。</pre></details>",
+      "css": ".ds-summary{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;cursor:pointer;padding:8px 0;color:var(--muted);font-size:12px;} .ds-summary:hover{color:var(--accent);} .ds-summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px;} .ds-config{white-space:pre-wrap;word-break:break-word;font-size:11px;line-height:1.6;background:#e9eeea;padding:12px;border-radius:6px;max-height:320px;overflow:auto;}"
+    },
+    {
+      "name": "Error message",
+      "kind": "custom",
+      "refersTo": "error",
+      "description": "Explanatory alert when the application reports an error.",
+      "html": "<div class=\"ds-error\" role=\"alert\">实验错误说明由当前错误提供。</div>",
+      "css": ".ds-error{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;margin-bottom:18px;padding:12px 16px;background:#f9e6e0;color:#852f1d;border-radius:6px;font-size:13px;line-height:1.6;}"
+    }
+  ],
+  "narrative": {
+    "overview": "The implemented interface is a minimal, restrained engineering workbench. A pale neutral page, white plotting surfaces, dark green text, and a single action accent keep attention on controls, the physical apparatus, and measured values. This documents the current implementation; no brand metaphor or additional visual identity has been selected.\n\nThe desktop composition groups experiment settings and evidence controls beside the running experiment. Compact typography, explicit units, stable numeric alignment, and visible state descriptions make the workbench readable without decorative elevation.",
+    "keyCharacteristics": [
+      "Restrained green action accent with separate colors for the four measured signals.",
+      "Flat white measurement surfaces on a pale page, separated by thin borders.",
+      "Compact Chinese labels, explicit units, and tabular numeric readouts."
+    ],
+    "rules": [],
+    "dos": [
+      "Do preserve each signal’s color across its readout and plotted trace.",
+      "Do use the shared accent outline for keyboard focus and retain the visible skip link.",
+      "Do keep units and descriptive text alongside color-coded measurements.",
+      "Do use the existing control and panel shapes when extending the implemented workbench."
+    ],
+    "donts": [
+      "Don't use the signal colors as interchangeable action accents.",
+      "Don't replace text status, warnings, or errors with color alone.",
+      "Don't describe the existing narrow-screen CSS as validated mobile support.",
+      "Don't introduce an invented brand metaphor, tonal ramp, or component into this record of the current implementation."
+    ]
+  }
+}

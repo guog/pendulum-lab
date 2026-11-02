@@ -131,7 +131,9 @@ function render() {
   write('sampling', String(config.timing.sample_period_s * 1000))
   write('step-size', String(config.timing.physics_step_s * 1000))
   write('ratio', wallMs > 0 ? `${(current.sim_time_s / (wallMs / 1000)).toFixed(2)}×` : '—')
-  const last = current.events.at(-1)
+  const last = current.events.findLast((event) =>
+    ['boundary', 'numerical_error'].includes(event.event_type),
+  )
   write(
     'end-reason',
     last?.event_type === 'boundary'
@@ -262,8 +264,12 @@ benchmark.onchange = () => void configure()
 exportButton.onclick = () =>
   void action(async () => {
     if (!current) return
-    const targetKey = key()
-    const name = await saveEvidenceFile(evidence, `pendulum-${current.experiment_id}.json`)
+    let targetKey = ''
+    const name = await saveEvidenceFile(async () => {
+      const text = await evidence()
+      targetKey = key()
+      return text
+    }, `pendulum-${current.experiment_id}.json`)
     verifiedKey = targetKey
     exportMessage.textContent = `已写入并读回校验：${name}`
   })
@@ -294,8 +300,7 @@ verifyFile.onchange = () =>
     exportMessage.textContent = `已读回校验：${file.name}`
   })
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && current?.status === 'running')
-    void call({ type: 'pause', reason: 'background' }).catch(showError)
+  if (document.hidden) void call({ type: 'pause', reason: 'background' }).catch(showError)
 })
 window.addEventListener('beforeunload', (event) => {
   if (current?.samples.length && verifiedKey !== key()) event.preventDefault()

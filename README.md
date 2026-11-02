@@ -31,7 +31,7 @@ npm run preview
 - 也可在“下载副本与文件校验”中生成JSON证据包，下载后选取实际文件校验。仅点击下载不会显示保存成功。
 - 证据包包含完整配置、原始CSV、JSONL事件、结果及SHA-256清单。只标研究记录，不冒充控制验收通过或工作区已提交数据。
 
-方程、数值方法、接口和记录格式详见[T01实现契约](docs/design/t01-implementation.md)。
+方程、数值方法、接口和记录格式详见[T01实现契约](docs/design/t01-implementation.md)。本次[验证与审查记录](docs/verification/t01/review.md)附实际下载的原始证据及运行环境。
 
 ## 检查
 

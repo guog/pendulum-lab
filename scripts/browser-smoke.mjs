@@ -10,6 +10,8 @@ const chrome =
   process.env.CHROME_EXECUTABLE ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 if (!existsSync(chrome))
   throw new Error('请通过CHROME_EXECUTABLE指定已安装的Chrome；此检查不安装或替代真实目标浏览器。')
+const chromeVersion = spawnSync(chrome, ['--version'], { encoding: 'utf8', timeout: 10_000 })
+if (chromeVersion.status !== 0) throw new Error('无法读取指定Chrome的实际版本')
 const artifacts = process.env.BROWSER_ARTIFACTS_DIR
   ? resolve(process.env.BROWSER_ARTIFACTS_DIR)
   : await mkdtemp(join(tmpdir(), 'pendulum-browser-'))
@@ -54,7 +56,10 @@ function verifyBundle(path) {
   const manifest = JSON.parse(bundle.files['manifest.json'])
   assert.equal(config.experiment_id, bundle.experiment_id)
   assert.equal(result.experiment_id, bundle.experiment_id)
-  assert.equal(config.environment.user_agent.includes('Chrome/'), true)
+  assert.equal(
+    config.environment.user_agent.match(/Chrome\/(\d+)/)?.[1],
+    chromeVersion.stdout.match(/Chrome (\d+)/)?.[1],
+  )
   assert.equal(result.formal_acceptance, 'not_eligible')
   for (const file of manifest.files) {
     assert.equal(createHash('sha256').update(bundle.files[file.path]).digest('hex'), file.sha256)
@@ -111,6 +116,7 @@ try {
   browser('set', 'viewport', '1440', '1000')
   browser('wait', '--text', '准备就绪')
   assert.match(browser('get', 'title'), /一阶倒立摆实验台/)
+  browser('focus', '#preset')
   browser('screenshot', join(artifacts, 'desktop-ready.png'))
   click('开始基准')
   browser('wait', '--text', '运行中')
@@ -137,6 +143,14 @@ try {
   const events = first.bundle.files['events/part-000001.jsonl'].trim().split('\n').map(JSON.parse)
   assert.ok(
     events.some((event) => event.event_type === 'pause' && event.payload.reason === 'background'),
+  )
+  assert.ok(
+    events.some(
+      (event) =>
+        event.event_type === 'export' &&
+        event.payload.stage === 'requested' &&
+        event.payload.persistence_confirmed === false,
+    ),
   )
   assert.equal(first.result.status, 'stopped')
   assert.equal(first.config.initial_state.theta_unwrapped_rad, Math.PI / 2)
@@ -179,6 +193,22 @@ try {
   const dimensions =
     typeof overflow.result === 'string' ? JSON.parse(overflow.result) : overflow.result
   assert.ok(dimensions.scroll <= dimensions.width, '桌面视口存在横向溢出')
+  // Controlled DOM visibility event exercises start-before-worker-ack ordering;
+  // the separate tab-switch scenario above checks actual browser visibility.
+  click('重置')
+  browser('wait', '--text', '准备就绪')
+  browser(
+    'eval',
+    `document.querySelector('#start').click(); Object.defineProperty(document, 'hidden', {configurable:true, get:()=>true}); document.dispatchEvent(new Event('visibilitychange'))`,
+  )
+  browser('wait', '--text', '已暂停')
+  const raceTime = text('#time')
+  assert.equal(raceTime, '0.000')
+  browser('wait', '200')
+  assert.equal(text('#time'), raceTime)
+  browser('eval', `delete document.hidden; document.dispatchEvent(new Event('visibilitychange'))`)
+  assert.equal(text('#status'), '已暂停')
+  assert.equal(text('#time'), raceTime)
   writeFileSync(
     join(artifacts, 'summary.json'),
     JSON.stringify(
@@ -186,9 +216,12 @@ try {
         status: 'passed',
         scenario: 'T01 real Chrome + macOS + localhost',
         chrome,
+        chrome_version: chromeVersion.stdout.trim(),
+        user_agent: first.config.environment.user_agent,
         release_experiment_id: first.bundle.experiment_id,
         equilibrium_experiment_id: second.bundle.experiment_id,
         equilibrium_samples: second.result.sample_count,
+        controlled_start_before_ack_visibility_regression: 'passed',
         artifacts,
       },
       null,

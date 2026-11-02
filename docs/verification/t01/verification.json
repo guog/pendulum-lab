@@ -2,30 +2,34 @@
   "status": "passed",
   "scenario": "T01 real Chrome + macOS + localhost",
   "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-  "release_experiment_id": "7fb1f178-1ea9-4f2d-9402-6e6bdb9dfbf4",
-  "equilibrium_experiment_id": "0c0fbeb7-fdbb-48ad-a3d2-d1c80d3822e0",
+  "chrome_version": "Google Chrome 156.0.8078.76",
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "release_experiment_id": "06e525d5-4a9b-4490-9df5-a3d33c7e743b",
+  "equilibrium_experiment_id": "f9b38d53-02e6-43cb-80b2-eece320c0131",
   "equilibrium_samples": 1001,
-  "artifacts": "/tmp/pendulum-spec-review.atvRKc/browser-verified-2",
+  "controlled_start_before_ack_visibility_regression": "passed",
+  "artifacts": "/tmp/pendulum-spec-review.atvRKc/browser-final-audit",
   "environment": {
     "os": "15.8.2",
     "architecture": "arm64",
-    "chrome_version": "155.0.8059.40"
+    "browser_version_source": "Chrome executable --version; user-agent major cross-checked"
   },
   "automated_checks": {
-    "repository_tests": 31,
-    "application_tests": 10,
+    "repository_tests": 33,
+    "application_tests": 12,
     "typecheck": "passed",
     "production_build": "passed",
     "axe_violations": 0,
     "desktop_widths": [1440, 1100]
   },
   "evidence_files": {
-    "release-evidence.json": "3e2ce499f3efdb5165b1dbaf3ccacd90b3294f4df940e81378b1a1d5ffc28793",
-    "equilibrium-evidence.json": "9a7738ad5b554c99f8865e6a2c50a1392b6063968f8252fcccf501aeff627105"
+    "equilibrium-evidence.json": "2278451d89bafef9dc3d75bb5a5c04047efc7533850c8e399706835d8d3876e9",
+    "release-evidence.json": "22cbd8029993fbfa52a5ad6feb5605b532d1375ace1a010a201d86e74143ee9f"
   },
   "limitations": [
     "T01 behavior only; complete physical P0 not executed",
     "Swing-up, controller qualification, directory persistence and native picker interruption not validated",
-    "No Windows or Edge validation in this run"
+    "No Windows or Edge validation in this run",
+    "User-agent OS/version may be reduced by Chrome; host OS recorded independently"
   ]
 }
