@@ -3,6 +3,7 @@
 ## 布局
 
 采用 single-context：
+
 - 根目录 GLOSSARY.md：领域术语。
 - docs/adr/：架构与领域决策。
 

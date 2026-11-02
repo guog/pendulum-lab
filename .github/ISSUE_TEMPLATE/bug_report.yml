@@ -1,0 +1,21 @@
+name: Bug report
+description: 报告可复现的问题
+labels: [bug, needs-triage]
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤与环境
+      description: 提供浏览器、操作系统、应用版本和最小复现步骤。请去除敏感数据。
+    validations:
+      required: true
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: 预期结果与实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 运行记录、截图或相关需求

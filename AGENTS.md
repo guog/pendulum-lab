@@ -1,3 +1,7 @@
+# Repository instructions
+
+提交、分支、PR、检查或发布前，读取 `CONTRIBUTING.md` 并遵循其中的工程约定。
+
 ## Agent skills
 
 ### Issue tracker
