@@ -59,6 +59,20 @@ Automation-Agent: Dependabot
 AI 来源检查是主分支 PR 必需检查。来源缺失时补齐真实信息，再重新运行检查。
 代理不会自动给他人的内容添加来源声明，或为了过检查而猜测来源。
 
+## Dependabot 更新的接续流程
+
+Dependabot 定期 PR 用于报告候选更新。其提交消息配置为约定式标题，但原生输出不携带本仓库的来源尾注；
+因此来源检查预期会阻止直接合并这些 PR，不能通过伪造 AI 声明或放宽门禁解决。
+
+维护者或代理从最新 main 创建 codex/build-编号-依赖名称 分支，重现候选更新：
+使用 npm install 更新依赖及锁文件，或核验上游 SHA 后更新 Actions 引用。
+新提交与 PR 按实际执行者填写来源尾注，引用 Dependabot 原 PR，并运行全部检查。
+通过审查并合并替代 PR 后，关闭原机器人 PR，注明替代链接；关闭评论也携带执行者的来源声明。
+本仓库暂不启用依赖自动合并。此接续流程保留来源要求，同时利用机器人发现更新。
+
+[Dependabot 配置参考](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
+提供标题前缀与 scope 定制；来源尾注由本仓库接续流程补齐。
+
 ## 历史披露
 
 已经共享的历史提交保持原始 SHA。已知的 AI 产物补录至

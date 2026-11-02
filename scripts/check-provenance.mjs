@@ -2,12 +2,38 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 
-// Read only the final paragraph so examples in the body cannot act as disclosure.
+function requireVisibleFooter(prefix) {
+  let fence
+  let comment = false
+  for (const line of prefix.split(/\r?\n/)) {
+    if (fence) {
+      const close = /^ {0,3}(`+|~+)[ \t]*$/.exec(line)
+      if (close && close[1][0] === fence[0] && close[1].length >= fence.length) fence = undefined
+      continue
+    }
+    if (!comment) {
+      const open = /^ {0,3}(`{3,}|~{3,})/.exec(line)
+      if (open) {
+        fence = open[1]
+        continue
+      }
+    }
+    for (const token of line.matchAll(/<!--|-->/g)) {
+      if (token[0] === '<!--' && !comment) comment = true
+      else if (token[0] === '-->' && comment) comment = false
+    }
+  }
+  if (fence || comment)
+    throw new Error('Provenance footer must be outside code fences and HTML comments')
+}
+
+// Require a visible final paragraph so body examples cannot act as disclosure.
 export function validateProvenance(text) {
   const footer = text
     .trim()
     .split(/\r?\n\s*\r?\n/)
     .at(-1)
+  requireVisibleFooter(text.trim().slice(0, -footer.length))
   const fields = new Map()
   for (const line of footer.split(/\r?\n/)) {
     const match = /^([A-Za-z][A-Za-z-]*): (\S.*)$/.exec(line)

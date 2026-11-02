@@ -67,6 +67,8 @@ package.json 暂时覆盖 re2js 与 katex 至安全修复版本；上游解除�
 GitHub Actions 在 PR、main 与 codex/ 分支推送时运行；手动运行入口在工作流进入默认分支后可用。
 PR 标题通过环境变量传入校验命令。依赖的 Actions 固定到提交 SHA，Dependabot 每月检查更新。
 
+Dependabot PR 用作候选更新通知；缺少来源声明时，按 [来源规则中的接续流程](docs/agents/ai-provenance.md#dependabot-更新的接续流程) 在维护分支重现更新，通过检查后合并替代 PR。
+
 ## 版本与兼容性
 
 软件发布遵循 [SemVer 2.0.0](https://semver.org/)，初期使用 0.y.z。

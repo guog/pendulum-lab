@@ -23,3 +23,17 @@ for (const [name, text] of [
 ]) {
   test(`rejects ${name}`, () => assert.throws(() => validateProvenance(text)))
 }
+
+const aiFooter = 'Assisted-by: LLM\nAI-Agent: Codex'
+for (const [name, prefix] of [
+  ['cross-paragraph backtick fence', 'Body\n\n```text\n\n'],
+  ['cross-paragraph tilde fence', 'Body\n\n~~~text\n\n'],
+  ['cross-paragraph HTML comment', 'Body\n\n<!--\n\n'],
+]) {
+  test(`rejects ${name}`, () => assert.throws(() => validateProvenance(prefix + aiFooter)))
+}
+test('accepts footer after closed code fences and comments', () => {
+  assert.doesNotThrow(() =>
+    validateProvenance('```text\n\nexample\n```\n\n<!-- hidden -->\n\n' + aiFooter),
+  )
+})
