@@ -9,11 +9,12 @@
   },
   "scripts": {
     "prepare": "husky",
-    "check": "npm run format:check && npm run lint:docs",
+    "check": "npm run format:check && npm run lint:docs && npm run test:tooling",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:docs": "markdownlint-cli2",
-    "lint:commit": "commitlint"
+    "lint:commit": "commitlint",
+    "test:tooling": "node --test scripts/*.test.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",

@@ -19,3 +19,13 @@ body:
     id: constraints
     attributes:
       label: 约束、替代方案与相关需求
+  - type: textarea
+    id: provenance
+    attributes:
+      label: AI 来源披露
+      description: AI 参与时填写 Assisted-by 与 AI-Agent；人类独立完成填写 AI-Usage none。格式见 CONTRIBUTING.md。
+      placeholder: |
+        Assisted-by: LLM
+        AI-Agent: <实际使用的代理名称>
+    validations:
+      required: true

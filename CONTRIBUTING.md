@@ -28,6 +28,13 @@ fix(storage): preserve committed data after interruption
 `npm ci` 启用 pre-commit（运行仓库检查）和 commit-msg（校验提交信息）hooks。
 PR 标题使用相同规范，由 CI 校验，作为 squash 合并的最终提交标题。
 
+## AI 来源署名
+
+AI 创建或实质修改的提交、Issue、PR、评论、审查与发布说明必须署名。
+具体格式、非 AI 来源声明及历史补录规则见 [AI 来源披露](docs/agents/ai-provenance.md)。
+AI 使用 `Assisted-by: LLM` 与真实 `AI-Agent` 尾注；人类独立贡献使用 `AI-Usage: none`。
+AI 不代人类添加 Signed-off-by；披露不能代替人类审查与批准。
+
 ## 分支与审查
 
 采用 [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow)：
@@ -51,7 +58,7 @@ npm run format
 printf '%s\n' 'docs: update contribution guide' | npm run lint:commit
 ```
 
-`check` 执行格式检查与 Markdown lint。配置排除了来源资料、第三方技能及锁文件的格式化。
+`check` 执行格式检查、Markdown lint 与来源校验工具测试。配置排除了来源资料、第三方技能及锁文件的格式化。
 依赖锁文件仍由 `npm ci` 校验安装一致性。
 package.json 暂时覆盖 re2js 与 katex 至安全修复版本；上游解除受影响版本锁定后移除对应 overrides。
 当前没有应用测试、构建或性能验收；应用建立后增加真实检查，再纳入 CI。
@@ -77,7 +84,7 @@ CI 通过且人类批准后合并，在确认的提交上创建 vX.Y.Z 标签及
 
 ## GitHub 合并门禁
 
-主分支目标策略：PR 合并，必需检查为 `Repository checks` 与 `PR title`，禁止强推与删除。
+主分支目标策略：PR 合并，必需检查为 `Repository checks`、`PR title` 与 `AI provenance`，禁止强推与删除。
 人工批准是工作约定；若有第二名维护者，再启用至少一名独立审批人的强制要求。
 仓库保护属于 GitHub 设置，工作流文件本身不会启用它；以仓库实时设置为准。
 

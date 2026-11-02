@@ -2,6 +2,8 @@
 
 提交、分支、PR、检查或发布前，读取 `CONTRIBUTING.md` 并遵循其中的工程约定。
 
+提交、创建或更新 Issue/PR、评论、审查及发布说明前，读取 `docs/agents/ai-provenance.md`，在本次 AI 产物末尾披露真实来源。
+
 ## Agent skills
 
 ### Issue tracker

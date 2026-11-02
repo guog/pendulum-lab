@@ -1,7 +1,7 @@
 # Issue tracker: GitHub
 
 本仓库的任务和规格存放在 guog/pendulum-lab 的 GitHub Issues。
-使用 gh CLI 操作。
+使用 gh CLI 操作。创建或修改 Issue、PR 和评论时，按 `docs/agents/ai-provenance.md` 在正文末尾添加来源尾注。
 
 ## 操作约定
 

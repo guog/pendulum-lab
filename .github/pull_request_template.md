@@ -16,3 +16,5 @@
 - [ ] 检查通过，相关文档已更新。
 - [ ] 已列出与需求或 ADR 的冲突。
 - [ ] 已取得人类批准。
+
+<!-- 最后追加纯文本来源尾注，不放入代码块。AI：Assisted-by: LLM 与 AI-Agent: 实际代理名称；人类独立完成：AI-Usage: none。详见 docs/agents/ai-provenance.md。 -->
