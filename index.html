@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      name="theme-color"
+      content="#f3f5f2"
+    />
+    <meta
+      name="description"
+      content="浏览器本地的一阶倒立摆自由运动实验与原始证据导出。"
+    />
+    <title>一阶倒立摆实验台 · Pendulum Lab</title>
+  </head>
+  <body>
+    <a
+      class="skip-link"
+      href="#experiment"
+      >跳至实验区域</a
+    >
+    <header class="page-header">
+      <div class="identity">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 32 32"
+        >
+          <path d="M4 26h24M16 26V8M16 8l9 10" />
+          <circle
+            cx="25"
+            cy="18"
+            r="3"
+          /></svg
+        ><span>Pendulum Lab</span>
+      </div>
+      <span class="mode-note">独立研究 · 内存记录</span>
+    </header>
+    <main>
+      <div class="title-row">
+        <div>
+          <h1>一阶倒立摆实验台</h1>
+          <p>从真实运动开始，留下可以检查的证据。</p>
+        </div>
+        <span
+          id="status"
+          role="status"
+          >正在加载计算模块</span
+        >
+      </div>
+      <div
+        id="error"
+        class="error-message"
+        role="alert"
+        hidden
+      ></div>
+      <div class="workbench">
+        <aside aria-label="实验设置">
+          <h2>实验设置</h2>
+          <label for="preset">基础工况</label>
+          <select id="preset">
+            <option value="simple">简单</option>
+            <option
+              value="standard"
+              selected
+            >
+              标准
+            </option>
+          </select>
+          <label for="benchmark">自由运动基准</label>
+          <select id="benchmark">
+            <option value="release">零阻力释放</option>
+            <option value="equilibrium">静止下垂平衡</option>
+          </select>
+          <p
+            id="benchmark-description"
+            class="explanation"
+          ></p>
+          <dl
+            class="parameters"
+            id="parameters"
+          ></dl>
+          <details>
+            <summary>完整配置与版本</summary>
+            <pre id="config"></pre>
+          </details>
+          <section
+            class="recording"
+            aria-labelledby="recording-title"
+          >
+            <h2 id="recording-title">研究证据</h2>
+            <p
+              id="record-state"
+              role="status"
+            >
+              尚无实验记录
+            </p>
+            <p class="explanation">数据只在当前页内存中。关闭或刷新页面会丢失未导出的记录。</p>
+            <button
+              id="export"
+              class="secondary full-width"
+              disabled
+            >
+              导出并校验
+            </button>
+            <details class="download-options">
+              <summary>下载副本与文件校验</summary>
+              <button
+                id="prepare-download"
+                class="text-button"
+                disabled
+              >
+                生成下载副本
+              </button>
+              <a
+                id="download"
+                hidden
+                >下载 JSON 证据包</a
+              >
+              <label
+                class="file-label"
+                for="verify-file"
+                >校验已导出的文件</label
+              >
+              <input
+                id="verify-file"
+                type="file"
+                accept=".json,application/json"
+                disabled
+              />
+            </details>
+            <p
+              id="export-message"
+              class="explanation"
+              role="status"
+            ></p>
+          </section>
+          <p class="scope-note">
+            本次仅自由运动基准。自动起摆与目录持续保存尚未进入本切片；不代表控制验收通过。
+          </p>
+        </aside>
+        <section
+          id="experiment"
+          class="experiment-area"
+          aria-label="实验区域"
+          tabindex="-1"
+        >
+          <div
+            class="toolbar"
+            role="group"
+            aria-label="运行工具栏"
+          >
+            <div class="actions">
+              <button
+                id="start"
+                disabled
+              >
+                开始基准</button
+              ><button
+                id="pause"
+                class="secondary"
+                disabled
+              >
+                暂停</button
+              ><button
+                id="stop"
+                class="secondary"
+                disabled
+              >
+                终止</button
+              ><button
+                id="reset"
+                class="text-button"
+                disabled
+              >
+                重置
+              </button>
+            </div>
+            <div class="clock">
+              <span>仿真时间</span><output id="time">0.000</output><span>s / 10 s</span>
+            </div>
+          </div>
+          <section
+            class="apparatus"
+            aria-label="二维物理视图"
+          >
+            <div class="panel-heading">
+              <h2>自由运动</h2>
+              <span>无驱动力 · 允许连续旋转</span>
+            </div>
+            <svg
+              id="apparatus"
+              role="img"
+              aria-label="滑块、导轨和有质量摆杆的实时二维位置"
+            ></svg>
+            <div class="apparatus-legend">
+              <span><i class="legend-rod"></i>均匀杆</span
+              ><span><i class="legend-weight"></i>配重</span
+              ><span><i class="legend-center"></i>摆体质心</span><span>尺寸按同一比例绘制</span>
+            </div>
+          </section>
+          <section
+            class="signals"
+            aria-labelledby="signals-title"
+          >
+            <div class="panel-heading">
+              <h2 id="signals-title">状态曲线</h2>
+              <span>原始采样周期 <span id="sampling">10</span> ms</span>
+            </div>
+            <div class="chart-grid">
+              <figure>
+                <figcaption>
+                  <span>滑块位置 x <small>m</small></span
+                  ><output id="value-x">0.0000</output>
+                </figcaption>
+                <canvas
+                  id="chart-x"
+                  aria-label="滑块位置随仿真时间变化曲线"
+                  role="img"
+                ></canvas>
+              </figure>
+              <figure>
+                <figcaption>
+                  <span>滑块速度 v <small>m/s</small></span
+                  ><output id="value-v">0.0000</output>
+                </figcaption>
+                <canvas
+                  id="chart-v"
+                  aria-label="滑块速度随仿真时间变化曲线"
+                  role="img"
+                ></canvas>
+              </figure>
+              <figure>
+                <figcaption>
+                  <span>累计摆角 θ <small>rad</small></span
+                  ><output id="value-theta">3.1416</output>
+                </figcaption>
+                <canvas
+                  id="chart-theta"
+                  aria-label="累计摆角随仿真时间变化曲线"
+                  role="img"
+                ></canvas>
+              </figure>
+              <figure>
+                <figcaption>
+                  <span>摆角速度 ω <small>rad/s</small></span
+                  ><output id="value-omega">0.0000</output>
+                </figcaption>
+                <canvas
+                  id="chart-omega"
+                  aria-label="摆角速度随仿真时间变化曲线"
+                  role="img"
+                ></canvas>
+              </figure>
+            </div>
+          </section>
+          <div class="experiment-footer">
+            <span>已记录 <strong id="sample-count">0</strong> 点</span
+            ><span>物理步长 <strong id="step-size">1</strong> ms</span
+            ><span>实际运行倍率 <strong id="ratio">—</strong></span
+            ><span id="end-reason">开始后记录真实轨迹</span>
+          </div>
+        </section>
+      </div>
+      <footer class="page-footer">
+        <span>所有计算在浏览器本地进行，实验数据不上传。</span
+        ><span>快速验证按本机单实例使用，未验证跨窗口独占。</span>
+      </footer>
+    </main>
+    <script
+      type="module"
+      src="/src/main.ts"
+    ></script>
+  </body>
+</html>

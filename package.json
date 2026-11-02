@@ -2,27 +2,37 @@
   "name": "pendulum-lab",
   "version": "0.0.0",
   "private": true,
-  "description": "Repository tooling for the pendulum simulation requirements project",
+  "description": "Browser-local cart-pole research workbench with reproducible evidence",
   "type": "module",
   "engines": {
     "node": ">=24 <27"
   },
   "scripts": {
     "prepare": "husky",
-    "check": "npm run format:check && npm run lint:docs && npm run test:tooling",
+    "check": "npm run format:check && npm run lint:docs && npm run typecheck && npm test && npm run build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint:docs": "markdownlint-cli2",
     "lint:commit": "commitlint",
-    "test:tooling": "node --test scripts/*.test.mjs"
+    "test:tooling": "node --test scripts/*.test.mjs",
+    "dev": "vite --host localhost",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host localhost",
+    "typecheck": "tsc --noEmit",
+    "test:app": "node --test tests/*.test.ts",
+    "test:browser": "node scripts/browser-smoke.mjs",
+    "test": "node --test scripts/*.test.mjs tests/*.test.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
     "@commitlint/config-conventional": "21.2.4",
+    "@types/node": "26.0.0",
     "husky": "9.1.7",
     "markdownlint-cli2": "0.24.0",
     "mdast-util-from-markdown": "2.1.0",
-    "prettier": "3.9.10"
+    "prettier": "3.9.10",
+    "typescript": "7.0.2",
+    "vite": "8.3.5"
   },
   "overrides": {
     "re2js": "2.8.7",
