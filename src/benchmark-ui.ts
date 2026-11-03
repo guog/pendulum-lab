@@ -208,7 +208,8 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
     } else if (output) preset.value = output.cases[0]!.config.preset
   }
   run.onclick = () => begin('start')
-  pause.onclick = () => (output?.status === 'paused' ? begin('resume') : send({ type: 'pause' }))
+  pause.onclick = () =>
+    output?.status === 'paused' ? begin('resume') : send({ type: 'pause', reason: 'manual' })
   stop.onclick = () => send({ type: 'stop' })
   preset.onchange = configure
   get<HTMLButtonElement>('bench-new').onclick = configure
@@ -248,7 +249,7 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
       render()
     })
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) send({ type: 'pause' })
+    if (document.hidden) send({ type: 'pause', reason: 'background' })
   })
   window.addEventListener('beforeunload', (event) => {
     if (output?.cases.some((item) => item.experiment_id) && !verified) event.preventDefault()

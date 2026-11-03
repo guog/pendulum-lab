@@ -44,6 +44,16 @@ function verify(raw, preset) {
   assert.equal(results.status, 'completed')
   assert.equal(results.batch_id, bundle.batch_id)
   assert.equal(results.cases.length, 16)
+  if (preset === 'standard') {
+    const pauses = Object.entries(bundle.files)
+      .filter(([path]) => path.endsWith('.jsonl'))
+      .flatMap(([, content]) => content.trim().split('\n').filter(Boolean).map(JSON.parse))
+      .filter((event) => event.event_type === 'pause')
+    assert.ok(
+      pauses.some((event) => event.payload.reason === 'manual'),
+      '实际暂停按钮必须导出manual原因',
+    )
+  }
   const manifest = JSON.parse(bundle.files['manifest.json'])
   for (const file of manifest.files) {
     assert.equal(hash(bundle.files[file.path]), file.sha256)
@@ -132,11 +142,27 @@ try {
       const locked = JSON.parse(
         browser(
           'eval',
-          `(()=>{document.querySelector('#bench-run').click(); const locked=document.querySelector('#start').disabled; document.querySelector('#start').click(); return locked})()`,
+          `(()=>{
+            const pause = document.querySelector('#bench-pause');
+            const rows = document.querySelector('#bench-results');
+            const observer = new MutationObserver(() => {
+              if (!pause.disabled && rows.querySelector('.benchmark-ledger') && document.querySelector('#bench-status').textContent.startsWith('正在计算')) {
+                observer.disconnect();
+                pause.click();
+              }
+            });
+            observer.observe(rows, {childList:true, subtree:true});
+            document.querySelector('#bench-run').click();
+            const locked=document.querySelector('#start').disabled;
+            document.querySelector('#start').click();
+            return locked;
+          })()`,
           '--json',
         ),
       ).data.result
       assert.equal(locked, true, '基准启动回执前必须立即禁止单次实验启动')
+      browser('wait', '--text', '批次已暂停')
+      click('#bench-pause')
     } else click('#bench-run')
     browser('wait', '--text', '批次已完成')
     if (

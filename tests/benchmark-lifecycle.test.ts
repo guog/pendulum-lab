@@ -66,3 +66,22 @@ test('终止只使已经开始的当前基准无效，尚未创建的项目保�
       )
   }
 })
+
+test('基准暂停证据区分人工与后台原因，默认公开暂停为人工操作', async () => {
+  for (const reason of [undefined, 'manual', 'background'] as const) {
+    const suite = createPhysicsBenchmarks('simple')
+    suite.start()
+    suite.advance()
+    suite.pause(reason)
+    suite.advance()
+    assert.equal(suite.read().cases[0]!.sim_time_s, 1)
+    const bundle = await suite.exportEvidence()
+    const events = bundle.files['experiments/equilibrium-down/events/part-000001.jsonl']!.trim()
+      .split('\n')
+      .map((line) => JSON.parse(line))
+    const pauses = events.filter((event) => event.event_type === 'pause')
+    assert.equal(pauses.length, 1)
+    assert.equal(pauses[0].payload.reason, reason ?? 'manual')
+    assert.equal(pauses[0].sim_time_s, 1)
+  }
+})

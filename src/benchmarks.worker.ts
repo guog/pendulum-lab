@@ -34,7 +34,7 @@ context.onmessage = async ({ data }) => {
         break
       case 'pause':
         clearTimeout(timer)
-        suite.pause()
+        suite.pause(data.reason)
         break
       case 'resume':
         suite.resume()

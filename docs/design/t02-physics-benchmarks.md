@@ -49,6 +49,8 @@ P0-PHY-03仍使用候选角差≤0.1°、车位差≤1mm；P0-PHY-04仍为30s最
 
 createPhysicsBenchmarks编排createSession的创建、开始、推进、暂停、继续、停止、读取及导出。页面和Node行为测试使用同一编排及会话。独立Worker每批推进最多1s仿真时间后让出执行环境；消息在批次边界生效，后台暂停后可见不自动继续，没有墙钟追赶。批次完成只表示16项已执行；不把无效诊断、触边、失败或阻塞汇总为全部物理通过。
 
+公开pause(reason)默认reason为manual。页面暂停按钮明确发送manual，可见性变化明确发送background，Worker和批次接口将该原因原样传给子实验，JSONL事件保留真实来源；两种暂停均不推进仿真时间。
+
 结果逐项使用not_executed、blocked、passed、failed、invalid。尚未取得参考或缺少比较条件为阻塞；完成且超容差为失败；触边或数值异常使对应完整窗口验证无效。numerical-failure故意检查已有冻结路径，其轨迹仍标无效，而安全冻结行为另由测试断言。中途停止保留已执行部分，其余未执行。每项包含完整输入、关联需求、实验UUID、误差、阈值、计算关系和原因。
 
 批次JSON schema_version=1，kind=pendulum-physics-benchmarks，包含batch_id和逻辑files：results.json、reference.json、每项experiments/<id>/下的T01配置/原始CSV/JSONL事件/result/manifest，以及根manifest。每个内层清单保持实验身份，根清单按UTF-8字节计算所有逻辑文件SHA-256和长度，不对自身递归摘要。不是工作区分块或断电耐久性承诺。

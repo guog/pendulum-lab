@@ -349,10 +349,10 @@ export function createPhysicsBenchmarks(preset: PresetId) {
       index++
       if (index === cases.length) status = 'completed'
     },
-    pause() {
+    pause(reason: 'manual' | 'background' = 'manual') {
       if (status === 'running') {
         status = 'paused'
-        sessions.get(cases[index]!.id)?.pause('background')
+        sessions.get(cases[index]!.id)?.pause(reason)
       }
     },
     resume() {
