@@ -1,0 +1,9 @@
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 test:browser
+> node scripts/browser-smoke.mjs && node scripts/browser-benchmarks.mjs
+
+真实浏览器检查通过，证据位于：/tmp/pendulum-merge19/browser-final
+T02真实Chrome验证通过：/tmp/pendulum-merge19/browser-final

@@ -1,0 +1,18 @@
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 test:browser
+> node scripts/browser-smoke.mjs && node scripts/browser-benchmarks.mjs
+
+file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-smoke.mjs:123
+      reject(new Error(`预览服务提前退出：${code}`))
+             ^
+
+Error: 预览服务提前退出：1
+    at ChildProcess.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-smoke.mjs:123:14)
+    at ChildProcess.wrapper (node:events:639:12)
+    at ChildProcess.emit (node:events:514:20)
+    at ChildProcess._handle.onexit (node:internal/child_process:294:12)
+
+Node.js v26.7.0
