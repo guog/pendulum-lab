@@ -564,3 +564,6 @@ canvas {
   color: #79500b;
   font-weight: 600;
 }
+.benchmark-ledger {
+  max-width: 480px;
+}

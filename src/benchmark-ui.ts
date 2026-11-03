@@ -29,10 +29,21 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
   let failed = false
   let otherActive = false
   let exporting = false
+  let commandPending = false
   let lastActivity = false
   let prepared: { text: string; hash: string; url: string } | undefined
   let pending: { resolve(text: string): void; reject(error: Error): void } | undefined
   const send = (command: BenchmarkCommand) => worker.postMessage(command)
+  function setMessage(text: string, error = false) {
+    message.textContent = text
+    message.setAttribute('role', error ? 'alert' : 'status')
+    message.classList.toggle('error-message', error)
+  }
+  function begin(type: 'start' | 'resume') {
+    commandPending = true
+    controls()
+    send({ type })
+  }
   function clearPrepared() {
     if (prepared) URL.revokeObjectURL(prepared.url)
     prepared = undefined
@@ -41,11 +52,12 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
     verify.value = ''
   }
   function controls() {
-    const active = output?.status === 'running' || output?.status === 'paused'
-    run.disabled = failed || exporting || otherActive || !output || output.status !== 'ready'
-    pause.disabled = failed || exporting || !active
+    const active = commandPending || output?.status === 'running' || output?.status === 'paused'
+    run.disabled =
+      failed || exporting || active || otherActive || !output || output.status !== 'ready'
+    pause.disabled = failed || exporting || commandPending || !active
     pause.textContent = output?.status === 'paused' ? '继续物理基准' : '暂停物理基准'
-    stop.disabled = failed || exporting || !active
+    stop.disabled = failed || exporting || commandPending || !active
     preset.disabled = failed || exporting || active
     get<HTMLButtonElement>('bench-new').disabled = failed || exporting || active
     const exportable =
@@ -101,6 +113,29 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
         config.setAttribute('aria-label', `${item.title}的完整冻结输入`)
         config.textContent = JSON.stringify(item.config, null, 2)
         details.append(summary, reason, list, config)
+        if (item.ledger) {
+          const ledger = document.createElement('dl')
+          ledger.className = 'parameters benchmark-ledger'
+          ledger.setAttribute('aria-label', `${item.title}的机械能账本`)
+          for (const [field, label] of [
+            ['initial_energy_J', '初始机械能'],
+            ['kinetic_energy_J', '末采样动能'],
+            ['potential_energy_J', '末采样势能'],
+            ['mechanical_energy_J', '末采样机械能'],
+            ['dissipated_energy_J', '累计耗散'],
+            ['actuator_work_J', '执行器做功'],
+            ['force_external_work_J', '水平外力做功'],
+            ['torque_external_work_J', '关节外力矩做功'],
+            ['energy_residual_J', '能量收支残差'],
+          ] as const) {
+            const term = document.createElement('dt')
+            const amount = document.createElement('dd')
+            term.textContent = label
+            amount.textContent = `${item.ledger[field].toExponential(6)} J`
+            ledger.append(term, amount)
+          }
+          details.insertBefore(ledger, list)
+        }
         return details
       }),
     )
@@ -108,6 +143,7 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
   }
   worker.onmessage = ({ data }: MessageEvent<BenchmarkReply>) => {
     if (data.type === 'snapshot') {
+      commandPending = false
       if (output && JSON.stringify(output) !== JSON.stringify(data.output)) {
         verified = false
         clearPrepared()
@@ -118,7 +154,8 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
       pending?.resolve(JSON.stringify(data.bundle, null, 2) + '\n')
       pending = undefined
     } else {
-      message.textContent = data.message
+      commandPending = false
+      setMessage(data.message, true)
       pending?.reject(new Error(data.message))
       pending = undefined
       exporting = false
@@ -127,7 +164,8 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
   }
   worker.onerror = () => {
     failed = true
-    message.textContent = '物理基准计算模块中断，请刷新后重试。'
+    commandPending = false
+    setMessage('物理基准计算模块中断，请刷新后重试。', true)
     pending?.reject(new Error(message.textContent))
     pending = undefined
     controls()
@@ -144,11 +182,12 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
   async function action(task: () => Promise<void>) {
     if (exporting) return
     exporting = true
+    setMessage('')
     controls()
     try {
       await task()
     } catch (error) {
-      message.textContent = error instanceof Error ? error.message : String(error)
+      setMessage(error instanceof Error ? error.message : String(error), true)
     } finally {
       exporting = false
       controls()
@@ -160,14 +199,16 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
     window.confirm('基准证据尚未确认导出。继续将清空当前批次，是否继续？')
   const configure = () => {
     if (discard()) {
+      commandPending = true
+      controls()
       send({ type: 'configure', preset: preset.value === 'simple' ? 'simple' : 'standard' })
       verified = false
       clearPrepared()
-      message.textContent = ''
+      setMessage('')
     } else if (output) preset.value = output.cases[0]!.config.preset
   }
-  run.onclick = () => send({ type: 'start' })
-  pause.onclick = () => send({ type: output?.status === 'paused' ? 'resume' : 'pause' })
+  run.onclick = () => begin('start')
+  pause.onclick = () => (output?.status === 'paused' ? begin('resume') : send({ type: 'pause' }))
   stop.onclick = () => send({ type: 'stop' })
   preset.onchange = configure
   get<HTMLButtonElement>('bench-new').onclick = configure
@@ -175,7 +216,7 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
     void action(async () => {
       const name = await saveEvidenceFile(evidence, `physics-${output?.batch_id}.json`)
       verified = true
-      message.textContent = `已写入并读回校验：${name}`
+      setMessage(`已写入并读回校验：${name}`)
       render()
     })
   prepare.onclick = () =>
@@ -190,10 +231,10 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
       download.href = prepared.url
       download.download = `physics-${output?.batch_id}.json`
       download.hidden = false
-      message.textContent = '下载后选取实际文件校验，才确认本次导出。'
+      setMessage('下载后选取实际文件校验，才确认本次导出。')
     })
   download.onclick = () => {
-    message.textContent = '下载已发起，尚未确认写入。'
+    setMessage('下载已发起，尚未确认写入。')
   }
   verify.onchange = () =>
     void action(async () => {
@@ -203,7 +244,7 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
       if ((await sha256(await file.text())) !== prepared.hash)
         throw new Error('文件与当前基准证据不一致，请重新选择。')
       verified = true
-      message.textContent = `已读回校验：${file.name}`
+      setMessage(`已读回校验：${file.name}`)
       render()
     })
   document.addEventListener('visibilitychange', () => {

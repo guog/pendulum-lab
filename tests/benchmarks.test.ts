@@ -64,6 +64,20 @@ test('三种已批准阻力分别及共同耗散，保存tanh平滑与能量账�
     assert.equal(item.status, 'passed', JSON.stringify(item))
     assert.ok(item.metrics.some((metric) => metric.name === '耗散账本残差'))
     assert.equal(item.config.physics.friction_smoothing_m_s, 0.01)
+    assert.ok(item.ledger)
+    assert.ok(item.ledger.dissipated_energy_J > 0)
+    assert.ok(
+      Math.abs(
+        item.ledger.mechanical_energy_J +
+          item.ledger.dissipated_energy_J -
+          item.ledger.initial_energy_J,
+      ) < 1e-7,
+    )
+    assert.equal(item.ledger.actuator_work_J, 0)
+    assert.equal(item.ledger.force_external_work_J, 0)
+    assert.equal(item.ledger.torque_external_work_J, 0)
+    if (id === 'coulomb' || id === 'cart-viscous')
+      assert.ok(Math.abs(item.ledger.initial_energy_J - 0.0148) < 1e-12)
   }
 })
 

@@ -116,10 +116,28 @@ try {
   browser('set', 'viewport', '1440', '1000')
   browser('wait', '--text', '准备就绪')
   assert.match(text('#bench-status'), /未执行 16/)
+  const configuring = JSON.parse(
+    browser(
+      'eval',
+      `(()=>{document.querySelector('#bench-new').click(); return document.querySelector('#bench-run').disabled})()`,
+      '--json',
+    ),
+  ).data.result
+  assert.equal(configuring, true, '新建批次回执前必须禁止启动，避免旧配置快照解除互斥')
+  browser('wait', '--fn', `!document.querySelector('#bench-run').disabled`)
   const reports = []
   for (const preset of ['standard', 'simple']) {
     browser('select', '#bench-preset', preset)
-    click('#bench-run')
+    if (preset === 'standard') {
+      const locked = JSON.parse(
+        browser(
+          'eval',
+          `(()=>{document.querySelector('#bench-run').click(); const locked=document.querySelector('#start').disabled; document.querySelector('#start').click(); return locked})()`,
+          '--json',
+        ),
+      ).data.result
+      assert.equal(locked, true, '基准启动回执前必须立即禁止单次实验启动')
+    } else click('#bench-run')
     browser('wait', '--text', '批次已完成')
     if (
       !JSON.parse(
@@ -132,6 +150,8 @@ try {
     )
       browser('click', '#bench-results details[data-id="energy-30s"] summary')
     assert.match(text('#bench-results details[data-id="energy-30s"]'), /最大相对能量漂移/)
+    assert.match(text('#bench-results details[data-id="energy-30s"]'), /初始机械能/)
+    assert.match(text('#bench-results details[data-id="energy-30s"]'), /累计耗散/)
     browser('scrollintoview', '#bench-title')
     browser('eval', 'window.scrollTo(0,0)')
     browser('screenshot', '--full', join(artifacts, `${preset}-benchmarks.png`))
@@ -150,6 +170,13 @@ try {
     writeFileSync(wrong, '{}')
     browser('upload', '#bench-verify', wrong)
     browser('wait', '--text', '文件与当前基准证据不一致')
+    assert.equal(
+      JSON.parse(
+        browser('eval', `document.querySelector('#bench-message').getAttribute('role')`, '--json'),
+      ).data.result,
+      'alert',
+    )
+    browser('screenshot', join(artifacts, `${preset}-file-error.png`))
     assert.match(text('#bench-record'), /尚未确认导出/)
     browser('upload', '#bench-verify', path)
     browser('wait', '--text', '基准证据已导出并校验')
@@ -172,6 +199,18 @@ try {
   assert.ok(dimensions.scroll <= dimensions.width)
   click('#bench-new')
   browser('wait', '--text', '未执行 16')
+  const locked = JSON.parse(
+    browser(
+      'eval',
+      `(()=>{document.querySelector('#start').click(); const locked=document.querySelector('#bench-run').disabled; document.querySelector('#bench-run').click(); return locked})()`,
+      '--json',
+    ),
+  ).data.result
+  assert.equal(locked, true, '单次实验启动回执前必须立即禁止基准启动')
+  browser('wait', '--text', '运行中')
+  assert.match(text('#bench-status'), /未执行 16/)
+  click('#stop')
+  browser('wait', '--text', '已终止')
   // Controlled start-before-ack visibility ordering; actual background behavior is also exercised by T01.
   browser(
     'eval',
@@ -199,6 +238,7 @@ try {
         },
         reports,
         controlled_visibility_pause: 'passed',
+        controlled_start_before_ack_exclusion: 'passed in both directions',
         download_readback_and_wrong_file_rejection: 'passed',
         axe_violations: 0,
         desktop_widths: [1440, 1100],

@@ -16,6 +16,17 @@ export type BenchmarkCase = BenchmarkInput & {
   metrics: Metric[]
   experiment_id: string | null
   sim_time_s: number
+  ledger: {
+    initial_energy_J: number
+    kinetic_energy_J: number
+    potential_energy_J: number
+    mechanical_energy_J: number
+    dissipated_energy_J: number
+    actuator_work_J: number
+    force_external_work_J: number
+    torque_external_work_J: number
+    energy_residual_J: number
+  } | null
 }
 export type BenchmarkBundle = {
   schema_version: 1
@@ -277,6 +288,7 @@ export function createPhysicsBenchmarks(preset: PresetId) {
     metrics: [],
     experiment_id: null,
     sim_time_s: 0,
+    ledger: null,
   }))
   const sessions = new Map<string, ReturnType<typeof createSession>>()
   let index = 0
@@ -299,6 +311,19 @@ export function createPhysicsBenchmarks(preset: PresetId) {
       const output = session.read()
       item.experiment_id = output.experiment_id
       item.sim_time_s = output.sim_time_s
+      const first = output.samples[0]!
+      const last = output.samples.at(-1)!
+      item.ledger = {
+        initial_energy_J: first.kinetic_energy_J + first.potential_energy_J,
+        kinetic_energy_J: last.kinetic_energy_J,
+        potential_energy_J: last.potential_energy_J,
+        mechanical_energy_J: last.kinetic_energy_J + last.potential_energy_J,
+        dissipated_energy_J: last.dissipated_energy_J,
+        actuator_work_J: last.actuator_work_J,
+        force_external_work_J: last.force_external_work_J,
+        torque_external_work_J: last.torque_external_work_J,
+        energy_residual_J: last.energy_residual_J,
+      }
       if (output.status === 'running') return
       try {
         item.metrics =

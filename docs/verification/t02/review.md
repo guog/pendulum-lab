@@ -6,7 +6,7 @@
 
 会话开始时HEAD为185a5a41bb5ec863968a3400271a333003c66f1e，按用户要求固定为审查基点。随后fetch得到最新origin/main为58083b53b3c50a877cf9190595fbc95defbd96f2，在其上新建codex/feat-7-physics-benchmarks。全量审查使用git diff 185a5a4...HEAD；其中58083b5是已合并T01，本轮#7的增量另以58083b5...HEAD定位，不把T01重新算作本轮交付。
 
-Standards与Spec独立代理审查结论在审查完成后登记；本提交前不冒称已完成审查。
+初次完整审查HEAD为4b862661075f27a8fb94e9e30e274434bbb91b09，Standards与Spec由两个独立上下文代理分别检查。两项P2及补充竞态发现修复后，原代理复核修复差异，均判定已解决；最终实现仍以开始时HEAD为总基点。本报告登记审查结论，不代替人类批准。
 
 ## 实际执行
 
@@ -17,6 +17,8 @@ Standards与Spec独立代理审查结论在审查完成后登记；本提交前�
 - T01原操作、暂停/继续/终止/重置、实际切页后台暂停、下载及1001点精确平衡回归继续通过。T02开始回执前后台暂停使用受控visibility事件检查，返回可见不自动继续；不冒称它是锁屏或真实极短切页时序证明。
 
 实际文件[verification.json](verification.json)保存环境、批次UUID、源码身份和摘要；[简单批次](simple-benchmarks.json.gz)与[标准批次](standard-benchmarks.json.gz)为实际Chrome下载文件的gzip无损压缩，解压后的外层文件摘要见元数据，内层清单可独立按UTF-8字节复查。压缩只减少仓库体积，原始十进制样本未重采样或改精度。
+
+上述初审版本的成功与失败证据保持原样。审查修复后的最终构建及两个批次另存[review-fixes/verification.json](review-fixes/verification.json)、[简单批次](review-fixes/simple-benchmarks.json.gz)、[标准批次](review-fixes/standard-benchmarks.json.gz)，其中新增页面实际能量账本及错误告警，数值输入/步长/阈值/轨迹保持不变。
 
 源码身份source_revision记录构建时真实HEAD，source_dirty=true表示构建输入在该提交基础上已修改，source_sha256覆盖本轮实际应用输入。不得把构建时的旧HEAD当成已含本轮源码的提交；后续文档、证据和审查登记不进入应用摘要。
 
@@ -44,14 +46,27 @@ Standards与Spec独立代理审查结论在审查完成后登记；本提交前�
 - initial-batch.json.gz、red-rotation-boundary.txt：初版批次原输入、轨迹、结果及测试输出。均匀参考时刻不落在实际样本点造成缺失，最初标阻塞；修复为真实采样时刻计算独立参考，数值参数和阈值未变。保留真实触边及新增案例的版本说明见[实现契约](../../design/t02-physics-benchmarks.md)。
 - red-browser-disclosure.txt：第二工况沿用了已展开的原生details，脚本再次点击将其关闭，因而读不到误差。修复测试为先读取open状态再决定点击；未改变应用判定。
 - red-accessibility.json、red-browser-keyboard.txt：真实axe检测展开配置滚动区域缺少键盘焦点，给出1项violation；增加tabIndex=0及可访问名称后复测0项。
+- red-ledger-display.txt：审查发现页面只有误差，没有实际能量账本；公开输出测试先因缺少ledger失败。修复后批次保存初始机械能、末采样动能/势能/机械能、累计耗散、三类做功和残差，页面显示带J单位的九项数值；解析初始能量、耗散及账本测试通过。
+- red-browser-start-exclusion.txt、red-browser-configure-exclusion.txt：真实Chrome受控同一事件内点击，复现启动/配置回执前尚未锁定另一操作。现在开始、继续、配置均同步锁定，T01待回执busy状态也立即阻止基准启动；最终浏览器分别断言两方向互斥及配置前置锁定。不是仅依赖异步快照最终一致。
+- red-browser-harness-scope.txt：浏览器脚本两次eval共享顶层const名称导致测试脚本SyntaxError，改用IIFE局部作用域；不改变应用结论。
 
 ## Standards
 
-待独立审查。
+初审3项：1项P2文档表现偏差、2项P3重复计算/流程维护建议。P2为新面板错误提示未沿用现有role=alert和告警样式，已修复并复核为resolved。补充发现的跨面板回执前启动竞态也已修复并经静态复核、受控Chrome红绿回归验证。
+
+仍保留2项非阻断P3：新面板与T01重复下载准备/文件校验状态逻辑；T01可视化与动力学的一阶质量矩推导重复，本轮明示零动量初态也计算相同属性。后续可共享应用内部的质量属性和导出工具，离线独立参考继续独立。本轮聚焦#7，不为建议展开跨模块重构。硬性规范未解决0项。
 
 ## Spec
 
-待独立审查。
+初审1项P2：只有残差/比较指标，不足以满足“展示耗散及机械能账本”。现公开输出和页面均显示实际九项能量数值，完整历史保存在CSV，原规格代理复核为resolved，修复差异未发现新增可行动问题。未解决0项；原始触边与数值异常保持无效，不改判为通过。
+
+## 视觉复核
+
+impeccable独立完成审查初版1440px全页、展开能量细节及1100px截图，结论ship；保留既有工程实验台风格，未发现可见裁切、横向溢出或冲突视觉体系。新增账本及告警后的最终截图另存review-fixes/，同一代理复核账本和错误两项新增内容，均为resolved，结论仍为ship；不将截图复核冒称交互或读屏器测试。检测器的标题字号提示未读取外部CSS，原有移动23px提示不属于本轮桌面增量；未借此扩展移动端或重建设计系统。
+
+最终npm run check及T01/T02真实Chrome流程再次通过。每工况16份原始CSV与初审构建逐字节比较相同，16份配置的物理参数/初态/时钟也保持一致；修复只增加实际账本展示、告警和操作互斥，没有调整数值结果。最终元数据记录构建源码SHA-256、实际文件摘要及这些比较项。
+
+计数：Standards初审3项，1项P2已解决、2项非阻断P3保留；Spec初审1项P2已解决。补充竞态已解决。
 
 OpenAI Codex完成本轮实现、红绿测试、真实Chrome运行、原始文件校验和证据整理；代理审查不代替人类合并批准，软件未发布。
 

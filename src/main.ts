@@ -88,7 +88,7 @@ function updateControls() {
   exportButton.disabled = busy || !exportable
   prepareDownload.disabled = busy || !exportable
   verifyFile.disabled = busy || !prepared
-  benchmarkUI.setOtherActive(status === 'running' || status === 'paused')
+  benchmarkUI.setOtherActive(busy || status === 'running' || status === 'paused')
   write(
     'record-state',
     !current?.samples.length
