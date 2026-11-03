@@ -1,0 +1,32 @@
+✔ 冻结基准通过同一实验会话保持两个精确平衡点，输出完整输入及独立误差 (151.658708ms)
+✖ 10秒逐点收敛及30秒逐物理步能量漂移使用冻结容差，数值失败保留原输入和最后有效状态 (89.424625ms)
+✔ 三种已批准阻力分别及共同耗散，保存tanh平滑与能量账本 (84.868333ms)
+✔ 自然运动、多圈及配重基准用独立动量参考核对四状态和全部质量的能量 (87.457417ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 504.901542
+
+✖ failing tests:
+
+test at tests/benchmarks.test.ts:22:1
+✖ 10秒逐点收敛及30秒逐物理步能量漂移使用冻结容差，数值失败保留原输入和最后有效状态 (89.424625ms)
+  AssertionError [ERR_ASSERTION]: 缺少convergence-1ms
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/benchmarks.test.ts:30:14)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

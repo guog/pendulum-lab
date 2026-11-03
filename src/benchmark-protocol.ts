@@ -1,0 +1,10 @@
+import type { PresetId } from './config.ts'
+import type { BenchmarkBundle, BenchmarkOutput } from './benchmarks.ts'
+
+export type BenchmarkCommand =
+  | { type: 'configure'; preset: PresetId }
+  | { type: 'start' | 'pause' | 'resume' | 'stop' | 'export' }
+export type BenchmarkReply =
+  | { type: 'snapshot'; output: BenchmarkOutput }
+  | { type: 'evidence'; bundle: BenchmarkBundle }
+  | { type: 'error'; message: string }

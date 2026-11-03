@@ -517,3 +517,50 @@ canvas {
     transition: none;
   }
 }
+.physics-benchmarks {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.physics-benchmarks > .explanation {
+  max-width: 100ch;
+}
+.benchmark-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+  font-size: 13px;
+}
+.benchmark-actions select {
+  width: 110px;
+}
+.benchmark-actions input {
+  width: 220px;
+}
+#bench-results {
+  margin: 18px 0;
+}
+#bench-results details {
+  border-bottom: 1px solid var(--line);
+  padding: 4px 0;
+}
+#bench-results summary {
+  font-size: 13px;
+  color: var(--ink);
+}
+#bench-results summary[data-status='failed'],
+#bench-results summary[data-status='invalid'] {
+  color: #852f1d;
+}
+#bench-results ul {
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+#bench-record {
+  color: #79500b;
+  font-weight: 600;
+}
