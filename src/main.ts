@@ -182,12 +182,12 @@ function render() {
   write('step-size', String(config.timing.physics_step_s * 1000))
   write('ratio', wallMs > 0 ? `${(current.sim_time_s / (wallMs / 1000)).toFixed(2)}×` : '—')
   const last = current.events.findLast((event) =>
-    ['boundary', 'numerical_error'].includes(event.event_type),
+    ['boundary', 'numerical_error', 'controller_error'].includes(event.event_type),
   )
   write(
     'end-reason',
     config.control_mode === 'automatic'
-      ? `${current.controller?.state.phase === 'balance' ? '稳摆' : '起摆'} · ${current.first_stable.status === 'passed' ? (verifiedKey === key() ? '首次连续5秒稳定；快照证据已导出校验，扰动功能尚未执行' : '首次连续5秒稳定，候选快照待导出校验；扰动测试阻塞') : current.first_stable.status === 'failed' ? '首次稳定失败，扰动测试阻塞' : '等待首次稳定；无合格快照，扰动测试阻塞'}`
+      ? `${current.controller?.state.phase === 'balance' ? '稳摆' : '起摆'} · ${last?.event_type === 'boundary' ? '触边终止；首次稳定失败，扰动测试阻塞' : last?.event_type === 'numerical_error' ? '数值异常；首次稳定失败，扰动测试阻塞' : last?.event_type === 'controller_error' ? '控制器异常或超出预算；首次稳定失败，扰动测试阻塞' : current.first_stable.reason === 'user_stopped' ? '用户终止；首次稳定未完成，扰动测试阻塞' : current.first_stable.physical_status === 'passed' && !current.first_stable.snapshot ? '物理稳定曾达成，但配置或资格无效；扰动测试阻塞' : current.first_stable.physical_status === 'passed' ? (current.first_stable.disturbance_eligibility === 'eligible' ? '首次连续5秒稳定；快照证据已导出校验，扰动功能尚未执行' : '首次连续5秒稳定，候选快照待导出校验；扰动测试阻塞') : ['failed', 'invalid'].includes(current.first_stable.status) ? `首次稳定失败（${current.qualification_reasons.join('、') || '超过时限'}），扰动测试阻塞` : '等待首次稳定；无合格快照，扰动测试阻塞'}`
       : last?.event_type === 'boundary'
         ? '触边终止；无碰撞反弹'
         : last?.event_type === 'numerical_error'
@@ -419,6 +419,12 @@ exportButton.onclick = () =>
       targetKey = key()
       return text
     }, `pendulum-${current.experiment_id}.json`)
+    if (!current || targetKey !== key()) throw new Error('证据已过期，请重新导出')
+    await call({
+      type: 'confirm-export',
+      experiment_id: current.experiment_id,
+      event_count: current.events.length,
+    })
     verifiedKey = targetKey
     scheduleRender()
     exportMessage.textContent = `已写入并读回校验：${name}`
@@ -446,6 +452,12 @@ verifyFile.onchange = () =>
     const text = await file.text()
     if ((await sha256(text)) !== prepared.hash || prepared.key !== key())
       throw new Error('文件与当前证据包不一致，请重新导出后校验。')
+    if (!current) throw new Error('实验不可用')
+    await call({
+      type: 'confirm-export',
+      experiment_id: current.experiment_id,
+      event_count: current.events.length,
+    })
     verifiedKey = prepared.key
     scheduleRender()
     exportMessage.textContent = `已读回校验：${file.name}`

@@ -81,6 +81,9 @@ context.onmessage = async ({ data: { request_id, command } }) => {
         session.reset()
         runningWallMs = 0
         break
+      case 'confirm-export':
+        session.confirmExport(command.experiment_id, command.event_count)
+        break
       case 'export': {
         const bundle = await session.exportEvidence()
         snapshot()

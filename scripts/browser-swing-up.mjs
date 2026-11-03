@@ -60,7 +60,8 @@ try {
     '仿真时间:',
     result.first_stable.snapshot?.sim_time_s,
   )
-  assert.equal(result.first_stable.status, 'passed')
+  assert.equal(result.first_stable.status, 'blocked')
+  assert.equal(result.first_stable.physical_status, 'passed')
   assert.ok(bundle.files['snapshot.json'])
   assert.match(text, /候选快照待导出校验/)
   assert.equal(result.first_stable.disturbance_eligibility, 'blocked_pending_export')
@@ -71,6 +72,24 @@ try {
     '--fn',
     "document.querySelector('#end-reason').textContent.includes('快照证据已导出校验')",
   )
+  browser('click', '#prepare-download')
+  browser('wait', '#download')
+  browser('download', '#download', `${dir}/confirmed-evidence.json`)
+  const confirmed = JSON.parse(readFileSync(`${dir}/confirmed-evidence.json`))
+  assert.equal(
+    JSON.parse(confirmed.files['result.json']).first_stable.disturbance_eligibility,
+    'eligible',
+  )
+  verifyManifest(confirmed.files, JSON.parse(confirmed.files['manifest.json']))
+  browser('upload', '#verify-file', `${dir}/confirmed-evidence.json`)
+  browser('wait', '--text', '当前证据已导出并校验')
+  browser('click', '#reset')
+  browser('wait', '--text', '准备就绪')
+  browser('click', '#start')
+  browser('wait', '--text', '运行中')
+  browser('click', '#stop')
+  browser('wait', '--text', '已终止')
+  assert.match(browser('get', 'text', '#end-reason'), /用户终止/)
   writeFileSync(
     `${dir}/summary.json`,
     JSON.stringify(

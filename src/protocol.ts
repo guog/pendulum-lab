@@ -5,6 +5,7 @@ import type { SessionOutput } from './session.ts'
 export type Command =
   | { type: 'configure'; preset: PresetId; benchmark: BenchmarkId }
   | { type: 'start' | 'resume' | 'stop' | 'reset' | 'export' }
+  | { type: 'confirm-export'; experiment_id: string; event_count: number }
   | { type: 'pause'; reason: 'manual' | 'background' }
 
 export type Request = { request_id: number; command: Command }

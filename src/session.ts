@@ -54,7 +54,11 @@ export function createSession(input: ExperimentConfig) {
       dissipated_J: number
     }
   }
+  let physicalStableSince: number | null = null
+  let physicalFirstStable: number | null = null
+  let physicallyStable = false
   let stableSnapshot: StableSnapshot | null = null
+  let exportConfirmed = false
   let maxControlMs = 0
   let stabilityStatus: 'not_executed' | 'pending' | 'passed' | 'failed' = controller
     ? 'pending'
@@ -76,7 +80,20 @@ export function createSession(input: ExperimentConfig) {
         a.index - b.index,
     )
   let commandIndex = 0
-  const qualificationReasons = new Set<string>()
+  const standard = controller ? createConfig('simple', 'swing-up') : null
+  const nonstandard =
+    standard !== null &&
+    (Object.keys(standard.physics).some(
+      (key) =>
+        config.physics[key as keyof typeof standard.physics] !==
+        standard.physics[key as keyof typeof standard.physics],
+    ) ||
+      config.preset_version !== standard.preset_version ||
+      config.versions.model !== standard.versions.model ||
+      config.versions.controller !== standard.versions.controller ||
+      config.versions.rules !== standard.versions.rules ||
+      Object.keys(config.preset_overrides).length !== 0)
+  const qualificationReasons = new Set<string>(nonstandard ? ['nonstandard_config'] : [])
   type Interval = {
     condition: string
     start_time_s: number
@@ -199,7 +216,6 @@ export function createSession(input: ExperimentConfig) {
     } catch (error) {
       status = 'error'
       qualificationReasons.add('controller_error')
-      finishConditions()
       event('controller_error', {
         ...state,
         message: error instanceof Error ? error.message : String(error),
@@ -236,7 +252,18 @@ export function createSession(input: ExperimentConfig) {
       stableStart = tick
       event('stability_enter', { ...state })
     }
-    if ((tick - stableStart) * dt >= 5 && qualificationReasons.size === 0) {
+    if ((tick - stableStart) * dt >= 5 && !physicallyStable) {
+      physicallyStable = true
+      physicalStableSince = stableStart * dt
+      physicalFirstStable = time()
+      if (qualificationReasons.size > 0)
+        event('physical_stability_observed', {
+          ...state,
+          stable_since_s: stableStart * dt,
+          qualification_reasons: [...qualificationReasons],
+        })
+    }
+    if (physicallyStable && qualificationReasons.size === 0) {
       stableSnapshot = structuredClone({
         sim_time_s: time(),
         stable_since_s: stableStart * dt,
@@ -313,7 +340,8 @@ export function createSession(input: ExperimentConfig) {
         applyInputs()
         updateController()
         observe()
-        checkStability()
+        if (qualificationReasons.has('controller_error')) finishConditions()
+        else checkStability()
       }
       sample()
     },
@@ -373,6 +401,7 @@ export function createSession(input: ExperimentConfig) {
         if (controller && tick % controlSteps === 0) updateController()
         observe(previousForces)
         if (qualificationReasons.has('controller_error')) {
+          finishConditions()
           sample()
           break
         }
@@ -419,6 +448,7 @@ export function createSession(input: ExperimentConfig) {
       commandIndex = 0
       controller?.reset()
       qualificationReasons.clear()
+      if (nonstandard) qualificationReasons.add('nonstandard_config')
       intervals.length = 0
       active.clear()
       status = 'ready'
@@ -426,6 +456,9 @@ export function createSession(input: ExperimentConfig) {
       previousFailures.clear()
       maxControlMs = 0
       stableSnapshot = null
+      physicallyStable = false
+      physicalStableSince = physicalFirstStable = null
+      exportConfirmed = false
       stabilityStatus = controller ? 'pending' : 'not_executed'
       experiment_id = crypto.randomUUID()
       created_at_utc = new Date().toISOString()
@@ -434,13 +467,41 @@ export function createSession(input: ExperimentConfig) {
       return structuredClone({
         config,
         first_stable: {
-          status:
-            stabilityStatus === 'pending' && ['stopped', 'error'].includes(status)
-              ? 'failed'
-              : stabilityStatus,
+          status: !controller
+            ? 'not_executed'
+            : stabilityStatus === 'passed'
+              ? exportConfirmed
+                ? 'passed'
+                : 'blocked'
+              : status === 'stopped' && !qualificationReasons.has('boundary')
+                ? 'invalid'
+                : stabilityStatus === 'failed' ||
+                    status === 'error' ||
+                    qualificationReasons.has('boundary')
+                  ? nonstandard
+                    ? 'invalid'
+                    : 'failed'
+                  : status === 'ready'
+                    ? 'not_executed'
+                    : 'blocked',
+          reason:
+            status === 'stopped' && !qualificationReasons.has('boundary')
+              ? 'user_stopped'
+              : stabilityStatus === 'passed' && !exportConfirmed
+                ? 'pending_export'
+                : nonstandard
+                  ? 'nonstandard_config'
+                  : null,
+          physical_stable_since_s: physicalStableSince,
+          physical_first_stable_s: physicalFirstStable,
+          physical_status: physicallyStable ? 'passed' : stabilityStatus,
           snapshot: stableSnapshot,
-          stable_since_s: stableStart === null ? null : stableStart * dt,
-          disturbance_eligibility: stableSnapshot ? 'blocked_pending_export' : 'blocked',
+          stable_since_s: physicalStableSince ?? (stableStart === null ? null : stableStart * dt),
+          disturbance_eligibility: stableSnapshot
+            ? exportConfirmed
+              ? 'eligible'
+              : 'blocked_pending_export'
+            : 'blocked',
         },
         controller: controller
           ? {
@@ -465,6 +526,16 @@ export function createSession(input: ExperimentConfig) {
           duration_s: (interval.end_time_s ?? time()) - interval.start_time_s,
         })),
       })
+    },
+    confirmExport(id: string, eventCount: number) {
+      if (
+        id !== experiment_id ||
+        eventCount !== events.length ||
+        events.at(-1)?.event_type !== 'export' ||
+        status === 'running'
+      )
+        throw new Error('证据已过期或不属于当前实验')
+      exportConfirmed = true
     },
     async exportEvidence() {
       if (status === 'ready' || status === 'running') throw new Error('请先暂停或结束实验再导出')
