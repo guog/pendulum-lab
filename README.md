@@ -4,6 +4,8 @@
 
 [T02：物理与数值可信性基准](https://github.com/guog/pendulum-lab/issues/7)在页面下方提供每工况16项冻结基准，包括独立数值参考、配重与阻力、10秒步长收敛、30秒能量漂移及异常冻结诊断。逐项展开查看输入、误差、阈值及结果，导出整个批次的原始轨迹和计算依据；触边或数值异常保留为无效，批次完成不表示全部物理通过。
 
+[T03：受限执行器、外扰与导轨边界](https://github.com/guog/pendulum-lab/issues/8)在实验基准中增加简单/标准各13项受力场景，展示请求力、实际驱动力、水平外力、关节外力矩、功率、饱和、超速及分类能量账本；逐项独立核验并导出终止原因和原始证据。
+
 当前为未发布实现。自动起摆、正式控制验收、目录持续保存及工作区独占均未实现或验证；完整计划见[需求基线QV-1](https://github.com/guog/pendulum-lab/issues/4)。
 
 ## 本地运行
@@ -35,7 +37,7 @@ npm run preview
 
 方程、数值方法、接口和记录格式详见[T01实现契约](docs/design/t01-implementation.md)。本次[验证与审查记录](docs/verification/t01/review.md)附实际下载的原始证据及运行环境。
 
-T02的冻结场景、解析关系、独立参考生成与结果格式见[T02实现契约](docs/design/t02-physics-benchmarks.md)，实际结果及失败历史见[T02验证记录](docs/verification/t02/review.md)。批次的原始轨迹和计算依据在其证据包内，页面上方的二维动画仍对应单次自由实验。
+T02的冻结场景、解析关系、独立参考生成与结果格式见[T02实现契约](docs/design/t02-physics-benchmarks.md)，实际结果及失败历史见[T02验证记录](docs/verification/t02/review.md)。批次的原始轨迹和计算依据在其证据包内，页面上方的二维动画对应当前选择的单次实验。T03的冻结输入、执行器约束、分类做功和事件语义见[T03实现契约](docs/design/t03-actuation.md)，实际页面/导出及两路审查见[T03最新验证记录](docs/verification/t03/completion/review.md)。
 
 ## 检查
 
@@ -54,7 +56,7 @@ npm run build
 npm run test:browser
 ```
 
-该命令依次启动T01、T02的独立静态预览服务和隔离真实Chrome会话，执行页面操作、后台暂停、下载/读回校验、10秒平衡及简单/标准完整物理基准；结束后关闭它自己启动的浏览器和服务。默认查找macOS Chrome，可用`CHROME_EXECUTABLE`指定实际可执行文件。`BROWSER_ARTIFACTS_DIR`可指定日志、截图和导出证据的目的目录，默认写入独立系统临时目录。浏览器检查不纳入无Chrome的通用CI，也不以替身浏览器冒充实际目标验证。
+该命令依次启动T01、T02、T03的独立静态预览服务和隔离真实Chrome会话，执行页面操作、后台暂停、下载/读回校验、10秒平衡、简单/标准完整物理基准及26项受力场景；结束后关闭它自己启动的浏览器和服务。默认查找macOS Chrome，可用`CHROME_EXECUTABLE`指定实际可执行文件。`BROWSER_ARTIFACTS_DIR`可指定日志、截图和导出证据的目的目录，默认写入独立系统临时目录；T03在指定证据目录下使用t03子目录，避免覆盖T02报告。浏览器检查不纳入无Chrome的通用CI，也不以替身浏览器冒充实际目标验证。
 
 ## 仓库导航
 
@@ -64,7 +66,7 @@ npm run test:browser
 - `docs/origin/`：本地需求来源材料，保持原样；是否纳入版本控制单独处理。
 - `docs/agents/`：Issue跟踪、分诊及领域文档规则。
 
-本次T02增补由OpenAI Codex实施、验证并整理；保留T01的来源信息及验证边界。
+T01/T02由OpenAI Codex实施、验证并整理。本次T03增补由OpenAI Codex完成，并以独立Standards/Spec子代理审查；保留此前来源信息与验证边界。
 
 Assisted-by: LLM
 AI-Agent: OpenAI Codex

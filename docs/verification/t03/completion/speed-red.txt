@@ -1,0 +1,31 @@
+✔ 观察窗口终点先结束外扰及请求力，再记录唯一终点样本和完整分类做功 (8.628125ms)
+✖ 正反向跨入速度上限时按解析切换时刻分段，无自致超速或虚假做功 (1.158541ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 102.350042
+
+✖ failing tests:
+
+test at tests/actuation-boundaries.test.ts:45:1
+✖ 正反向跨入速度上限时按解析切换时刻分段，无自致超速或虚假做功 (1.158541ms)
+  AssertionError [ERR_ASSERTION]: -2.5125135135135137 != -2.5
+      at close (file:///Users/guog/projects/github/guog/pendulum-lab/tests/actuation-boundaries.test.ts:6:10)
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/actuation-boundaries.test.ts:64:9)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

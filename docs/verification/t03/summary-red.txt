@@ -1,0 +1,31 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: 冻结输入摘要缺少实际滑块粘性阻力
+    at file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-actuation.mjs:84:16
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '杆长\n' +
+    '0.35 m\n' +
+    '杆质量\n' +
+    '0.12 kg\n' +
+    '滑块质量\n' +
+    '0.6 kg\n' +
+    '配重质量\n' +
+    '0.02 kg\n' +
+    '配重位置\n' +
+    '0.175 m\n' +
+    '导轨总长\n' +
+    '3 m\n' +
+    '重力加速度\n' +
+    '9.81 m/s²\n' +
+    '阻力设置\n' +
+    '零阻力（基准覆盖）',
+  expected: /0\.1 N·s\/m/,
+  operator: 'match',
+  diff: 'simple'
+}
+
+Node.js v26.7.0

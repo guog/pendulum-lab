@@ -12,7 +12,7 @@
     />
     <meta
       name="description"
-      content="浏览器本地的一阶倒立摆自由运动实验与原始证据导出。"
+      content="浏览器本地的一阶倒立摆自由运动、受力基准与原始证据导出。"
     />
     <title>一阶倒立摆实验台 · Pendulum Lab</title>
   </head>
@@ -69,7 +69,7 @@
               标准
             </option>
           </select>
-          <label for="benchmark">自由运动基准</label>
+          <label for="benchmark">实验基准</label>
           <select id="benchmark">
             <option value="release">零阻力释放</option>
             <option value="equilibrium">静止下垂平衡</option>
@@ -138,7 +138,7 @@
             ></p>
           </section>
           <p class="scope-note">
-            本次仅自由运动基准。自动起摆与目录持续保存尚未进入本切片；不代表控制验收通过。
+            自由运动及受限执行器、外扰诊断。场景初态是明示基准输入；自动起摆和目录持续保存尚未实现，不代表正式控制验收。
           </p>
         </aside>
         <section
@@ -179,7 +179,8 @@
               </button>
             </div>
             <div class="clock">
-              <span>仿真时间</span><output id="time">0.000</output><span>s / 10 s</span>
+              <span>仿真时间</span><output id="time">0.000</output
+              ><span>s / <span id="duration">10</span> s</span>
             </div>
           </div>
           <section
@@ -187,8 +188,8 @@
             aria-label="二维物理视图"
           >
             <div class="panel-heading">
-              <h2>自由运动</h2>
-              <span>无驱动力 · 允许连续旋转</span>
+              <h2 id="observation-title">自由运动</h2>
+              <span id="input-note">无驱动力 · 允许连续旋转</span>
             </div>
             <svg
               id="apparatus"
@@ -255,6 +256,54 @@
                 ></canvas>
               </figure>
             </div>
+          </section>
+          <section
+            class="signals"
+            aria-labelledby="force-title"
+          >
+            <div class="panel-heading">
+              <h2 id="force-title">受力、约束与能量</h2>
+              <span>SI单位 · 分类做功</span>
+            </div>
+            <p
+              id="force-observation"
+              class="explanation"
+              role="status"
+            >
+              开始后显示逐步约束与能量记录。
+            </p>
+            <div
+              id="force-charts"
+              class="chart-grid"
+            ></div>
+            <details>
+              <summary>分类能量账本（末采样）</summary>
+              <dl
+                id="force-ledger"
+                class="parameters benchmark-ledger"
+              ></dl>
+            </details>
+            <p
+              id="actuation-result"
+              class="explanation"
+              role="status"
+            ></p>
+            <details>
+              <summary>独立核验误差与阈值</summary>
+              <pre
+                id="actuation-metrics"
+                tabindex="0"
+                aria-label="受力基准的独立核验误差与阈值"
+              ></pre>
+            </details>
+            <details>
+              <summary>限制、超速、安全区与终止事件</summary>
+              <pre
+                id="force-events"
+                tabindex="0"
+                aria-label="受力基准的事件与持续时间"
+              ></pre>
+            </details>
           </section>
           <div class="experiment-footer">
             <span>已记录 <strong id="sample-count">0</strong> 点</span

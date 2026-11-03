@@ -1,3 +1,6 @@
+import { actuationCases } from './actuator-benchmarks.ts'
+import actuationReference from './actuation-reference.json' with { type: 'json' }
+import { assessActuation } from './actuation-assessment.ts'
 import type { SessionOutput, Sample } from './session.ts'
 
 export type EvidenceBundle = {
@@ -40,6 +43,8 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
     'dissipated_energy_J',
     'energy_residual_J',
     'overspeed',
+    'saturation_reasons',
+    'saturated',
   ]
   const files: Record<string, string> = {
     'config.json': stringify({
@@ -50,7 +55,13 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
     'samples/chunk-000001.csv':
       [
         columns.join(','),
-        ...output.samples.map((sample) => columns.map((key) => String(sample[key])).join(',')),
+        ...output.samples.map((sample) =>
+          columns
+            .map((key) =>
+              Array.isArray(sample[key]) ? sample[key].join('|') : String(sample[key]),
+            )
+            .join(','),
+        ),
       ].join('\n') + '\n',
     'events/part-000001.jsonl':
       output.events
@@ -62,12 +73,18 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
           }),
         )
         .join('\n') + '\n',
+    ...(Object.hasOwn(actuationCases, output.config.benchmark)
+      ? { 'reference.json': stringify(actuationReference) }
+      : {}),
     'result.json': stringify({
       schema_version: 1,
       experiment_id,
       status: output.status,
       execution_mode: 'memory-research',
       formal_acceptance: 'not_eligible',
+      actuation_assessment: assessActuation(output),
+      qualification_reasons: output.qualification_reasons,
+      condition_intervals: output.condition_intervals,
       first_stable: 'not_executed',
       endurance: 'not_executed',
       horizontal_disturbance: 'not_executed',
@@ -76,7 +93,7 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
       last_state: output.state,
       sample_count: output.samples.length,
       rules_version: output.config.versions.rules,
-      limitation: '仅自由运动基准；内存记录需用户显式导出，不承诺崩溃恢复或正式控制验收。',
+      limitation: '自由运动或明确受力基准；内存记录需用户显式导出，不承诺崩溃恢复或正式控制验收。',
     }),
   }
   const entries = await Promise.all(

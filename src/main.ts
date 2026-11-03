@@ -1,3 +1,5 @@
+import { actuationCases, type ActuationCaseId } from './actuator-benchmarks.ts'
+import { assessActuation } from './actuation-assessment.ts'
 import './styles.css'
 import { sha256 } from './evidence.ts'
 import { saveEvidenceFile } from './save.ts'
@@ -31,6 +33,39 @@ const views = [
   { field: 'theta_unwrapped_rad', value: 'value-theta', canvas: 'chart-theta', color: '#996018' },
   { field: 'theta_dot_rad_s', value: 'value-omega', canvas: 'chart-omega', color: '#8255a1' },
 ] as const
+const forceViews = [
+  { field: 'force_requested_N', label: '请求力', unit: 'N', color: '#996018' },
+  { field: 'force_actual_N', label: '实际驱动力', unit: 'N', color: '#08776b' },
+  { field: 'force_external_N', label: '水平外力', unit: 'N', color: '#315f9e' },
+  { field: 'torque_external_Nm', label: '关节外力矩', unit: 'N·m', color: '#8255a1' },
+  { field: 'actuator_power_W', label: '机械功率', unit: 'W', color: '#08776b' },
+  { field: 'energy_residual_J', label: '能量收支残差', unit: 'J', color: '#996018' },
+  { field: 'saturated', label: '饱和/方向受限', unit: '0/1', color: '#996018' },
+  { field: 'overspeed', label: '超速', unit: '0/1', color: '#8255a1' },
+] as const
+for (const [id, label] of Object.entries(actuationCases)) {
+  const option = document.createElement('option')
+  option.value = id
+  option.textContent = label
+  benchmark.append(option)
+}
+const forceCharts = element('force-charts', HTMLDivElement)
+for (const view of forceViews) {
+  const figure = document.createElement('figure')
+  const caption = document.createElement('figcaption')
+  const label = document.createElement('span')
+  label.textContent = `${view.label} (${view.unit})`
+  const value = document.createElement('output')
+  value.id = `value-${view.field}`
+  value.textContent = '—'
+  const canvas = document.createElement('canvas')
+  canvas.id = `chart-${view.field}`
+  canvas.setAttribute('role', 'img')
+  canvas.setAttribute('aria-label', `${view.label}随仿真时间变化曲线`)
+  caption.append(label, value)
+  figure.append(caption, canvas)
+  forceCharts.append(figure)
+}
 const statusText = {
   ready: '准备就绪',
   running: '运行中',
@@ -116,7 +151,13 @@ function render() {
       ['配重位置', `${config.physics.counterweight_position_m} m`],
       ['导轨总长', `${config.physics.track_length_m} m`],
       ['重力加速度', `${config.physics.gravity_m_s2} m/s²`],
-      ['阻力设置', '零阻力（基准覆盖）'],
+      ['最大驱动力', `${config.physics.force_max_N} N`],
+      ['最大速度', `${config.physics.speed_max_m_s} m/s`],
+      ['最大机械功率', `${config.physics.power_max_W} W`],
+      ['安全缓冲区', `${config.physics.safety_buffer_m} m`],
+      ['滑块库仑阻力', `${config.physics.cart_coulomb_N} N`],
+      ['滑块粘性阻力', `${config.physics.cart_viscous_N_s_m} N·s/m`],
+      ['关节粘性阻力', `${config.physics.joint_viscous_Nm_s_rad} N·m·s/rad`],
     ]
     const list = element('parameters', HTMLDListElement)
     list.replaceChildren(
@@ -133,7 +174,8 @@ function render() {
     write('status', statusText[current.status])
     lastStatus = current.status
   }
-  write('time', current.sim_time_s.toFixed(3))
+  write('time', current.sim_time_s.toFixed(config.control_mode === 'prescribed' ? 6 : 3))
+  write('duration', String(config.timing.duration_s))
   write('sample-count', String(current.samples.length))
   write('sampling', String(config.timing.sample_period_s * 1000))
   write('step-size', String(config.timing.physics_step_s * 1000))
@@ -148,7 +190,7 @@ function render() {
       : last?.event_type === 'numerical_error'
         ? '数值异常，保留最后有效状态'
         : current.status === 'completed'
-          ? '10秒观察窗口结束，未做控制判定'
+          ? `${config.timing.duration_s}秒观察窗口结束，未做控制判定`
           : '自动起摆及控制验收未执行',
   )
   for (const view of views) {
@@ -161,6 +203,88 @@ function render() {
       config.timing.duration_s,
     )
   }
+  write('observation-title', config.control_mode === 'prescribed' ? '受限执行器与外扰' : '自由运动')
+  write(
+    'input-note',
+    config.control_mode === 'prescribed'
+      ? '冻结受力输入 · 允许连续旋转'
+      : '无驱动力 · 允许连续旋转',
+  )
+  const lastSample = current.samples.at(-1)
+  for (const view of forceViews) {
+    write(`value-${view.field}`, lastSample ? Number(lastSample[view.field]).toFixed(4) : '—')
+    drawChart(
+      element(`chart-${view.field}`, HTMLCanvasElement),
+      current.samples,
+      view.field,
+      view.color,
+      config.timing.duration_s,
+    )
+  }
+  const reasons: Record<string, string> = {
+    force: '限力',
+    power: '限功率',
+    speed_direction: '速度方向受限',
+  }
+  write(
+    'force-observation',
+    lastSample
+      ? [
+          lastSample.saturation_reasons.map((reason) => reasons[reason] ?? reason).join('、') ||
+            '执行器未限幅',
+          lastSample.overspeed ? '超速；正式资格已取消' : '当前未超速',
+          current.qualification_reasons.length
+            ? `资格取消原因：${current.qualification_reasons.join('、')}`
+            : '本实验仅诊断，不具备正式控制资格',
+        ].join(' · ')
+      : '开始后显示逐步约束与能量记录。',
+  )
+  const ledger = element('force-ledger', HTMLDListElement)
+  ledger.replaceChildren(
+    ...(
+      [
+        ['kinetic_energy_J', '动能'],
+        ['potential_energy_J', '势能'],
+        ['actuator_work_J', '执行器做功'],
+        ['force_external_work_J', '水平外力做功'],
+        ['torque_external_work_J', '关节外力矩做功'],
+        ['dissipated_energy_J', '累计耗散'],
+        ['energy_residual_J', '能量收支残差'],
+      ] as const
+    ).flatMap(([field, label]) => {
+      const term = document.createElement('dt'),
+        value = document.createElement('dd')
+      term.textContent = label
+      value.textContent = lastSample ? `${lastSample[field].toExponential(6)} J` : '—'
+      return [term, value]
+    }),
+  )
+  const assessment = assessActuation(current)
+  const labels = {
+    not_executed: '未执行',
+    blocked: '阻塞',
+    passed: '通过',
+    failed: '失败',
+    invalid: '无效',
+  }
+  write(
+    'actuation-result',
+    assessment
+      ? `受力基准：${labels[assessment.status]} · ${assessment.reason}`
+      : '自由运动基准；完整物理基准见下方独立批次。',
+  )
+  write(
+    'actuation-metrics',
+    assessment ? JSON.stringify(assessment.metrics, null, 2) : '尚无受力基准结论。',
+  )
+  write(
+    'force-events',
+    JSON.stringify(
+      { condition_intervals: current.condition_intervals, events: current.events },
+      null,
+      2,
+    ),
+  )
   drawApparatus(apparatus, current)
   updateControls()
 }
@@ -259,8 +383,11 @@ async function configure() {
     return
   }
   const selectedPreset: PresetId = preset.value === 'simple' ? 'simple' : 'standard'
-  const selectedBenchmark: BenchmarkId =
-    benchmark.value === 'equilibrium' ? 'equilibrium' : 'release'
+  const selectedBenchmark: BenchmarkId = Object.hasOwn(actuationCases, benchmark.value)
+    ? (benchmark.value as ActuationCaseId)
+    : benchmark.value === 'equilibrium'
+      ? 'equilibrium'
+      : 'release'
   await action(async () => {
     await call({ type: 'configure', preset: selectedPreset, benchmark: selectedBenchmark })
     exportMessage.textContent = ''

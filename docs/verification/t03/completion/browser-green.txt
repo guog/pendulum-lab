@@ -1,0 +1,35 @@
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 test:browser
+> node scripts/browser-smoke.mjs && node scripts/browser-benchmarks.mjs && node scripts/browser-actuation.mjs
+
+真实浏览器检查通过，证据位于：/tmp/pendulum-issue8-finish/browser-final
+T02真实Chrome验证通过：/tmp/pendulum-issue8-finish/browser-final
+simple/near-zero: passed, actual file read back and verified
+simple/force-limit: passed, actual file read back and verified
+simple/power-drive: passed, actual file read back and verified
+simple/power-brake: passed, actual file read back and verified
+simple/speed-direction: passed, actual file read back and verified
+simple/speed-crossing: passed, actual file read back and verified
+simple/speed-crossing-reverse: passed, actual file read back and verified
+simple/pulse-endpoint: passed, actual file read back and verified
+simple/external-overspeed: passed, actual file read back and verified
+simple/coupling-overspeed: passed, actual file read back and verified
+simple/joint-torque: passed, actual file read back and verified
+simple/combined-work: passed, actual file read back and verified
+simple/rail-boundary: passed, actual file read back and verified
+standard/near-zero: passed, actual file read back and verified
+standard/force-limit: passed, actual file read back and verified
+standard/power-drive: passed, actual file read back and verified
+standard/power-brake: passed, actual file read back and verified
+standard/speed-direction: passed, actual file read back and verified
+standard/speed-crossing: passed, actual file read back and verified
+standard/speed-crossing-reverse: passed, actual file read back and verified
+standard/pulse-endpoint: passed, actual file read back and verified
+standard/external-overspeed: passed, actual file read back and verified
+standard/coupling-overspeed: passed, actual file read back and verified
+standard/joint-torque: passed, actual file read back and verified
+standard/combined-work: passed, actual file read back and verified
+standard/rail-boundary: passed, actual file read back and verified
