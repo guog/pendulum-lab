@@ -1,3 +1,4 @@
+import { createBrowser, verifyManifest, waitForConfig } from './browser-driver.mjs'
 import { mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { spawn, spawnSync } from 'node:child_process'
@@ -24,20 +25,8 @@ const server = spawn('npm', ['run', 'preview', '--', '--port', '4175', '--strict
   stdio: ['ignore', 'pipe', 'pipe'],
 })
 const log = []
-const browser = (...args) => {
-  const result = spawnSync(
-    'npx',
-    ['--yes', 'agent-browser@0.41.1', '--session', session, ...args],
-    {
-      encoding: 'utf8',
-      timeout: 30000,
-      maxBuffer: 8 * 1024 * 1024,
-    },
-  )
-  log.push({ args, status: result.status, stdout: result.stdout, stderr: result.stderr })
-  assert.equal(result.status, 0, `${args.join(' ')}\n${result.stdout}\n${result.stderr}`)
-  return result.stdout.trim()
-}
+const browser = createBrowser(session, log, join(artifacts, 'browser-steps.jsonl'))
+
 const click = (selector) => {
   browser('scrollintoview', selector)
   browser('click', selector)
@@ -92,18 +81,10 @@ try {
   browser('snapshot', '-i')
   for (const preset of ['simple', 'standard']) {
     browser('select', '#preset', preset)
-    browser(
-      'wait',
-      '--fn',
-      `JSON.parse(document.querySelector('#config').textContent).preset === ${JSON.stringify(preset)} && !document.querySelector('#benchmark').disabled && !document.querySelector('#start').disabled`,
-    )
+    waitForConfig(browser, preset)
     for (const id of selectedCases) {
       browser('select', '#benchmark', id)
-      browser(
-        'wait',
-        '--fn',
-        `JSON.parse(document.querySelector('#config').textContent).preset === ${JSON.stringify(preset)} && JSON.parse(document.querySelector('#config').textContent).benchmark === ${JSON.stringify(id)} && !document.querySelector('#start').disabled`,
-      )
+      waitForConfig(browser, preset, id)
       assert.match(text('#config'), new RegExp(`"benchmark": "${id}"`))
       if (id === 'combined-work') {
         assert.match(text('#parameters'), /0\.1 N·s\/m/, '冻结输入摘要缺少实际滑块粘性阻力')
@@ -148,10 +129,7 @@ try {
         chromeVersion.stdout.match(/Chrome (\d+)/)?.[1],
       )
       const manifest = JSON.parse(bundle.files['manifest.json'])
-      for (const entry of manifest.files) {
-        assert.equal(hash(bundle.files[entry.path]), entry.sha256)
-        assert.equal(Buffer.byteLength(bundle.files[entry.path]), entry.byte_length)
-      }
+      verifyManifest(bundle.files, manifest)
       const csv = bundle.files['samples/chunk-000001.csv'].trim().split('\n')
       assert.equal(csv.length - 1, result.sample_count)
       assert.match(csv[0], /saturation_reasons,saturated$/)
