@@ -1,0 +1,9 @@
+✔ 异步导出冻结整批原始记录与结果，后续继续推进不改写导出快照 (40.456708ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 132.466958

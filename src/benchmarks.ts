@@ -363,9 +363,13 @@ export function createPhysicsBenchmarks(preset: PresetId) {
     },
     stop() {
       if (status === 'running' || status === 'paused') {
-        sessions.get(cases[index]!.id)?.stop()
-        cases[index]!.status = 'invalid'
-        cases[index]!.reason = '批次被终止；保留已运行记录'
+        const item = cases[index]!
+        const session = sessions.get(item.id)
+        if (session) {
+          session.stop()
+          item.status = 'invalid'
+          item.reason = '批次被终止；保留已运行记录'
+        }
         status = 'stopped'
       }
     },
@@ -380,13 +384,18 @@ export function createPhysicsBenchmarks(preset: PresetId) {
     },
     async exportEvidence(): Promise<BenchmarkBundle> {
       if (status === 'ready' || status === 'running') throw new Error('请先暂停或结束基准再导出')
+      // Each child captures its output synchronously before hashing. Capture all
+      // children and the batch before yielding, so later commands cannot mix cuts.
+      const pending = [...sessions].map(
+        async ([id, session]) => [id, await session.exportEvidence()] as const,
+      )
+      const snapshot = this.read()
       const files: Record<string, string> = {}
-      for (const [id, session] of sessions) {
-        const bundle = await session.exportEvidence()
+      for (const [id, bundle] of await Promise.all(pending)) {
         for (const [path, content] of Object.entries(bundle.files))
           files[`experiments/${id}/${path}`] = content
       }
-      files['results.json'] = JSON.stringify(this.read(), null, 2) + '\n'
+      files['results.json'] = JSON.stringify(snapshot, null, 2) + '\n'
       files['reference.json'] = JSON.stringify(reference, null, 2) + '\n'
       const entries = await Promise.all(
         Object.entries(files).map(async ([path, content]) => ({

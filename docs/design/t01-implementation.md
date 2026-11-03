@@ -66,6 +66,8 @@ x向右、y向上，θ从向上竖直开始逆时针为正，杆上距轴r的点
 
 Vite为页面/Worker提供构建时身份，并输出同一dist/build-info.json。摘要输入为src/全部普通文件，以及index.html、package.json、package-lock.json、tsconfig.json、vite.config.ts和scripts/build-identity.ts。相对路径排序后，每个文件按JSON.stringify([路径,字节长度])加LF、再加原始文件字节串联，计算SHA-256；来源文档、原始资料、测试证据和Git元数据不进入该源码摘要。构建期间输入变化会使构建失败；身份为源码/构建来源说明，不是二进制签名或安全认证。
 
+Git修改状态检查整个src/及固定构建输入，包含尚未暂存和已暂存的源码删除；不能只检查当前仍存在的文件。删除会改变源码摘要并标记source_dirty=true，恢复原输入后返回原摘要和干净状态。对应回归在隔离Git源码副本中执行真实生产构建、读取dist/build-info.json，不修改用户工作区。
+
 生产静态应用在Worker加载时取得身份，完整配置随后冻结。开发源文件变化会使开发模块缓存失效并重新加载页面，避免继续使用旧身份；内存实验仍须事先导出。直接用原生Node运行会话而没有经过Vite时，两字段明确为null，不伪装成已验证浏览器构建。无Git的源码归档仍可构建并记录源码摘要，Git字段为null。
 
 实际Chrome回归在下载的证据中校验源码摘要格式、Git来源，并核对其与静态构建清单及当前输入的身份一致；验证报告保存同一个build_identity。
