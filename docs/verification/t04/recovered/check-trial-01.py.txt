@@ -1,0 +1,38 @@
+import hashlib
+import json
+import math
+from pathlib import Path
+
+if not __debug__:
+    raise RuntimeError('Optimized Python disables required checks')
+
+root = Path(__file__).parent
+raw = (root / 'trial-01-stdout.txt').read_bytes()
+provenance = json.loads((root / 'provenance.json').read_text())
+record = next(item for item in provenance['records'] if item['file'] == 'trial-01-stdout.txt')
+assert hashlib.sha256(raw).hexdigest() == record['captured_stdout_sha256']
+rows = raw.decode('utf-8').splitlines()
+assert len(rows) == 30
+errors = []
+for second, row in enumerate(rows, 1):
+    index, status, body = row.split(' ', 2)
+    assert int(index) == second
+    assert status == ('completed' if second == 30 else 'running')
+    state, end = json.JSONDecoder().raw_decode(body)
+    assert body[end:].strip() == 'swing'
+    theta = float(state['theta_unwrapped_rad'])
+    assert math.isfinite(theta)
+    error_deg = abs(math.degrees(math.atan2(math.sin(theta), math.cos(theta))))
+    errors.append(error_deg)
+assert all(error > 3 for error in errors)
+result = {
+    'source_stdout_sha256': hashlib.sha256(raw).hexdigest(),
+    'observed_seconds': list(range(1, 31)),
+    'observed_angle_violations': len(errors),
+    'minimum_angle_error_deg': min(errors),
+    'candidate_hold_s': 5,
+    'deadline_s': 30,
+    'conclusion': 'no_candidate_five_second_window',
+    'scope': 'zero-friction exploratory trial only; no 10ms samples or formal acceptance',
+}
+print(json.dumps(result, indent=2))

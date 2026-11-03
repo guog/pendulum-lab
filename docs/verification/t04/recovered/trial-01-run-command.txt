@@ -1,0 +1,1 @@
+node --input-type=module -e "import {createSession,createConfig} from './src/session.ts'; let s=createSession(createConfig('simple','swing-up'));s.start();for(let i=0;i<30;i++){s.advance(1);let o=s.read();console.log(i+1,o.status,JSON.stringify(o.state),o.controller?.state.phase);if(o.status!=='running')break}"
