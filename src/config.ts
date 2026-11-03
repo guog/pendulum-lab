@@ -68,7 +68,6 @@ export function createConfig(
     !['release', 'equilibrium', 'swing-up'].includes(benchmark)
   )
     throw new Error('未知工况或基准')
-  if (benchmark === 'swing-up' && preset !== 'simple') throw new Error('自动起摆当前仅支持简单工况')
   return {
     schema_version: 1,
     preset,
@@ -76,7 +75,7 @@ export function createConfig(
     benchmark,
     benchmark_description:
       benchmark === 'swing-up'
-        ? '简单工况：从精确静止下垂自动起摆，30秒内完成连续5秒稳定。'
+        ? `${preset === 'simple' ? '简单' : '标准'}工况：从精确静止下垂自动起摆，${preset === 'simple' ? 30 : 60}秒内完成连续5秒稳定。`
         : benchmark === 'release'
           ? '零阻力释放：初角为+π/2rad（水平），车居中、两速度为零。显式非平衡初态，仅用于自由运动基准。'
           : '零阻力静止下垂：初角为+πrad，车居中、两速度为零，不施加隐藏扰动。',
@@ -119,7 +118,7 @@ export function createConfig(
       physics_step_s: 0.001,
       control_period_s: 0.01,
       sample_period_s: 0.01,
-      duration_s: benchmark === 'swing-up' ? 30 : 10,
+      duration_s: benchmark === 'swing-up' ? (preset === 'simple' ? 30 : 60) : 10,
     },
   }
 }
@@ -135,18 +134,20 @@ export function validateConfig(config: ExperimentConfig) {
     throw new Error('自动起摆必须使用自动控制')
   if (
     config.control_mode === 'automatic' &&
-    (config.timing.duration_s !== 30 ||
+    (config.timing.duration_s !== (config.preset === 'simple' ? 30 : 60) ||
       config.initial_state.cart_x_m !== 0 ||
       config.initial_state.cart_v_m_s !== 0 ||
       config.initial_state.theta_unwrapped_rad !== Math.PI ||
       config.initial_state.theta_dot_rad_s !== 0)
   )
-    throw new Error('自动起摆初态及30秒时限必须保持冻结')
+    throw new Error('自动起摆初态及工况时限必须保持冻结')
   if (
     config.control_mode === 'automatic' &&
-    (config.benchmark !== 'swing-up' || config.preset !== 'simple' || config.input_program?.length)
+    (config.benchmark !== 'swing-up' ||
+      !['simple', 'standard'].includes(config.preset) ||
+      config.input_program?.length)
   )
-    throw new Error('自动起摆仅支持无外扰的简单工况')
+    throw new Error('自动起摆仅支持无外扰的冻结工况')
   if (
     config.control_mode === 'free' &&
     Array.isArray(config.input_program) &&

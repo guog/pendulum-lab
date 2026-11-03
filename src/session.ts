@@ -80,7 +80,7 @@ export function createSession(input: ExperimentConfig) {
         a.index - b.index,
     )
   let commandIndex = 0
-  const standard = controller ? createConfig('simple', 'swing-up') : null
+  const standard = controller ? createConfig(config.preset, 'swing-up') : null
   const nonstandard =
     standard !== null &&
     (Object.keys(standard.physics).some(

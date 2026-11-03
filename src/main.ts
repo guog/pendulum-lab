@@ -117,8 +117,7 @@ function updateControls() {
   pause.textContent = status === 'paused' ? '继续' : '暂停'
   stop.disabled = busy || (status !== 'running' && status !== 'paused')
   reset.disabled = busy || workerFailed || !current || status === 'ready'
-  preset.disabled =
-    busy || workerFailed || status === 'running' || current?.config.benchmark === 'swing-up'
+  preset.disabled = busy || workerFailed || status === 'running'
   benchmark.disabled = busy || workerFailed || status === 'running'
   const exportable = !workerFailed && !!current?.samples.length && status !== 'running'
   exportButton.disabled = busy || !exportable
@@ -394,8 +393,7 @@ async function configure() {
     }
     return
   }
-  const selectedPreset: PresetId =
-    benchmark.value === 'swing-up' ? 'simple' : preset.value === 'simple' ? 'simple' : 'standard'
+  const selectedPreset: PresetId = preset.value === 'simple' ? 'simple' : 'standard'
   const selectedBenchmark: BenchmarkId = Object.hasOwn(actuationCases, benchmark.value)
     ? (benchmark.value as ActuationCaseId)
     : benchmark.value === 'swing-up'
