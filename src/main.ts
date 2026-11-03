@@ -175,7 +175,14 @@ function render() {
     lastStatus = current.status
   }
   write('time', current.sim_time_s.toFixed(config.control_mode === 'prescribed' ? 6 : 3))
-  write('duration', String(config.timing.duration_s))
+  write(
+    'duration',
+    String(
+      current.endurance.start_s === null
+        ? config.timing.duration_s
+        : Number((current.endurance.start_s + 20).toFixed(3)),
+    ),
+  )
   write('sample-count', String(current.samples.length))
   write('sampling', String(config.timing.sample_period_s * 1000))
   write('step-size', String(config.timing.physics_step_s * 1000))
@@ -185,15 +192,29 @@ function render() {
   )
   write(
     'end-reason',
-    config.control_mode === 'automatic'
-      ? `${current.controller?.state.phase === 'balance' ? '稳摆' : '起摆'} · ${last?.event_type === 'boundary' ? '触边终止；首次稳定失败，扰动测试阻塞' : last?.event_type === 'numerical_error' ? '数值异常；首次稳定失败，扰动测试阻塞' : last?.event_type === 'controller_error' ? '控制器异常或超出预算；首次稳定失败，扰动测试阻塞' : current.first_stable.reason === 'user_stopped' ? '用户终止；首次稳定未完成，扰动测试阻塞' : current.first_stable.physical_status === 'passed' && !current.first_stable.snapshot ? '物理稳定曾达成，但配置或资格无效；扰动测试阻塞' : current.first_stable.physical_status === 'passed' ? (current.first_stable.disturbance_eligibility === 'eligible' ? '首次连续5秒稳定；快照证据已导出校验，扰动功能尚未执行' : '首次连续5秒稳定，候选快照待导出校验；扰动测试阻塞') : ['failed', 'invalid'].includes(current.first_stable.status) ? `首次稳定失败（${current.qualification_reasons.join('、') || '超过时限'}），扰动测试阻塞` : '等待首次稳定；无合格快照，扰动测试阻塞'}`
-      : last?.event_type === 'boundary'
-        ? '触边终止；无碰撞反弹'
-        : last?.event_type === 'numerical_error'
-          ? '数值异常，保留最后有效状态'
-          : current.status === 'completed'
-            ? `${config.timing.duration_s}秒观察窗口结束，未做控制判定`
-            : '自动起摆及控制验收未执行',
+    config.control_mode === 'automatic' && current.first_stable.snapshot
+      ? `首次稳定：${current.first_stable.disturbance_eligibility === 'eligible' ? '通过，快照证据已导出校验' : '已达成，候选快照待导出校验'} · ${last?.event_type === 'boundary' ? '触边终止 · ' : last?.event_type === 'controller_error' ? '控制器异常 · ' : last?.event_type === 'numerical_error' ? '数值异常 · ' : current.status === 'stopped' ? '用户终止 · ' : ''}扰动测试尚未执行`
+      : config.control_mode === 'automatic'
+        ? `${current.controller?.state.phase === 'balance' ? '稳摆' : '起摆'} · ${last?.event_type === 'boundary' ? '触边终止；首次稳定失败，扰动测试阻塞' : last?.event_type === 'numerical_error' ? '数值异常；首次稳定失败，扰动测试阻塞' : last?.event_type === 'controller_error' ? '控制器异常或超出预算；首次稳定失败，扰动测试阻塞' : current.first_stable.reason === 'user_stopped' ? '用户终止；首次稳定未完成，扰动测试阻塞' : current.first_stable.physical_status === 'passed' && !current.first_stable.snapshot ? '物理稳定曾达成，但配置或资格无效；扰动测试阻塞' : current.first_stable.physical_status === 'passed' ? (current.first_stable.disturbance_eligibility === 'eligible' ? '首次连续5秒稳定；快照证据已导出校验，扰动功能尚未执行' : '首次连续5秒稳定，候选快照待导出校验；扰动测试阻塞') : ['failed', 'invalid'].includes(current.first_stable.status) ? `首次稳定失败（${current.qualification_reasons.join('、') || '超过时限'}），扰动测试阻塞` : '等待首次稳定；无合格快照，扰动测试阻塞'}`
+        : last?.event_type === 'boundary'
+          ? '触边终止；无碰撞反弹'
+          : last?.event_type === 'numerical_error'
+            ? '数值异常，保留最后有效状态'
+            : current.status === 'completed'
+              ? `${config.timing.duration_s}秒观察窗口结束，未做控制判定`
+              : '自动起摆及控制验收未执行',
+  )
+  const enduranceText: Record<string, string> = {
+    not_executed: '未执行',
+    blocked: '阻塞（无合格快照）',
+    running: '进行中',
+    passed: '通过',
+    failed: '失败',
+    invalid: '中止',
+  }
+  write(
+    'endurance-result',
+    `耐久：${enduranceText[current.endurance.status]}${current.endurance.start_s === null ? '' : ` · 起点 ${current.endurance.start_s.toFixed(3)} s${current.endurance.end_s === null ? '' : ` · 终点 ${current.endurance.end_s.toFixed(3)} s`}`}`,
   )
   for (const view of views) {
     write(view.value, state[view.field].toFixed(4))
@@ -202,7 +223,9 @@ function render() {
       current.samples,
       view.field,
       view.color,
-      config.timing.duration_s,
+      current.endurance.start_s === null
+        ? config.timing.duration_s
+        : Math.max(config.timing.duration_s, current.endurance.start_s + 20),
     )
   }
   write(
@@ -229,7 +252,9 @@ function render() {
       current.samples,
       view.field,
       view.color,
-      config.timing.duration_s,
+      current.endurance.start_s === null
+        ? config.timing.duration_s
+        : Math.max(config.timing.duration_s, current.endurance.start_s + 20),
     )
   }
   const reasons: Record<string, string> = {

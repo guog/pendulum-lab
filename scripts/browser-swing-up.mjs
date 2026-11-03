@@ -43,12 +43,22 @@ try {
     preset,
   )
   browser('click', '#start')
-  browser(
-    'wait',
-    '--fn',
-    "document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'",
-  )
+  let finished = false
+  for (let attempt = 0; attempt < 4 && !finished; attempt++) {
+    try {
+      browser(
+        'wait',
+        '--fn',
+        "document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'",
+      )
+      finished = true
+    } catch (error) {
+      if (attempt === 3 || !String(error).includes('Wait timed out')) throw error
+    }
+  }
   const text = browser('get', 'text', '#end-reason')
+  const enduranceText = browser('get', 'text', '#endurance-result')
+  assert.match(enduranceText, /耐久：通过/)
   console.log('页面结果:', text)
   browser('screenshot', '--full', `${dir}/result.png`)
   browser('eval', "document.querySelector('details.download-options').open=true")
@@ -67,6 +77,8 @@ try {
     '仿真时间:',
     result.first_stable.snapshot?.sim_time_s,
   )
+  assert.equal(result.endurance.status, 'passed')
+  assert.ok(Math.abs(result.endurance.end_s - result.endurance.start_s - 20) < 1e-9)
   assert.equal(result.first_stable.status, 'blocked')
   assert.equal(result.first_stable.physical_status, 'passed')
   assert.ok(bundle.files['snapshot.json'])
@@ -102,6 +114,8 @@ try {
     JSON.stringify(
       {
         text,
+        enduranceText,
+        endurance: result.endurance,
         result: result.first_stable,
         controller: JSON.parse(bundle.files['controller.json']),
         experiment_id: bundle.experiment_id,

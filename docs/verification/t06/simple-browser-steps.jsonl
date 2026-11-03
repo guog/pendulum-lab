@@ -1,0 +1,92 @@
+{"phase":"start","args":["--executable-path","/Applications/Google Chrome.app/Contents/MacOS/Google Chrome","open","http://localhost:4173/"],"time":"2026-11-03T11:55:49.005Z"}
+{"phase":"finish","args":["--executable-path","/Applications/Google Chrome.app/Contents/MacOS/Google Chrome","open","http://localhost:4173/"],"status":0,"stdout":"✓ 一阶倒立摆实验台 · Pendulum Lab\n  http://localhost:4173/\n","stderr":"","elapsed_ms":1444}
+{"phase":"start","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"standard\" && !document.querySelector('#benchmark').disabled && !document.querySelector('#start').disabled"],"time":"2026-11-03T11:55:50.449Z"}
+{"phase":"finish","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"standard\" && !document.querySelector('#benchmark').disabled && !document.querySelector('#start').disabled"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":53}
+{"phase":"start","args":["select","#benchmark","swing-up"],"time":"2026-11-03T11:55:50.502Z"}
+{"phase":"finish","args":["select","#benchmark","swing-up"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":49}
+{"phase":"start","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"standard\" && JSON.parse(document.querySelector('#config').textContent).benchmark === \"swing-up\" && !document.querySelector('#start').disabled"],"time":"2026-11-03T11:55:50.551Z"}
+{"phase":"finish","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"standard\" && JSON.parse(document.querySelector('#config').textContent).benchmark === \"swing-up\" && !document.querySelector('#start').disabled"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":49}
+{"phase":"start","args":["select","#preset","simple"],"time":"2026-11-03T11:55:50.600Z"}
+{"phase":"finish","args":["select","#preset","simple"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"simple\" && JSON.parse(document.querySelector('#config').textContent).benchmark === \"swing-up\" && !document.querySelector('#start').disabled"],"time":"2026-11-03T11:55:50.646Z"}
+{"phase":"finish","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"simple\" && JSON.parse(document.querySelector('#config').textContent).benchmark === \"swing-up\" && !document.querySelector('#start').disabled"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":47}
+{"phase":"start","args":["eval","document.querySelector('#preset').disabled","--json"],"time":"2026-11-03T11:55:50.693Z"}
+{"phase":"finish","args":["eval","document.querySelector('#preset').disabled","--json"],"status":0,"stdout":"{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":9467515241851479685},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"http://localhost:4173/\",\"result\":false},\"error\":null}\n","stderr":"","elapsed_ms":47}
+{"phase":"start","args":["eval","document.querySelector('#preset').value","--json"],"time":"2026-11-03T11:55:50.740Z"}
+{"phase":"finish","args":["eval","document.querySelector('#preset').value","--json"],"status":0,"stdout":"{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":9467515241851479685},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"http://localhost:4173/\",\"result\":\"simple\"},\"error\":null}\n","stderr":"","elapsed_ms":48}
+{"phase":"start","args":["click","#start"],"time":"2026-11-03T11:55:50.788Z"}
+{"phase":"finish","args":["click","#start"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":61}
+{"phase":"start","args":["wait","--fn","document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'"],"time":"2026-11-03T11:55:50.849Z"}
+{"phase":"finish","args":["wait","--fn","document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'"],"status":1,"stdout":"","stderr":"✗ Wait timed out after 25000ms\n","elapsed_ms":25142}
+{"phase":"start","args":["close"],"time":"2026-11-03T11:56:15.992Z"}
+{"phase":"finish","args":["close"],"status":0,"stdout":"✓ Browser closed\n","stderr":"","elapsed_ms":185}
+{"phase":"start","args":["--executable-path","/Applications/Google Chrome.app/Contents/MacOS/Google Chrome","open","http://localhost:4173/"],"time":"2026-11-03T11:56:27.072Z"}
+{"phase":"finish","args":["--executable-path","/Applications/Google Chrome.app/Contents/MacOS/Google Chrome","open","http://localhost:4173/"],"status":0,"stdout":"✓ 一阶倒立摆实验台 · Pendulum Lab\n  http://localhost:4173/\n","stderr":"","elapsed_ms":714}
+{"phase":"start","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"standard\" && !document.querySelector('#benchmark').disabled && !document.querySelector('#start').disabled"],"time":"2026-11-03T11:56:27.786Z"}
+{"phase":"finish","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"standard\" && !document.querySelector('#benchmark').disabled && !document.querySelector('#start').disabled"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":49}
+{"phase":"start","args":["select","#benchmark","swing-up"],"time":"2026-11-03T11:56:27.835Z"}
+{"phase":"finish","args":["select","#benchmark","swing-up"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"standard\" && JSON.parse(document.querySelector('#config').textContent).benchmark === \"swing-up\" && !document.querySelector('#start').disabled"],"time":"2026-11-03T11:56:27.881Z"}
+{"phase":"finish","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"standard\" && JSON.parse(document.querySelector('#config').textContent).benchmark === \"swing-up\" && !document.querySelector('#start').disabled"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["select","#preset","simple"],"time":"2026-11-03T11:56:27.926Z"}
+{"phase":"finish","args":["select","#preset","simple"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"simple\" && JSON.parse(document.querySelector('#config').textContent).benchmark === \"swing-up\" && !document.querySelector('#start').disabled"],"time":"2026-11-03T11:56:27.970Z"}
+{"phase":"finish","args":["wait","--fn","JSON.parse(document.querySelector('#config').textContent).preset === \"simple\" && JSON.parse(document.querySelector('#config').textContent).benchmark === \"swing-up\" && !document.querySelector('#start').disabled"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["eval","document.querySelector('#preset').disabled","--json"],"time":"2026-11-03T11:56:28.015Z"}
+{"phase":"finish","args":["eval","document.querySelector('#preset').disabled","--json"],"status":0,"stdout":"{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":9467515241851479685},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"http://localhost:4173/\",\"result\":false},\"error\":null}\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["eval","document.querySelector('#preset').value","--json"],"time":"2026-11-03T11:56:28.060Z"}
+{"phase":"finish","args":["eval","document.querySelector('#preset').value","--json"],"status":0,"stdout":"{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":9467515241851479685},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"http://localhost:4173/\",\"result\":\"simple\"},\"error\":null}\n","stderr":"","elapsed_ms":48}
+{"phase":"start","args":["click","#start"],"time":"2026-11-03T11:56:28.108Z"}
+{"phase":"finish","args":["click","#start"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":51}
+{"phase":"start","args":["wait","--fn","document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'"],"time":"2026-11-03T11:56:28.159Z"}
+{"phase":"finish","args":["wait","--fn","document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'"],"status":1,"stdout":"","stderr":"✗ Wait timed out after 25000ms\n","elapsed_ms":25129}
+{"phase":"start","args":["wait","--fn","document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'"],"time":"2026-11-03T11:56:53.288Z"}
+{"phase":"finish","args":["wait","--fn","document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'"],"status":1,"stdout":"","stderr":"✗ Wait timed out after 25000ms\n","elapsed_ms":25057}
+{"phase":"start","args":["wait","--fn","document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'"],"time":"2026-11-03T11:57:18.346Z"}
+{"phase":"finish","args":["wait","--fn","document.querySelector('#status').textContent === '基准已结束' || document.querySelector('#status').textContent === '计算已冻结' || document.querySelector('#status').textContent === '已终止'"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":13182}
+{"phase":"start","args":["get","text","#end-reason"],"time":"2026-11-03T11:57:31.528Z"}
+{"phase":"finish","args":["get","text","#end-reason"],"status":0,"stdout":"首次稳定：已达成，候选快照待导出校验 · 扰动测试尚未执行\n","stderr":"","elapsed_ms":50}
+{"phase":"start","args":["get","text","#endurance-result"],"time":"2026-11-03T11:57:31.578Z"}
+{"phase":"finish","args":["get","text","#endurance-result"],"status":0,"stdout":"耐久：通过 · 起点 12.008 s · 终点 32.008 s\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["screenshot","--full","/tmp/pendulum-issue11-simple/result.png"],"time":"2026-11-03T11:57:31.622Z"}
+{"phase":"finish","args":["screenshot","--full","/tmp/pendulum-issue11-simple/result.png"],"status":0,"stdout":"✓ Screenshot saved to /tmp/pendulum-issue11-simple/result.png\n","stderr":"","elapsed_ms":167}
+{"phase":"start","args":["eval","document.querySelector('details.download-options').open=true"],"time":"2026-11-03T11:57:31.790Z"}
+{"phase":"finish","args":["eval","document.querySelector('details.download-options').open=true"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":49}
+{"phase":"start","args":["click","#prepare-download"],"time":"2026-11-03T11:57:31.839Z"}
+{"phase":"finish","args":["click","#prepare-download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":61}
+{"phase":"start","args":["wait","#download"],"time":"2026-11-03T11:57:31.900Z"}
+{"phase":"finish","args":["wait","#download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":49}
+{"phase":"start","args":["download","#download","/tmp/pendulum-issue11-simple/evidence.json"],"time":"2026-11-03T11:57:31.949Z"}
+{"phase":"finish","args":["download","#download","/tmp/pendulum-issue11-simple/evidence.json"],"status":0,"stdout":"✓ Download saved to /private/tmp/pendulum-issue11-simple/evidence.json\n","stderr":"","elapsed_ms":172}
+{"phase":"start","args":["upload","#verify-file","/tmp/pendulum-issue11-simple/evidence.json"],"time":"2026-11-03T11:57:32.124Z"}
+{"phase":"finish","args":["upload","#verify-file","/tmp/pendulum-issue11-simple/evidence.json"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":59}
+{"phase":"start","args":["wait","--text","当前证据已导出并校验"],"time":"2026-11-03T11:57:32.183Z"}
+{"phase":"finish","args":["wait","--text","当前证据已导出并校验"],"status":0,"stdout":"当前证据已导出并校验\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["wait","--fn","document.querySelector('#end-reason').textContent.includes('快照证据已导出校验')"],"time":"2026-11-03T11:57:32.228Z"}
+{"phase":"finish","args":["wait","--fn","document.querySelector('#end-reason').textContent.includes('快照证据已导出校验')"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["click","#prepare-download"],"time":"2026-11-03T11:57:32.273Z"}
+{"phase":"finish","args":["click","#prepare-download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":47}
+{"phase":"start","args":["wait","#download"],"time":"2026-11-03T11:57:32.321Z"}
+{"phase":"finish","args":["wait","#download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["download","#download","/tmp/pendulum-issue11-simple/confirmed-evidence.json"],"time":"2026-11-03T11:57:32.366Z"}
+{"phase":"finish","args":["download","#download","/tmp/pendulum-issue11-simple/confirmed-evidence.json"],"status":0,"stdout":"✓ Download saved to /private/tmp/pendulum-issue11-simple/confirmed-evidence.json\n","stderr":"","elapsed_ms":54}
+{"phase":"start","args":["upload","#verify-file","/tmp/pendulum-issue11-simple/confirmed-evidence.json"],"time":"2026-11-03T11:57:32.423Z"}
+{"phase":"finish","args":["upload","#verify-file","/tmp/pendulum-issue11-simple/confirmed-evidence.json"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["wait","--text","当前证据已导出并校验"],"time":"2026-11-03T11:57:32.467Z"}
+{"phase":"finish","args":["wait","--text","当前证据已导出并校验"],"status":0,"stdout":"当前证据已导出并校验\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["click","#reset"],"time":"2026-11-03T11:57:32.513Z"}
+{"phase":"finish","args":["click","#reset"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":51}
+{"phase":"start","args":["wait","--text","准备就绪"],"time":"2026-11-03T11:57:32.564Z"}
+{"phase":"finish","args":["wait","--text","准备就绪"],"status":0,"stdout":"准备就绪\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["click","#start"],"time":"2026-11-03T11:57:32.608Z"}
+{"phase":"finish","args":["click","#start"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":51}
+{"phase":"start","args":["wait","--text","运行中"],"time":"2026-11-03T11:57:32.659Z"}
+{"phase":"finish","args":["wait","--text","运行中"],"status":0,"stdout":"运行中\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["click","#stop"],"time":"2026-11-03T11:57:32.706Z"}
+{"phase":"finish","args":["click","#stop"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":58}
+{"phase":"start","args":["wait","--text","已终止"],"time":"2026-11-03T11:57:32.765Z"}
+{"phase":"finish","args":["wait","--text","已终止"],"status":0,"stdout":"已终止\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["get","text","#end-reason"],"time":"2026-11-03T11:57:32.809Z"}
+{"phase":"finish","args":["get","text","#end-reason"],"status":0,"stdout":"起摆 · 用户终止；首次稳定未完成，扰动测试阻塞\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["close"],"time":"2026-11-03T11:57:32.853Z"}
+{"phase":"finish","args":["close"],"status":0,"stdout":"✓ Browser closed\n","stderr":"","elapsed_ms":183}
