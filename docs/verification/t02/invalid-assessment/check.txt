@@ -1,0 +1,128 @@
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 check
+> npm run format:check && npm run lint:docs && npm run typecheck && npm test && npm run build
+
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 lint:docs
+> markdownlint-cli2
+
+markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)
+Finding: *.md docs/agents/**/*.md .github/**/*.md !.agents/** !docs/origin/** !node_modules/**
+Linting: 11 files
+Summary: 0 issues in 0 files
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 typecheck
+> tsc --noEmit
+
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 test
+> node --test scripts/*.test.mjs tests/*.test.ts
+
+✔ accepts AI disclosure (3.0775ms)
+✔ accepts human disclosure (0.375708ms)
+✔ accepts automation disclosure (0.341666ms)
+✔ rejects missing declaration (0.26775ms)
+✔ rejects agent missing (0.242209ms)
+✔ rejects conflicting declarations (0.25525ms)
+✔ rejects duplicate declarations (0.208208ms)
+✔ rejects fenced example (0.677917ms)
+✔ rejects nonfinal example (0.288917ms)
+✔ rejects unnamed automation (2.051666ms)
+✔ rejects misleading human declaration (0.246292ms)
+✔ rejects cross-paragraph backtick fence (0.288291ms)
+✔ rejects cross-paragraph tilde fence (0.2435ms)
+✔ rejects cross-paragraph HTML comment (0.441917ms)
+✔ accepts footer after closed code fences and comments (0.317708ms)
+✔ accepts visible footer after inline comment marker (0.368375ms)
+✔ accepts visible footer after indented code comment marker (0.387041ms)
+✔ accepts visible footer after multiline code span (0.247291ms)
+✔ rejects quoted disclosure (0.357542ms)
+✔ rejects indented disclosure (0.1225ms)
+✔ rejects hidden closed comment (0.164833ms)
+✔ 无效基准保留完整窗口误差不可评估和冻结阈值，不将异常诊断冒充物理通过 (1831.043125ms)
+✔ 异步导出冻结整批原始记录与结果，后续继续推进不改写导出快照 (49.517458ms)
+✔ 终止只使已经开始的当前基准无效，尚未创建的项目保持未执行 (45.363417ms)
+✔ 基准暂停证据区分人工与后台原因，默认公开暂停为人工操作 (11.27075ms)
+✔ 冻结基准通过同一实验会话保持两个精确平衡点，输出完整输入及独立误差 (1791.489125ms)
+✔ 10秒逐点收敛及30秒逐物理步能量漂移使用冻结容差，数值失败保留原输入和最后有效状态 (3350.243209ms)
+✔ 三种已批准阻力分别及共同耗散，保存tanh平滑与能量账本 (1499.911917ms)
+✔ 自然运动、多圈及配重基准用独立动量参考核对四状态和全部质量的能量 (1451.125959ms)
+✔ 真实构建清单识别未暂存及已暂存的源码删除，恢复后身份回到干净版本 (2221.203209ms)
+✔ 零重力无阻力基准按物理时间匀速运动，并完整记录10ms采样点 (8.538333ms)
+✔ 水平释放的有质量杆遵循重力动力学，而非匀速或预设动画 (0.277458ms)
+✔ 暂停不推进物理时间，继续保留状态，重置生成全新实验 (0.6725ms)
+✔ 拒绝非法物理配置，并隔离外部对已创建配置的修改 (0.461459ms)
+✔ 导出同一次实验的完整配置、原始CSV、事件、结果及可独立校验的清单 (5.468083ms)
+✔ 物理与采样周期相互独立，达到基准时长后精确结束且不静默取整输入 (0.369625ms)
+✔ 黏性阻力按解析匀速衰减基准耗散动能，能量账本可核验 (1.813ms)
+✔ 步内触边定位真实终止时刻，保留终点且不碰撞反弹 (0.296666ms)
+✔ 数值发散冻结在最后有效状态，导出不包含非法物理样本 (1.103416ms)
+✔ 一次推进与分批推进产生相同的10秒原始轨迹，完整结束含1001个采样点 (42.29025ms)
+✔ 触边事件独立携带四状态与违规条件，含初始触边 (0.3405ms)
+✔ 导出请求逐次记事件且不添加重复样本，不冒称写盘已成功 (3.735083ms)
+✔ 步内触边后返回仍在首次触边终止，左右边界及两种物理步长一致 (0.928333ms)
+✔ 合法整步时长不受浮点除法误差影响，非整步及超容量输入仍拒绝 (15.762334ms)
+ℹ tests 44
+ℹ suites 0
+ℹ pass 44
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8219.313958
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 build
+> tsc --noEmit && vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 9 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/build-info.json                         0.17 kB │ gzip: 0.15 kB
+dist/assets/experiment.worker-C4vyEl4j.js   11.58 kB
+dist/index.html                             11.61 kB │ gzip: 3.32 kB
+dist/assets/benchmarks.worker-nf9JAY9G.js  180.79 kB
+dist/assets/index-BSw4zcpN.css               7.58 kB │ gzip: 2.35 kB
+dist/assets/index-ApUXXjHR.js               16.70 kB │ gzip: 7.05 kB
+
+✓ built in 164ms

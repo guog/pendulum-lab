@@ -1,0 +1,1 @@
+T02真实Chrome验证通过：/tmp/pendulum-merge19/browser-invalid-retry

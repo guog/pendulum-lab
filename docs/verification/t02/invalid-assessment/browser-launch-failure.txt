@@ -1,0 +1,24 @@
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 test:browser
+> node scripts/browser-smoke.mjs && node scripts/browser-benchmarks.mjs
+
+真实浏览器检查通过，证据位于：/tmp/pendulum-merge19/browser-invalid-final
+file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-benchmarks.mjs:31
+    throw new Error(`浏览器步骤失败 ${args.join(' ')}: ${result.stdout} ${result.stderr}`)
+          ^
+
+Error: 浏览器步骤失败 --executable-path /Applications/Google Chrome.app/Contents/MacOS/Google Chrome open http://localhost:4174/:  npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+    at browser (file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-benchmarks.mjs:31:11)
+    at file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-benchmarks.mjs:138:3
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v26.7.0
