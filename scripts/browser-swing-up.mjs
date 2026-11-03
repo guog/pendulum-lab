@@ -3,6 +3,8 @@ import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 const dir = process.env.BROWSER_ARTIFACTS_DIR ?? '/tmp/pendulum-issue9-browser'
+const preset = process.env.SWING_PRESET ?? 'simple'
+assert.ok(['simple', 'standard'].includes(preset))
 mkdirSync(dir, { recursive: true })
 const server = spawn('npm', ['run', 'preview'], {
   stdio: ['ignore', 'pipe', 'pipe'],
@@ -29,14 +31,16 @@ try {
   )
   waitForConfig(browser, 'standard')
   browser('select', '#benchmark', 'swing-up')
-  waitForConfig(browser, 'simple', 'swing-up')
+  waitForConfig(browser, 'standard', 'swing-up')
+  if (preset === 'simple') browser('select', '#preset', 'simple')
+  waitForConfig(browser, preset, 'swing-up')
   assert.equal(
     JSON.parse(browser('eval', "document.querySelector('#preset').disabled", '--json')).data.result,
-    true,
+    false,
   )
   assert.equal(
     JSON.parse(browser('eval', "document.querySelector('#preset').value", '--json')).data.result,
-    'simple',
+    preset,
   )
   browser('click', '#start')
   browser(
@@ -53,6 +57,9 @@ try {
   browser('download', '#download', `${dir}/evidence.json`)
   const bundle = JSON.parse(readFileSync(`${dir}/evidence.json`))
   const result = JSON.parse(bundle.files['result.json'])
+  const config = JSON.parse(bundle.files['config.json'])
+  assert.equal(config.preset, preset)
+  assert.equal(config.timing.duration_s, preset === 'simple' ? 30 : 60)
   verifyManifest(bundle.files, JSON.parse(bundle.files['manifest.json']))
   console.log(
     '首次稳定状态:',

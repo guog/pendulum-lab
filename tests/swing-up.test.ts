@@ -183,3 +183,40 @@ test('首次稳定之前确认的部分记录不能确认之后生成的快照',
   assert.equal(session.read().first_stable.status, 'passed')
   assert.equal(session.read().first_stable.disturbance_eligibility, 'eligible')
 })
+
+test('标准工况自动起摆保持冻结物理参数与60秒时限', () => {
+  const config = createConfig('standard', 'swing-up')
+  assert.equal(config.timing.duration_s, 60)
+  assert.equal(config.physics.rod_length_m, 0.5)
+  assert.equal(config.physics.cart_mass_kg, 1)
+  assert.equal(config.physics.track_length_m, 2)
+  assert.equal(config.physics.force_max_N, 20)
+  const session = createSession(config)
+  session.start()
+  assert.equal(session.read().state.theta_unwrapped_rad, Math.PI)
+  assert.notEqual(session.read().samples[0]?.force_requested_N, 0)
+})
+
+test('标准工况使用自身冻结配置判定资格并导出真实结果', async () => {
+  const session = createSession(createConfig('standard', 'swing-up'))
+  session.start()
+  session.advance(60)
+  const result = session.read()
+  assert.ok(!result.qualification_reasons.includes('nonstandard_config'))
+  const bundle = await session.exportEvidence()
+  assert.equal(JSON.parse(bundle.files['config.json']!).preset, 'standard')
+  assert.equal(
+    JSON.parse(bundle.files['result.json']!).first_stable.physical_status,
+    result.first_stable.physical_status,
+  )
+})
+
+test('标准工况篡改物理参数不能获得合格快照', () => {
+  const config = createConfig('standard', 'swing-up')
+  config.physics.force_max_N = 21
+  const session = createSession(config)
+  session.start()
+  session.advance(60)
+  assert.ok(session.read().qualification_reasons.includes('nonstandard_config'))
+  assert.equal(session.read().first_stable.snapshot, null)
+})
