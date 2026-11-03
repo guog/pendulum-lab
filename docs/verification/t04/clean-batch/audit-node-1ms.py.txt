@@ -1,0 +1,87 @@
+import csv
+import gzip
+import hashlib
+import io
+import json
+import math
+import sys
+from collections import Counter
+from pathlib import Path
+
+if not __debug__:
+    raise RuntimeError('Optimized Python disables required audit checks')
+
+path = Path(sys.argv[1])
+raw = path.read_bytes()
+bundle = json.loads(gzip.decompress(raw))
+assert bundle['kind'] == 'pendulum-research-bundle'
+manifest = json.loads(bundle['files']['manifest.json'])
+required = {'config.json', 'samples/chunk-000001.csv', 'events/part-000001.jsonl', 'result.json', 'snapshot.json', 'controller.json'}
+manifest_paths = [entry['path'] for entry in manifest['files']]
+assert len(manifest_paths) == len(set(manifest_paths))
+assert set(manifest_paths) == required
+assert set(bundle['files']) == required | {'manifest.json'}
+for entry in manifest['files']:
+    content = bundle['files'][entry['path']].encode('utf-8')
+    assert len(content) == entry['byte_length']
+    assert hashlib.sha256(content).hexdigest() == entry['sha256']
+events = [json.loads(line) for line in bundle['files']['events/part-000001.jsonl'].splitlines()]
+samples = list(csv.DictReader(io.StringIO(bundle['files']['samples/chunk-000001.csv'])))
+config = json.loads(bundle['files']['config.json'])
+result = json.loads(bundle['files']['result.json'])
+assert bundle['experiment_id'] == config['experiment_id'] == result['experiment_id'] == manifest['experiment_id']
+assert all(e['experiment_id'] == bundle['experiment_id'] for e in events)
+assert config['timing']['physics_step_s'] == .001
+assert config['timing']['sample_period_s'] == .001
+assert len(samples) == result['sample_count']
+keys = ('cart_x_m', 'cart_v_m_s', 'theta_unwrapped_rad', 'theta_dot_rad_s')
+by_tick = {}
+for event in events:
+    if event['event_type'] in ('stability_violation', 'stability_enter', 'stability_reset', 'first_stable'):
+        tick = round(event['sim_time_s'] / .001)
+        assert abs(tick * .001 - event['sim_time_s']) < 1e-10
+        by_tick.setdefault(tick, []).append(event)
+assert all(e['event_index'] == i for i, e in enumerate(events))
+assert all(events[i]['sim_time_s'] <= events[i+1]['sim_time_s'] for i in range(len(events)-1))
+assert set(by_tick).issubset(range(len(samples)))
+previous = set()
+start = None
+counts = Counter()
+for index, row in enumerate(samples):
+    time = float(row['sim_time_s'])
+    assert int(row['sample_index']) == index
+    assert abs(time - index * .001) < 1e-10
+    x, v, theta, omega = (float(row[k]) for k in keys)
+    assert all(math.isfinite(value) for value in (time, x, v, theta, omega))
+    angle = math.atan2(math.sin(theta), math.cos(theta))
+    failures = set()
+    if abs(angle) > math.pi / 60: failures.add('angle')
+    if abs(omega) > .2: failures.add('angular_velocity')
+    if abs(x) > .1: failures.add('position')
+    if abs(v) > .1: failures.add('velocity')
+    expected = []
+    entered = failures - previous
+    if entered: expected.append('stability_violation')
+    if failures and start is not None:
+        expected.append('stability_reset')
+        start = None
+    elif not failures and start is None:
+        expected.append('stability_enter')
+        start = index
+    if start is not None and index - start == 5000:
+        expected.append('first_stable')
+    observed = by_tick.get(index, [])
+    assert [e['event_type'] for e in observed] == expected, (index, expected, observed)
+    for e in observed:
+        counts[e['event_type']] += 1
+        payload = e['payload']['state'] if e['event_type'] == 'first_stable' else e['payload']
+        for key in keys: assert abs(float(payload[key]) - float(row[key])) < 1e-12
+        if e['event_type'] == 'stability_violation':
+            assert set(payload['failed_thresholds']) == failures
+            assert set(payload['entered_thresholds']) == entered
+    previous = failures
+assert len(samples) == 12009
+assert counts['first_stable'] == 1
+assert abs(result['first_stable']['physical_first_stable_s'] - float(samples[-1]['sim_time_s'])) < 1e-10
+assert result['first_stable']['physical_status'] == 'passed'
+print(json.dumps({'method': 'independent threshold/event audit of saved 1ms Node samples; same model implementation, not Chrome samples', 'source_sha256': hashlib.sha256(raw).hexdigest(), 'experiment_id': bundle['experiment_id'], 'samples_checked': len(samples), 'threshold_entry_events': counts['stability_violation'], 'stability_entries': counts['stability_enter'], 'stability_resets': counts['stability_reset'], 'first_stability_events': counts['first_stable'], 'last_sample_s': float(samples[-1]['sim_time_s']), 'status': 'passed'}, indent=2))
