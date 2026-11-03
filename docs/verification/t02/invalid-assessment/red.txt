@@ -1,0 +1,32 @@
+✖ 无效基准保留完整窗口误差不可评估和冻结阈值，不将异常诊断冒充物理通过 (1518.925792ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1616.543541
+
+✖ failing tests:
+
+test at tests/benchmark-invalid-assessment.test.ts:5:1
+✖ 无效基准保留完整窗口误差不可评估和冻结阈值，不将异常诊断冒充物理通过 (1518.925792ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'unavailable'
+  
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/benchmark-invalid-assessment.test.ts:13:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'unavailable',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

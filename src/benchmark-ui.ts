@@ -103,6 +103,13 @@ export function initializeBenchmarks(activityChanged: (active: boolean) => void)
         reason.className = 'explanation'
         reason.textContent = `${item.requirement} · ${item.reason}`
         const list = document.createElement('ul')
+        if (item.assessment) {
+          for (const text of [item.assessment.error, item.assessment.threshold]) {
+            const row = document.createElement('li')
+            row.textContent = text
+            list.append(row)
+          }
+        }
         for (const metric of item.metrics) {
           const row = document.createElement('li')
           row.textContent = `${metric.name}：${metric.actual.toExponential(6)} ${metric.unit}；阈值 ≤ ${metric.limit.toExponential(6)} ${metric.unit}。${metric.basis}`

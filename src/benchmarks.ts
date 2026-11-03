@@ -14,6 +14,7 @@ export type BenchmarkCase = BenchmarkInput & {
   status: VerificationStatus
   reason: string
   metrics: Metric[]
+  assessment: { status: 'unavailable' | 'not_applicable'; error: string; threshold: string } | null
   experiment_id: string | null
   sim_time_s: number
   ledger: {
@@ -27,6 +28,48 @@ export type BenchmarkCase = BenchmarkInput & {
     torque_external_work_J: number
     energy_residual_J: number
   } | null
+}
+
+function unavailableAssessment(item: BenchmarkCase): NonNullable<BenchmarkCase['assessment']> {
+  if (item.id === 'numerical-failure')
+    return {
+      status: 'not_applicable',
+      error:
+        '物理误差不适用：本项为数值异常安全诊断；期望异常时冻结并保留最后有效状态与诊断，轨迹仍为无效。',
+      threshold: '物理通过阈值不适用；不将安全冻结行为计为物理通过。',
+    }
+  const limits = item.id.startsWith('equilibrium')
+    ? ['最大状态偏差 ≤ 0（各状态SI绝对差）', '能量绝对误差 ≤ 1e-12 J']
+    : [
+        '独立参考车位差 ≤ 1e-6 m',
+        '车速差 ≤ 1e-5 m/s',
+        '累计角差 ≤ 1e-6 rad',
+        '角速度差 ≤ 1e-4 rad/s',
+        '初始机械能误差 ≤ 1e-12 J',
+      ]
+  if (item.id.startsWith('rotation')) limits.push('累计角至少两圈（多圈不足量 ≤ 0 rad）')
+  if (item.id === 'release') limits.push('自然下落布尔违规 ≤ 0')
+  if (
+    !item.id.startsWith('equilibrium') &&
+    item.config.physics.cart_coulomb_N === 0 &&
+    item.config.physics.cart_viscous_N_s_m === 0
+  )
+    limits.push('水平质心运动误差 ≤ 1e-7 kg·m')
+  if (['coulomb', 'cart-viscous', 'joint-viscous', 'combined-damping'].includes(item.id)) {
+    limits.push(
+      '独立参考耗散误差及耗散账本残差 ≤ 1e-7 J',
+      '耗散倒退量 ≤ 1e-12 J',
+      '缺少正耗散布尔违规 ≤ 0',
+    )
+    if (item.id === 'coulomb' || item.id === 'cart-viscous') limits.push('解析车速误差 ≤ 1e-8 m/s')
+  }
+  if (item.id === 'convergence-0.5ms') limits.push('10s两步长最大车位差 ≤ 0.001 m、最大角差 ≤ 0.1°')
+  if (item.id === 'energy-30s') limits.push('30s最大相对能量漂移 ≤ 0.001（0.1%）')
+  return {
+    status: 'unavailable',
+    error: `完整窗口误差未计算：已记录 ${item.sim_time_s}s / ${item.config.timing.duration_s}s；${item.reason}`,
+    threshold: `原冻结完整窗口阈值（未作通过判定）：${limits.join('；')}。依据：${item.requirement}、解析关系及${reference.version}独立参考；输入、步长和容差不变。`,
+  }
 }
 export type BenchmarkBundle = {
   schema_version: 1
@@ -286,6 +329,7 @@ export function createPhysicsBenchmarks(preset: PresetId) {
     status: 'not_executed',
     reason: '尚未执行',
     metrics: [],
+    assessment: null,
     experiment_id: null,
     sim_time_s: 0,
     ledger: null,
@@ -342,6 +386,7 @@ export function createPhysicsBenchmarks(preset: PresetId) {
           output.status === 'completed'
             ? '按冻结输入完成，逐项比较原始数据'
             : `提前结束：${output.status}；${JSON.stringify(output.events.at(-1))}；最后有效状态=${JSON.stringify(output.state)}`
+        if (item.status === 'invalid') item.assessment = unavailableAssessment(item)
       } catch (error) {
         item.status = 'blocked'
         item.reason = error instanceof Error ? error.message : String(error)
@@ -369,6 +414,7 @@ export function createPhysicsBenchmarks(preset: PresetId) {
           session.stop()
           item.status = 'invalid'
           item.reason = '批次被终止；保留已运行记录'
+          item.assessment = unavailableAssessment(item)
         }
         status = 'stopped'
       }

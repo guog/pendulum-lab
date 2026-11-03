@@ -1,5 +1,7 @@
 # T02验证与审查记录
 
+最新合并前补充：[无效实验误差与阈值说明](invalid-assessment/review.md)。
+
 后续完整差异审查在f7d6953发现三个P2；本页以下为此前实施和复核的历史记录，不能替代后续完整审查结论。三个P2的TDD修复及完整双轴复审见[全量审查P2修复记录](full-review-p2/review.md)；PR远端新增的暂停原因P2及合并前验证见[暂停原因修复记录](pause-reason/review.md)。
 
 本轮仅实施[#7](https://github.com/guog/pendulum-lab/issues/7)。依据[#4](https://github.com/guog/pendulum-lab/issues/4)、[#5](https://github.com/guog/pendulum-lab/issues/5)、[T01实现与记录契约](../../design/t01-implementation.md)及其历史验证继续工作。未跟踪docs/origin/的文件列表和SHA-256在开始、结束时比较，保持原样且未纳入提交。

@@ -1,0 +1,9 @@
+✔ 无效基准保留完整窗口误差不可评估和冻结阈值，不将异常诊断冒充物理通过 (1725.657ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1825.316709

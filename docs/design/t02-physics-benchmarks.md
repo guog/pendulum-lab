@@ -51,7 +51,7 @@ createPhysicsBenchmarks编排createSession的创建、开始、推进、暂停�
 
 公开pause(reason)默认reason为manual。页面暂停按钮明确发送manual，可见性变化明确发送background，Worker和批次接口将该原因原样传给子实验，JSONL事件保留真实来源；两种暂停均不推进仿真时间。
 
-结果逐项使用not_executed、blocked、passed、failed、invalid。尚未取得参考或缺少比较条件为阻塞；完成且超容差为失败；触边或数值异常使对应完整窗口验证无效。numerical-failure故意检查已有冻结路径，其轨迹仍标无效，而安全冻结行为另由测试断言。中途停止保留已执行部分，其余未执行。每项包含完整输入、关联需求、实验UUID、误差、阈值、计算关系和原因。
+结果逐项使用not_executed、blocked、passed、failed、invalid。尚未取得参考或缺少比较条件为阻塞；完成且超容差为失败；触边或数值异常使对应完整窗口验证无效。numerical-failure故意检查已有冻结路径，其轨迹仍标无效，而安全冻结行为另由测试断言。中途停止保留已执行部分，其余未执行。每项包含完整输入、关联需求、实验UUID、误差、阈值、计算关系和原因。无效项目仍保留空metrics，不计算未完成窗口误差；assessment明确unavailable及实际/要求时长，并展示原冻结阈值和依据。数值异常诊断标not_applicable，说明物理误差与通过阈值不适用、安全冻结期望，且不改判物理通过。该说明随公开输出与results.json导出，也显示在页面。
 
 批次JSON schema_version=1，kind=pendulum-physics-benchmarks，包含batch_id和逻辑files：results.json、reference.json、每项experiments/<id>/下的T01配置/原始CSV/JSONL事件/result/manifest，以及根manifest。每个内层清单保持实验身份，根清单按UTF-8字节计算所有逻辑文件SHA-256和长度，不对自身递归摘要。不是工作区分块或断电耐久性承诺。
 

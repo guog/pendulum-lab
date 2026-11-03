@@ -44,6 +44,19 @@ function verify(raw, preset) {
   assert.equal(results.status, 'completed')
   assert.equal(results.batch_id, bundle.batch_id)
   assert.equal(results.cases.length, 16)
+  browser('eval', `document.querySelector('[data-id="numerical-failure"]').open = true`)
+  const numerical = results.cases.find((item) => item.id === 'numerical-failure')
+  assert.equal(numerical.assessment.status, 'not_applicable')
+  assert.match(numerical.assessment.threshold, /不适用/)
+  assert.match(text('#bench-results'), /物理误差不适用/)
+  if (preset === 'standard') {
+    browser('eval', `document.querySelector('[data-id="rotation"]').open = true`)
+    const rotation = results.cases.find((item) => item.id === 'rotation')
+    assert.equal(rotation.assessment.status, 'unavailable')
+    assert.match(rotation.assessment.threshold, /1e-6 m/)
+    assert.match(text('#bench-results'), /完整窗口误差未计算/)
+    assert.match(text('#bench-results'), /原冻结完整窗口阈值/)
+  }
   if (preset === 'standard') {
     const pauses = Object.entries(bundle.files)
       .filter(([path]) => path.endsWith('.jsonl'))
