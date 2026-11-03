@@ -50,6 +50,8 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
   const files: Record<string, string> = {
     'config.json': stringify({
       ...output.config,
+      trajectory_source: output.trajectory_source,
+      synthetic_trajectory: output.synthetic_trajectory,
       experiment_id,
       created_at_utc: output.created_at_utc,
     }),
@@ -93,6 +95,7 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
       schema_version: 1,
       experiment_id,
       status: output.status,
+      trajectory_source: output.trajectory_source,
       execution_mode: 'memory-research',
       formal_acceptance: 'not_eligible',
       actuation_assessment: assessActuation(output),

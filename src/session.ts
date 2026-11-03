@@ -16,9 +16,36 @@ export type ExperimentEvent = {
   payload: Record<string, unknown>
 }
 
+export type SyntheticStep = { tick: number; state: State }
+
 export function createSession(input: ExperimentConfig) {
+  return createSessionInternal(input, null)
+}
+
+export function createSyntheticSession(input: ExperimentConfig, steps: SyntheticStep[]) {
+  if (
+    !Array.isArray(steps) ||
+    steps.length > 10000 ||
+    steps.some(
+      (step, index) =>
+        !step ||
+        !Number.isSafeInteger(step.tick) ||
+        step.tick <= 0 ||
+        (index > 0 && step.tick <= steps[index - 1]!.tick) ||
+        !step.state ||
+        !['cart_x_m', 'cart_v_m_s', 'theta_unwrapped_rad', 'theta_dot_rad_s'].every((key) =>
+          Number.isFinite(step.state[key as keyof State]),
+        ),
+    )
+  )
+    throw new Error('非法合成轨迹')
+  return createSessionInternal(input, structuredClone(steps))
+}
+
+function createSessionInternal(input: ExperimentConfig, syntheticSteps: SyntheticStep[] | null) {
   validateConfig(input)
   const config = structuredClone(input)
+  const syntheticByTick = new Map(syntheticSteps?.map((step) => [step.tick, step.state]) ?? [])
   const controller = config.control_mode === 'automatic' ? createController(config.physics) : null
   const controlSteps = Math.round(config.timing.control_period_s / config.timing.physics_step_s)
   const initialEnergy = energy(config.initial_state, config.physics)
@@ -37,6 +64,7 @@ export function createSession(input: ExperimentConfig) {
   let stableStart: number | null = null
   let previousFailures = new Set<string>()
   type StableSnapshot = {
+    trajectory_source: 'physics' | 'synthetic'
     sim_time_s: number
     stable_since_s: number
     config: ExperimentConfig
@@ -268,6 +296,7 @@ export function createSession(input: ExperimentConfig) {
     if (physicallyStable && qualificationReasons.size === 0) {
       exportConfirmed = false
       stableSnapshot = structuredClone({
+        trajectory_source: syntheticSteps === null ? 'physics' : 'synthetic',
         sim_time_s: time(),
         stable_since_s: stableStart * dt,
         config,
@@ -382,7 +411,29 @@ export function createSession(input: ExperimentConfig) {
           sample()
           break
         }
-        const endpoint = next.firstBoundary(config.physics.track_length_m / 2)
+        const physicalEndpoint = next.firstBoundary(config.physics.track_length_m / 2)
+        const injected = physicalEndpoint ? undefined : syntheticByTick.get(tick + 1)
+        if (injected) {
+          const injectedEnergy = energy(injected, config.physics)
+          if (!Object.values(injectedEnergy).every(Number.isFinite)) {
+            status = 'error'
+            qualificationReasons.add('numerical_error')
+            finishConditions()
+            failEndurance('numerical_error')
+            event('numerical_error', {
+              attempted_sim_time_s: time() + dt,
+              reason: '合成状态能量非有限，保留最后有效状态',
+            })
+            sample()
+            break
+          }
+          next.state = structuredClone(injected)
+        }
+        const endpoint =
+          physicalEndpoint ??
+          (injected && Math.abs(injected.cart_x_m) >= config.physics.track_length_m / 2
+            ? { ...next, duration_s: dt }
+            : undefined)
         if (endpoint) {
           terminalTime = tick * dt + endpoint.duration_s
           state = endpoint.state
@@ -392,6 +443,7 @@ export function createSession(input: ExperimentConfig) {
           torqueWork += endpoint.torque_external_work_delta_J
           status = 'stopped'
           observe()
+          if (injected) event('synthetic_state', { ...injected, tick: tick + 1 })
           boundaryEvent()
           failEndurance('boundary')
           sample()
@@ -403,6 +455,7 @@ export function createSession(input: ExperimentConfig) {
         forceWork += next.force_external_work_delta_J
         torqueWork += next.torque_external_work_delta_J
         tick++
+        if (injected) event('synthetic_state', { ...state, tick })
         const previousForces = { ...forces }
         applyInputs()
         if (controller && tick % controlSteps === 0) updateController()
@@ -492,44 +545,59 @@ export function createSession(input: ExperimentConfig) {
     read() {
       return structuredClone({
         config,
+        trajectory_source: syntheticSteps === null ? 'physics' : 'synthetic',
+        synthetic_trajectory: syntheticSteps,
         first_stable: {
-          status: !controller
-            ? 'not_executed'
-            : stabilityStatus === 'passed'
-              ? exportConfirmed
-                ? 'passed'
-                : 'blocked'
-              : status === 'stopped' && !qualificationReasons.has('boundary')
-                ? 'invalid'
-                : stabilityStatus === 'failed' ||
-                    status === 'error' ||
-                    qualificationReasons.has('boundary')
-                  ? nonstandard
+          status:
+            syntheticSteps !== null
+              ? 'invalid'
+              : !controller
+                ? 'not_executed'
+                : stabilityStatus === 'passed'
+                  ? exportConfirmed
+                    ? 'passed'
+                    : 'blocked'
+                  : status === 'stopped' && !qualificationReasons.has('boundary')
                     ? 'invalid'
-                    : 'failed'
-                  : status === 'ready'
-                    ? 'not_executed'
-                    : 'blocked',
+                    : stabilityStatus === 'failed' ||
+                        status === 'error' ||
+                        qualificationReasons.has('boundary')
+                      ? nonstandard
+                        ? 'invalid'
+                        : 'failed'
+                      : status === 'ready'
+                        ? 'not_executed'
+                        : 'blocked',
           reason:
-            stabilityStatus !== 'passed' &&
-            status === 'stopped' &&
-            !qualificationReasons.has('boundary')
-              ? 'user_stopped'
-              : stabilityStatus === 'passed' && !exportConfirmed
-                ? 'pending_export'
-                : nonstandard
-                  ? 'nonstandard_config'
-                  : null,
+            syntheticSteps !== null
+              ? 'synthetic_trajectory'
+              : stabilityStatus !== 'passed' &&
+                  status === 'stopped' &&
+                  !qualificationReasons.has('boundary')
+                ? 'user_stopped'
+                : stabilityStatus === 'passed' && !exportConfirmed
+                  ? 'pending_export'
+                  : nonstandard
+                    ? 'nonstandard_config'
+                    : null,
           physical_stable_since_s: physicalStableSince,
           physical_first_stable_s: physicalFirstStable,
-          physical_status: physicallyStable ? 'passed' : stabilityStatus,
+          physical_status:
+            syntheticSteps !== null
+              ? 'not_executed'
+              : physicallyStable
+                ? 'passed'
+                : stabilityStatus,
           snapshot: stableSnapshot,
           stable_since_s: physicalStableSince ?? (stableStart === null ? null : stableStart * dt),
-          disturbance_eligibility: stableSnapshot
-            ? exportConfirmed
-              ? 'eligible'
-              : 'blocked_pending_export'
-            : 'blocked',
+          disturbance_eligibility:
+            syntheticSteps !== null
+              ? 'blocked'
+              : stableSnapshot
+                ? exportConfirmed
+                  ? 'eligible'
+                  : 'blocked_pending_export'
+                : 'blocked',
         },
         endurance: {
           status:
@@ -538,6 +606,7 @@ export function createSession(input: ExperimentConfig) {
             ['completed', 'stopped', 'error'].includes(status)
               ? 'blocked'
               : enduranceStatus,
+          validity: syntheticSteps === null ? 'physical' : 'synthetic',
           start_s: enduranceStart === null ? null : enduranceStart * dt,
           end_s: enduranceEnd,
           rules_version: config.versions.rules,
