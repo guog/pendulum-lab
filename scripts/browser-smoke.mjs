@@ -1,9 +1,9 @@
+import { createBrowser, verifyManifest } from './browser-driver.mjs'
 import { spawn, spawnSync, execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { mkdtemp } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
-import { createHash } from 'node:crypto'
 import assert from 'node:assert/strict'
 import { readBuildIdentity } from './build-identity.ts'
 
@@ -24,17 +24,8 @@ const server = spawn('npm', ['run', 'preview'], {
   stdio: ['ignore', 'pipe', 'pipe'],
 })
 const log = []
-function browser(...args) {
-  const result = spawnSync(
-    'npx',
-    ['--yes', 'agent-browser@0.41.1', '--session', session, ...args],
-    { encoding: 'utf8', timeout: 30_000, maxBuffer: 8 * 1024 * 1024 },
-  )
-  log.push({ args, status: result.status, stdout: result.stdout, stderr: result.stderr })
-  if (result.status !== 0)
-    throw new Error(`浏览器步骤失败：${args.join(' ')}\n${result.stdout}\n${result.stderr}`)
-  return result.stdout.trim()
-}
+const browser = createBrowser(session, log, join(artifacts, 'browser-steps.jsonl'))
+
 const click = (name) => {
   const ids = {
     开始基准: '#start',
@@ -72,10 +63,7 @@ function verifyBundle(path) {
   )
   assert.equal(typeof build.source_dirty, 'boolean')
   assert.equal(result.formal_acceptance, 'not_eligible')
-  for (const file of manifest.files) {
-    assert.equal(createHash('sha256').update(bundle.files[file.path]).digest('hex'), file.sha256)
-    assert.equal(Buffer.byteLength(bundle.files[file.path]), file.byte_length)
-  }
+  verifyManifest(bundle.files, manifest)
   const lines = bundle.files['samples/chunk-000001.csv'].trim().split('\n')
   assert.equal(lines.length - 1, result.sample_count)
   assert.ok(lines.slice(1).every((line) => !/NaN|Infinity/.test(line)))

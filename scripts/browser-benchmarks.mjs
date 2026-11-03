@@ -1,3 +1,4 @@
+import { createBrowser, verifyManifest } from './browser-driver.mjs'
 import { spawn, spawnSync, execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { resolve, join } from 'node:path'
@@ -20,17 +21,8 @@ const server = spawn('npm', ['run', 'preview', '--', '--port', '4174', '--strict
   detached: true,
   stdio: ['ignore', 'pipe', 'pipe'],
 })
-function browser(...args) {
-  const result = spawnSync(
-    'npx',
-    ['--yes', 'agent-browser@0.41.1', '--session', session, ...args],
-    { encoding: 'utf8', timeout: 30_000, maxBuffer: 8 * 1024 * 1024 },
-  )
-  log.push({ args, status: result.status, stdout: result.stdout, stderr: result.stderr })
-  if (result.status !== 0)
-    throw new Error(`浏览器步骤失败 ${args.join(' ')}: ${result.stdout} ${result.stderr}`)
-  return result.stdout.trim()
-}
+const browser = createBrowser(session, log, join(artifacts, 'browser-steps.jsonl'))
+
 const click = (selector) => {
   browser('scrollintoview', selector)
   browser('click', selector)
@@ -68,10 +60,7 @@ function verify(raw, preset) {
     )
   }
   const manifest = JSON.parse(bundle.files['manifest.json'])
-  for (const file of manifest.files) {
-    assert.equal(hash(bundle.files[file.path]), file.sha256)
-    assert.equal(Buffer.byteLength(bundle.files[file.path]), file.byte_length)
-  }
+  verifyManifest(bundle.files, manifest)
   for (const item of results.cases) {
     const prefix = `experiments/${item.id}/`
     const config = JSON.parse(bundle.files[prefix + 'config.json'])
@@ -83,8 +72,7 @@ function verify(raw, preset) {
       config.environment.user_agent.match(/Chrome\/(\d+)/)?.[1],
       chromeVersion.match(/Chrome (\d+)/)?.[1],
     )
-    for (const file of JSON.parse(bundle.files[prefix + 'manifest.json']).files)
-      assert.equal(hash(bundle.files[prefix + file.path]), file.sha256)
+    verifyManifest(bundle.files, JSON.parse(bundle.files[prefix + 'manifest.json']), prefix)
     assert.ok(!/NaN|Infinity/.test(bundle.files[prefix + 'samples/chunk-000001.csv']))
     if (item.id === 'numerical-failure') {
       assert.equal(item.status, 'invalid')
