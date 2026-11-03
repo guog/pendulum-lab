@@ -243,3 +243,72 @@ test('导出请求逐次记事件且不添加重复样本，不冒称写盘已�
     .map((line) => JSON.parse(line))
   assert.equal(exportedEvents.filter((event) => event.event_type === 'export').length, 2)
 })
+
+test('步内触边后返回仍在首次触边终止，左右边界及两种物理步长一致', () => {
+  const cases = [
+    { x: 1.4999998, v: 0.0013, earliest: 0.0002, latest: 0.00022 },
+    { x: 1.499999, v: 0.00264865, earliest: 0.0006, latest: 0.00063 },
+  ]
+  for (const scenario of cases) {
+    for (const direction of [-1, 1]) {
+      for (const physicsStep of [0.001, 0.0005]) {
+        const config = createConfig('simple', 'release')
+        config.physics.gravity_m_s2 = 0
+        config.timing.physics_step_s = physicsStep
+        config.initial_state = {
+          cart_x_m: direction * scenario.x,
+          cart_v_m_s: direction * scenario.v,
+          theta_unwrapped_rad: (direction * Math.PI) / 2,
+          theta_dot_rad_s: direction * 10,
+        }
+        const session = createSession(config)
+        session.start()
+        session.advance(0.001)
+        const output = session.read()
+        assert.equal(output.status, 'stopped')
+        // 初加速度约-3.31m/s²的独立短时近似给出首次交点区间。
+        // 第二例在0.5ms和1ms都位于轨道内，不能只增加半步抽查。
+        assert.ok(output.sim_time_s > scenario.earliest && output.sim_time_s < scenario.latest)
+        assert.ok(Math.abs(output.state.cart_x_m - direction * 1.5) < 1e-12)
+        assert.ok(output.state.cart_v_m_s * direction > 0, '首次触边时仍向外运动')
+        assert.equal(output.samples.at(-1)?.sim_time_s, output.sim_time_s)
+        const boundaries = output.events.filter((event) => event.event_type === 'boundary')
+        assert.equal(boundaries.length, 1)
+        assert.equal(boundaries[0]?.sim_time_s, output.sim_time_s)
+      }
+    }
+  }
+})
+
+test('合法整步时长不受浮点除法误差影响，非整步及超容量输入仍拒绝', () => {
+  for (const physicsStep of [0.001, 0.0005]) {
+    for (const [duration, count] of [
+      [0.043, 6],
+      [1.001, 102],
+      [1.002, 102],
+    ]) {
+      const config = createConfig('simple', 'equilibrium')
+      config.timing.physics_step_s = physicsStep
+      config.timing.duration_s = duration
+      const session = createSession(config)
+      session.start()
+      session.advance(duration)
+      const output = session.read()
+      assert.equal(output.status, 'completed')
+      assert.ok(Math.abs(output.sim_time_s - duration) < 1e-12)
+      assert.equal(output.samples.length, count)
+      assert.equal(output.samples.at(-1)?.sim_time_s, output.sim_time_s)
+    }
+  }
+  for (const duration of [0.0431, 0, -0.001, Number.NaN, Infinity, 600.001]) {
+    const config = createConfig('simple', 'equilibrium')
+    config.timing.duration_s = duration
+    assert.throws(() => createSession(config), /时长/)
+  }
+  const maximum = createConfig('simple', 'equilibrium')
+  maximum.timing.duration_s = 100
+  maximum.timing.sample_period_s = 0.001
+  assert.doesNotThrow(() => createSession(maximum))
+  maximum.timing.duration_s = 100.001
+  assert.throws(() => createSession(maximum), /容量/)
+})

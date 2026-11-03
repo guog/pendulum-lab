@@ -1,0 +1,46 @@
+{
+  "status": "passed",
+  "scenario": "T01 real Chrome + macOS + localhost",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "chrome_version": "Google Chrome 156.0.8078.76",
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "build_identity": {
+    "source_revision": "c5ab2e7ed8aca6c8f96605abebb7045b3868c89a",
+    "source_sha256": "573a789afd4c955256ad848bd7d66db29bbf4b78c7ce003994827fb0a2a62414",
+    "source_dirty": true
+  },
+  "release_experiment_id": "33c1502c-e3b5-4dcd-bb3e-cfd9e1549aab",
+  "equilibrium_experiment_id": "0bcfdb4e-110e-4e08-8a42-2ac6f04fc905",
+  "equilibrium_samples": 1001,
+  "controlled_start_before_ack_visibility_regression": "passed",
+  "artifacts": "/tmp/pendulum-p2-fixes/build-green",
+  "environment": {
+    "os": "15.8.2",
+    "architecture": "arm64",
+    "browser_version_source": "Actual Chrome executable --version and export UA major checked"
+  },
+  "automated_checks": {
+    "repository_tests": 35,
+    "application_tests": 14,
+    "typecheck": "passed",
+    "production_build": "passed",
+    "axe_violations": 0,
+    "desktop_widths": [1440, 1100]
+  },
+  "regressions": {
+    "first_internal_rail_crossing": "8 cases passed: two peak positions, both directions and both steps",
+    "integer_step_duration": "valid43/1001/1002ms accepted; noninteger and capacity violations rejected",
+    "build_identity": "downloaded bundles match static build manifest and current source/Git identity",
+    "dev_identity_http": "temporary source change updated hash; exact restore restored hash; not a live HMR browser test"
+  },
+  "evidence_files": {
+    "equilibrium-evidence.json": "6a02dd21633a238135c59b954e53c2fb1441d4f332fbb0919ea73fab3d0769e5",
+    "release-evidence.json": "1afec7717219749014ba12172a221e200e5e26453f434f7a61cc56b3a17ddf3b"
+  },
+  "limitations": [
+    "T01 regressions only; complete numerical/physical P0 remains pending",
+    "No swing-up, controller qualification or directory persistence validation",
+    "Native Node sessions are unbundled and explicitly carry null build identity",
+    "Build source_dirty records application inputs only; source_sha256 identifies the exact inputs even before commit"
+  ]
+}

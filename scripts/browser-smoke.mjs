@@ -1,10 +1,11 @@
-import { spawn, spawnSync } from 'node:child_process'
+import { spawn, spawnSync, execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { mkdtemp } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { tmpdir } from 'node:os'
 import { createHash } from 'node:crypto'
 import assert from 'node:assert/strict'
+import { readBuildIdentity } from './build-identity.ts'
 
 const chrome =
   process.env.CHROME_EXECUTABLE ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
@@ -60,6 +61,16 @@ function verifyBundle(path) {
     config.environment.user_agent.match(/Chrome\/(\d+)/)?.[1],
     chromeVersion.stdout.match(/Chrome (\d+)/)?.[1],
   )
+  assert.match(config.versions.build ?? '', /^[a-f0-9]{64}$/)
+  const build = JSON.parse(readFileSync('dist/build-info.json', 'utf8'))
+  assert.deepEqual(config.build_identity, build)
+  assert.deepEqual(build, readBuildIdentity(process.cwd()))
+  assert.equal(config.versions.build, build.source_sha256)
+  assert.equal(
+    build.source_revision,
+    execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+  )
+  assert.equal(typeof build.source_dirty, 'boolean')
   assert.equal(result.formal_acceptance, 'not_eligible')
   for (const file of manifest.files) {
     assert.equal(createHash('sha256').update(bundle.files[file.path]).digest('hex'), file.sha256)
@@ -218,6 +229,7 @@ try {
         chrome,
         chrome_version: chromeVersion.stdout.trim(),
         user_agent: first.config.environment.user_agent,
+        build_identity: first.config.build_identity,
         release_experiment_id: first.bundle.experiment_id,
         equilibrium_experiment_id: second.bundle.experiment_id,
         equilibrium_samples: second.result.sample_count,

@@ -1,4 +1,5 @@
 import { energy, type Physics, type State } from './dynamics.ts'
+import { buildIdentity, type BuildIdentity } from './build-info.ts'
 
 export type PresetId = 'simple' | 'standard'
 export type BenchmarkId = 'release' | 'equilibrium'
@@ -11,7 +12,14 @@ export type ExperimentConfig = {
   environment: { user_agent: string; language: string | null; logical_processors: number | null }
   execution_mode: 'memory-research'
   control_mode: 'free'
-  versions: { application: string; model: string; controller: string; rules: string }
+  build_identity: BuildIdentity | null
+  versions: {
+    application: string
+    build: string | null
+    model: string
+    controller: string
+    rules: string
+  }
   physics: Physics
   preset_overrides: Record<string, number>
   initial_state: State
@@ -68,9 +76,11 @@ export function createConfig(preset: PresetId, benchmark: BenchmarkId): Experime
     },
     execution_mode: 'memory-research',
     control_mode: 'free',
+    build_identity: structuredClone(buildIdentity),
     versions: {
       application: '0.0.0+t01',
-      model: 'rigid-cartpole-rk4-1',
+      build: buildIdentity?.source_sha256 ?? null,
+      model: 'rigid-cartpole-rk4-2',
       controller: 'none',
       rules: 'QV-1',
     },
@@ -141,12 +151,14 @@ export function validateConfig(config: ExperimentConfig) {
   if (![0.001, 0.0005].includes(physics_step_s)) throw new Error('不支持的物理步长')
   if (![0.001, 0.01, 0.1].includes(sample_period_s)) throw new Error('不支持的采样周期')
   if (control_period_s !== 0.01) throw new Error('当前控制周期必须为10ms')
-  const steps = duration_s / physics_step_s
+  const steps = Math.round(duration_s / physics_step_s)
   if (
     !Number.isSafeInteger(steps) ||
     steps <= 0 ||
-    steps > 600_000 ||
-    duration_s / sample_period_s > 100_000
+    Math.abs(steps * physics_step_s - duration_s) > 1e-12
   )
+    throw new Error('基准时长必须是正数且为物理步的整数倍')
+  const sampleSteps = Math.round(sample_period_s / physics_step_s)
+  if (steps > 600_000 || Math.ceil(steps / sampleSteps) > 100_000)
     throw new Error('内存基准时长超出有界记录容量')
 }

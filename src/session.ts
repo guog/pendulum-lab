@@ -114,18 +114,9 @@ export function createSession(input: ExperimentConfig) {
           sample()
           break
         }
-        const limit = config.physics.track_length_m / 2
-        if (Math.abs(next.state.cart_x_m) >= limit) {
-          let low = 0
-          let high = dt
-          for (let iteration = 0; iteration < 40; iteration++) {
-            const middle = (low + high) / 2
-            if (Math.abs(integrate(state, config.physics, middle).state.cart_x_m) >= limit)
-              high = middle
-            else low = middle
-          }
-          const endpoint = integrate(state, config.physics, high)
-          terminalTime = tick * dt + high
+        const endpoint = next.firstBoundary(config.physics.track_length_m / 2)
+        if (endpoint) {
+          terminalTime = tick * dt + endpoint.duration_s
           state = endpoint.state
           dissipated += endpoint.dissipated_delta_J
           status = 'stopped'

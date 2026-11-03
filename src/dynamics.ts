@@ -25,6 +25,38 @@ export type Physics = {
 
 type Vector = [number, number, number, number, number]
 
+function turningFractions(linear: number, quadratic: number, cubic: number) {
+  const scale = Math.max(Math.abs(linear), Math.abs(quadratic), Math.abs(cubic))
+  if (scale === 0) return []
+  const a = 3 * (cubic / scale)
+  const b = 2 * (quadratic / scale)
+  const c = linear / scale
+  let roots: number[]
+  if (a === 0) roots = b === 0 ? [] : [-c / b]
+  else {
+    const discriminant = b * b - 4 * a * c
+    if (discriminant < 0) roots = []
+    else if (discriminant === 0) roots = [-b / (2 * a)]
+    else {
+      const q = -0.5 * (b + (b >= 0 ? 1 : -1) * Math.sqrt(discriminant))
+      roots = [q / a, c / q]
+    }
+  }
+  return roots.filter((root) => root > 0 && root < 1).sort((left, right) => left - right)
+}
+
+function stepOutput(result: number[]) {
+  return {
+    state: {
+      cart_x_m: result[0]!,
+      cart_v_m_s: result[1]!,
+      theta_unwrapped_rad: result[2]!,
+      theta_dot_rad_s: result[3]!,
+    },
+    dissipated_delta_J: result[4]!,
+  }
+}
+
 function massProperties(physics: Physics) {
   const mass = physics.cart_mass_kg + physics.rod_mass_kg + physics.counterweight_mass_kg
   const moment =
@@ -78,13 +110,44 @@ export function integrate(state: State, physics: Physics, dt: number) {
     (value, i) => value + (dt / 6) * (k1[i]! + 2 * k2[i]! + 2 * k3[i]! + k4[i]!),
   )
   return {
-    state: {
-      cart_x_m: result[0]!,
-      cart_v_m_s: result[1]!,
-      theta_unwrapped_rad: result[2]!,
-      theta_dot_rad_s: result[3]!,
+    ...stepOutput(result),
+    firstBoundary(limit_m: number) {
+      // RK4 continuous extension: b1=s-3s²/2+2s³/3,
+      // b2=b3=s²-2s³/3, b4=-s²/2+2s³/3, for 0<=s<=1.
+      const coefficients = initial.map(
+        (_, i) =>
+          [
+            k1[i]!,
+            -1.5 * k1[i]! + k2[i]! + k3[i]! - 0.5 * k4[i]!,
+            (2 / 3) * (k1[i]! - k2[i]! - k3[i]! + k4[i]!),
+          ] as const,
+      )
+      const at = (fraction: number) =>
+        fraction === 1
+          ? result
+          : initial.map((value, i) => {
+              const [linear, quadratic, cubic] = coefficients[i]!
+              return value + dt * fraction * (linear + fraction * (quadratic + fraction * cubic))
+            })
+      const [linear, quadratic, cubic] = coefficients[0]!
+      const divisions = [...turningFractions(linear, quadratic, cubic), 1]
+      let low = 0
+      // Every interval is monotone in x, so its endpoint brackets any first hit,
+      // including an excursion that returns inside before the full step ends.
+      for (const end of divisions) {
+        if (Math.abs(at(end)[0]!) >= limit_m) {
+          let high = end
+          for (let iteration = 0; iteration < 40; iteration++) {
+            const middle = (low + high) / 2
+            if (Math.abs(at(middle)[0]!) >= limit_m) high = middle
+            else low = middle
+          }
+          return { duration_s: dt * high, ...stepOutput(at(high)) }
+        }
+        low = end
+      }
+      return undefined
     },
-    dissipated_delta_J: result[4]!,
   }
 }
 
