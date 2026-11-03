@@ -1,0 +1,35 @@
+✔ 冻结基准通过同一实验会话保持两个精确平衡点，输出完整输入及独立误差 (97.4465ms)
+✖ 自然运动、多圈及配重基准用独立动量参考核对四状态和全部质量的能量 (73.174292ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 257.099208
+
+✖ failing tests:
+
+test at tests/benchmarks.test.ts:22:1
+✖ 自然运动、多圈及配重基准用独立动量参考核对四状态和全部质量的能量 (73.174292ms)
+  AssertionError [ERR_ASSERTION]: {"id":"rotation","title":"连续多圈旋转","requirement":"P0-PHY-01","config":{"schema_version":1,"preset":"standard","preset_version":"qv1-1","benchmark":"release","benchmark_description":"连续多圈旋转；physics-qv1-1冻结的独立物理基准输入。","environment":{"user_agent":"Node.js/26","language":"en-US","logical_processors":10},"execution_mode":"memory-research","control_mode":"free","build_identity":null,"versions":{"application":"0.0.0+t01","build":null,"model":"rigid-cartpole-rk4-2","controller":"none","rules":"QV-1"},"physics":{"rod_length_m":0.5,"rod_mass_kg":0.2,"cart_mass_kg":1,"counterweight_mass_kg":0.05,"counterweight_position_m":0.25,"track_length_m":2,"force_max_N":20,"speed_max_m_s":2,"power_max_W":40,"gravity_m_s2":9.81,"safety_buffer_m":0.1,"cart_coulomb_N":0,"cart_viscous_N_s_m":0,"joint_viscous_Nm_s_rad":0,"friction_smoothing_m_s":0.01},"preset_overrides":{"cart_coulomb_N":0,"cart_viscous_N_s_m":0,"joint_viscous_Nm_s_rad":0},"initial_state":{"cart_x_m":0,"cart_v_m_s":0,"theta_unwrapped_rad":3.141592653589793,"theta_dot_rad_s":15},"timing":{"physics_step_s":0.001,"control_period_s":0.01,"sample_period_s":0.01,"duration_s":2}},"status":"blocked","reason":"缺少独立参考对齐样本","metrics":[],"experiment_id":"ec70650a-0af8-4298-8a6c-6a5c76430486"}
+  + actual - expected
+  
+  + 'blocked'
+  - 'passed'
+  
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/benchmarks.test.ts:29:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'blocked',
+    expected: 'passed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

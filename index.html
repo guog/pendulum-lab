@@ -264,6 +264,108 @@
           </div>
         </section>
       </div>
+      <section
+        class="physics-benchmarks"
+        aria-labelledby="bench-title"
+      >
+        <div class="panel-heading">
+          <h2 id="bench-title">物理与数值可信性基准</h2>
+          <span>QV-1 · P0-PHY-01～04</span>
+        </div>
+        <p class="explanation">
+          从冻结输入运行平衡、自然运动、配重、阻力、10秒步长收敛与30秒能量漂移。逐项展开查看完整输入、误差及阈值。触边与数值异常保留原始证据，不计为物理通过。
+        </p>
+        <div class="benchmark-actions">
+          <label for="bench-preset">基准工况</label>
+          <select id="bench-preset">
+            <option value="simple">简单</option>
+            <option
+              value="standard"
+              selected
+            >
+              标准
+            </option>
+          </select>
+          <button
+            id="bench-run"
+            disabled
+          >
+            运行物理基准
+          </button>
+          <button
+            id="bench-pause"
+            class="secondary"
+            disabled
+          >
+            暂停物理基准
+          </button>
+          <button
+            id="bench-stop"
+            class="secondary"
+            disabled
+          >
+            终止物理基准
+          </button>
+          <button
+            id="bench-new"
+            class="text-button"
+          >
+            新建基准批次
+          </button>
+        </div>
+        <p
+          id="bench-status"
+          role="status"
+          class="explanation"
+        >
+          正在加载基准
+        </p>
+        <div id="bench-results"></div>
+        <p class="explanation">
+          库仑阻力采用 tanh(v / 0.01m/s)
+          平滑，不模拟真实静摩擦锁止。无驱动与外扰，相关做功列为零；本轮不验收执行器或控制器。
+        </p>
+        <p
+          id="bench-record"
+          role="status"
+          class="explanation"
+        >
+          基准记录尚未确认导出
+        </p>
+        <div class="benchmark-actions">
+          <button
+            id="bench-save"
+            class="secondary"
+            disabled
+          >
+            导出基准并校验
+          </button>
+          <button
+            id="bench-prepare"
+            class="text-button"
+            disabled
+          >
+            生成基准下载副本
+          </button>
+          <a
+            id="bench-download"
+            hidden
+            >下载物理基准证据包</a
+          >
+          <label for="bench-verify">校验基准文件</label>
+          <input
+            id="bench-verify"
+            type="file"
+            accept=".json,application/json"
+            disabled
+          />
+        </div>
+        <p
+          id="bench-message"
+          role="status"
+          class="explanation"
+        ></p>
+      </section>
       <footer class="page-footer">
         <span>所有计算在浏览器本地进行，实验数据不上传。</span
         ><span>快速验证按本机单实例使用，未验证跨窗口独占。</span>

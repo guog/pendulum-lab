@@ -1,0 +1,19 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: 新建批次回执前必须禁止启动，避免旧配置快照解除互斥
+
+false !== true
+
+    at file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-benchmarks.mjs:120:10
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v26.7.0

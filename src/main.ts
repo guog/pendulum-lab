@@ -5,6 +5,7 @@ import { drawApparatus, drawChart } from './visualization.ts'
 import type { Command, Reply, Request } from './protocol.ts'
 import type { SessionOutput } from './session.ts'
 import type { BenchmarkId, PresetId } from './config.ts'
+import { initializeBenchmarks } from './benchmark-ui.ts'
 
 function element<T extends Element>(id: string, type: new (...args: never[]) => T): T {
   const found = document.getElementById(id)
@@ -48,6 +49,11 @@ let lastStatus = ''
 let renderQueued = false
 let verifiedKey = ''
 let prepared: { text: string; key: string; hash: string; url: string } | undefined
+let benchmarksActive = false
+const benchmarkUI = initializeBenchmarks((active) => {
+  benchmarksActive = active
+  updateControls()
+})
 const pending = new Map<number, { resolve(reply: Reply): void; reject(error: Error): void }>()
 const worker = new Worker(new URL('./experiment.worker.ts', import.meta.url), { type: 'module' })
 const key = () =>
@@ -71,7 +77,7 @@ function clearPrepared() {
 }
 function updateControls() {
   const status = workerFailed ? undefined : current?.status
-  start.disabled = busy || status !== 'ready'
+  start.disabled = busy || benchmarksActive || status !== 'ready'
   pause.disabled = busy || (status !== 'running' && status !== 'paused')
   pause.textContent = status === 'paused' ? '继续' : '暂停'
   stop.disabled = busy || (status !== 'running' && status !== 'paused')
@@ -82,6 +88,7 @@ function updateControls() {
   exportButton.disabled = busy || !exportable
   prepareDownload.disabled = busy || !exportable
   verifyFile.disabled = busy || !prepared
+  benchmarkUI.setOtherActive(busy || status === 'running' || status === 'paused')
   write(
     'record-state',
     !current?.samples.length

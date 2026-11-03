@@ -41,7 +41,8 @@ export function readBuildIdentity(root: string): BuildIdentity {
         stdio: ['ignore', 'pipe', 'ignore'],
       }).trim()
     source_revision = git(['rev-parse', 'HEAD'])
-    source_dirty = git(['status', '--porcelain', '--untracked-files=all', '--', ...paths]) !== ''
+    source_dirty =
+      git(['status', '--porcelain', '--untracked-files=all', '--', ...buildFiles, 'src/']) !== ''
   } catch {
     /* An archive still has a source digest, but no verified Git origin. */
   }

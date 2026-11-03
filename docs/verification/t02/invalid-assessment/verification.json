@@ -1,0 +1,343 @@
+{
+  "status": "passed",
+  "chrome_version": "Google Chrome 156.0.8078.80",
+  "environment": {
+    "os": "15.8.2",
+    "arch": "arm64",
+    "cpu": "Apple M1 Max",
+    "memory_bytes": 34359738368
+  },
+  "reports": [
+    {
+      "preset": "standard",
+      "batch_id": "84966ec2-3c3f-4d2d-984e-82a2cee241d4",
+      "source": {
+        "source_revision": "3f5f2ad758a93a8bb9c9068e17c16004c3c67408",
+        "source_sha256": "10ec03f5149d680b5b1e8d4483bfc868621ef2bdaf1f7e8b436566927bf8cd8d",
+        "source_dirty": false
+      },
+      "counts": {
+        "passed": 14,
+        "failed": 0,
+        "invalid": 2,
+        "blocked": 0
+      },
+      "metrics": [
+        {
+          "id": "convergence-0.5ms",
+          "metrics": [
+            {
+              "name": "独立参考车位差",
+              "actual": 8.973516374410906e-13,
+              "limit": 1e-6,
+              "unit": "m",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考车速差",
+              "actual": 6.090572490791146e-12,
+              "limit": 1e-5,
+              "unit": "m/s",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考角差",
+              "actual": 1.9328538769514125e-11,
+              "limit": 1e-6,
+              "unit": "rad",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考角速度差",
+              "actual": 7.40209005201109e-11,
+              "limit": 0.0001,
+              "unit": "rad/s",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "初始机械能误差",
+              "actual": 0,
+              "limit": 1e-12,
+              "unit": "J",
+              "basis": "独立质量积分：均匀杆+点质量，T=S v²/2−A cosθ vω+Bω²/2，V=Ag(1+cosθ)。"
+            },
+            {
+              "name": "水平质心运动误差",
+              "actual": 1.03292374653563e-13,
+              "limit": 1e-7,
+              "unit": "kg·m",
+              "basis": "无水平外力时，系统水平质心匀速；SΔx−AΔsinθ=Pₓ(0)t。"
+            },
+            {
+              "name": "两步长最大车位差",
+              "actual": 1.4114584501179195e-11,
+              "limit": 0.001,
+              "unit": "m",
+              "basis": "10s冻结光滑无控制场景，全部10001个共同1ms时刻直接比较原精度累计角和车位；角差≤0.1°，车位差≤1mm。"
+            },
+            {
+              "name": "两步长最大角差",
+              "actual": 2.6593882651582135e-10,
+              "limit": 0.0017453292519943296,
+              "unit": "rad",
+              "basis": "10s冻结光滑无控制场景，全部10001个共同1ms时刻直接比较原精度累计角和车位；角差≤0.1°，车位差≤1mm。"
+            }
+          ]
+        },
+        {
+          "id": "energy-30s",
+          "metrics": [
+            {
+              "name": "独立参考车位差",
+              "actual": 2.566295786987638e-11,
+              "limit": 1e-6,
+              "unit": "m",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考车速差",
+              "actual": 1.4855969232563382e-10,
+              "limit": 1e-5,
+              "unit": "m/s",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考角差",
+              "actual": 4.805071895930269e-10,
+              "limit": 1e-6,
+              "unit": "rad",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考角速度差",
+              "actual": 1.7426429188560633e-9,
+              "limit": 0.0001,
+              "unit": "rad/s",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "初始机械能误差",
+              "actual": 0,
+              "limit": 1e-12,
+              "unit": "J",
+              "basis": "独立质量积分：均匀杆+点质量，T=S v²/2−A cosθ vω+Bω²/2，V=Ag(1+cosθ)。"
+            },
+            {
+              "name": "水平质心运动误差",
+              "actual": 3.3661962106634746e-12,
+              "limit": 1e-7,
+              "unit": "kg·m",
+              "basis": "无水平外力时，系统水平质心匀速；SΔx−AΔsinθ=Pₓ(0)t。"
+            },
+            {
+              "name": "最大相对能量漂移",
+              "actual": 2.7978253987010405e-11,
+              "limit": 0.001,
+              "unit": "比例",
+              "basis": "Eref=0.613125J，非零；30s全部30001个物理步点最大|E−Eref|/|Eref|≤0.1%。"
+            }
+          ]
+        }
+      ],
+      "file_sha256": "c90b75317ddac5cd5dccc353d63f6a8d149b8a2dd5e8343c528dcd375fdfaa16",
+      "gzip_sha256": "110496e85929a72368e9f502d024d62cb41a0806706198d196991de51e106bee",
+      "unchanged_original_trajectories": 16,
+      "invalid_assessments": [
+        {
+          "id": "rotation",
+          "assessment": {
+            "status": "unavailable",
+            "error": "完整窗口误差未计算：已记录 1.358137177740483s / 2s；提前结束：stopped；{\"schema_version\":1,\"event_index\":1,\"sim_time_s\":1.358137177740483,\"event_type\":\"boundary\",\"payload\":{\"cart_x_m\":1.0000000000000009,\"cart_v_m_s\":1.1677687566013555,\"theta_unwrapped_rad\":18.468331068585577,\"theta_dot_rad_s\":9.001603717794412,\"condition\":\"abs(cart_x_m) >= track_length_m / 2\",\"track_limit_m\":1}}；最后有效状态={\"cart_x_m\":1.0000000000000009,\"cart_v_m_s\":1.1677687566013555,\"theta_unwrapped_rad\":18.468331068585577,\"theta_dot_rad_s\":9.001603717794412}",
+            "threshold": "原冻结完整窗口阈值（未作通过判定）：独立参考车位差 ≤ 1e-6 m；车速差 ≤ 1e-5 m/s；累计角差 ≤ 1e-6 rad；角速度差 ≤ 1e-4 rad/s；初始机械能误差 ≤ 1e-12 J；累计角至少两圈（多圈不足量 ≤ 0 rad）；水平质心运动误差 ≤ 1e-7 kg·m。依据：P0-PHY-01、解析关系及momentum-dop853-2独立参考；输入、步长和容差不变。"
+          }
+        },
+        {
+          "id": "numerical-failure",
+          "assessment": {
+            "status": "not_applicable",
+            "error": "物理误差不适用：本项为数值异常安全诊断；期望异常时冻结并保留最后有效状态与诊断，轨迹仍为无效。",
+            "threshold": "物理通过阈值不适用；不将安全冻结行为计为物理通过。"
+          }
+        }
+      ]
+    },
+    {
+      "preset": "simple",
+      "batch_id": "8d423374-01f2-46a2-85f7-f92daed5ed62",
+      "source": {
+        "source_revision": "3f5f2ad758a93a8bb9c9068e17c16004c3c67408",
+        "source_sha256": "10ec03f5149d680b5b1e8d4483bfc868621ef2bdaf1f7e8b436566927bf8cd8d",
+        "source_dirty": false
+      },
+      "counts": {
+        "passed": 15,
+        "failed": 0,
+        "invalid": 1,
+        "blocked": 0
+      },
+      "metrics": [
+        {
+          "id": "convergence-0.5ms",
+          "metrics": [
+            {
+              "name": "独立参考车位差",
+              "actual": 1.309442138053285e-12,
+              "limit": 1e-6,
+              "unit": "m",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考车速差",
+              "actual": 1.0905498726287988e-11,
+              "limit": 1e-5,
+              "unit": "m/s",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考角差",
+              "actual": 4.034550471487819e-11,
+              "limit": 1e-6,
+              "unit": "rad",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考角速度差",
+              "actual": 1.964162166245842e-10,
+              "limit": 0.0001,
+              "unit": "rad/s",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "初始机械能误差",
+              "actual": 0,
+              "limit": 1e-12,
+              "unit": "J",
+              "basis": "独立质量积分：均匀杆+点质量，T=S v²/2−A cosθ vω+Bω²/2，V=Ag(1+cosθ)。"
+            },
+            {
+              "name": "水平质心运动误差",
+              "actual": 8.10185252220208e-14,
+              "limit": 1e-7,
+              "unit": "kg·m",
+              "basis": "无水平外力时，系统水平质心匀速；SΔx−AΔsinθ=Pₓ(0)t。"
+            },
+            {
+              "name": "两步长最大车位差",
+              "actual": 1.9477773560705458e-11,
+              "limit": 0.001,
+              "unit": "m",
+              "basis": "10s冻结光滑无控制场景，全部10001个共同1ms时刻直接比较原精度累计角和车位；角差≤0.1°，车位差≤1mm。"
+            },
+            {
+              "name": "两步长最大角差",
+              "actual": 5.765006250157967e-10,
+              "limit": 0.0017453292519943296,
+              "unit": "rad",
+              "basis": "10s冻结光滑无控制场景，全部10001个共同1ms时刻直接比较原精度累计角和车位；角差≤0.1°，车位差≤1mm。"
+            }
+          ]
+        },
+        {
+          "id": "energy-30s",
+          "metrics": [
+            {
+              "name": "独立参考车位差",
+              "actual": 2.8266975565793828e-11,
+              "limit": 1e-6,
+              "unit": "m",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考车速差",
+              "actual": 2.0874843520424236e-10,
+              "limit": 1e-5,
+              "unit": "m/s",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考角差",
+              "actual": 8.351714875232119e-10,
+              "limit": 1e-6,
+              "unit": "rad",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "独立参考角速度差",
+              "actual": 3.657952774016593e-9,
+              "limit": 0.0001,
+              "unit": "rad/s",
+              "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+            },
+            {
+              "name": "初始机械能误差",
+              "actual": 0,
+              "limit": 1e-12,
+              "unit": "J",
+              "basis": "独立质量积分：均匀杆+点质量，T=S v²/2−A cosθ vω+Bω²/2，V=Ag(1+cosθ)。"
+            },
+            {
+              "name": "水平质心运动误差",
+              "actual": 2.9198379825068344e-12,
+              "limit": 1e-7,
+              "unit": "kg·m",
+              "basis": "无水平外力时，系统水平质心匀速；SΔx−AΔsinθ=Pₓ(0)t。"
+            },
+            {
+              "name": "最大相对能量漂移",
+              "actual": 6.584935107008257e-11,
+              "limit": 0.001,
+              "unit": "比例",
+              "basis": "Eref=0.24034499999999998J，非零；30s全部30001个物理步点最大|E−Eref|/|Eref|≤0.1%。"
+            }
+          ]
+        }
+      ],
+      "file_sha256": "131cb01a0d8a11fb64d28cf3b6032954e2d0b10cde4836696feccf31922d7332",
+      "gzip_sha256": "2f56bd6e67387802915caccf881e26f604499a969a418d9dc6e5b6948b0f4007",
+      "unchanged_original_trajectories": 16,
+      "invalid_assessments": [
+        {
+          "id": "numerical-failure",
+          "assessment": {
+            "status": "not_applicable",
+            "error": "物理误差不适用：本项为数值异常安全诊断；期望异常时冻结并保留最后有效状态与诊断，轨迹仍为无效。",
+            "threshold": "物理通过阈值不适用；不将安全冻结行为计为物理通过。"
+          }
+        }
+      ]
+    }
+  ],
+  "controlled_visibility_pause": "passed",
+  "controlled_start_before_ack_exclusion": "passed in both directions",
+  "download_readback_and_wrong_file_rejection": "passed",
+  "axe_violations": 0,
+  "desktop_widths": [1440, 1100],
+  "review_base": "185a5a41bb5ec863968a3400271a333003c66f1e",
+  "review_target": "3f5f2ad758a93a8bb9c9068e17c16004c3c67408",
+  "automated_checks": {
+    "tests": 44,
+    "full_check": "passed"
+  },
+  "origin_files_unchanged": 9,
+  "t01_regression": {
+    "status": "passed",
+    "scenario": "T01 real Chrome + macOS + localhost",
+    "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chrome_version": "Google Chrome 156.0.8078.80",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "build_identity": {
+      "source_revision": "3f5f2ad758a93a8bb9c9068e17c16004c3c67408",
+      "source_sha256": "10ec03f5149d680b5b1e8d4483bfc868621ef2bdaf1f7e8b436566927bf8cd8d",
+      "source_dirty": false
+    },
+    "release_experiment_id": "121f5199-bf8b-4c50-99af-2ba1d5982524",
+    "equilibrium_experiment_id": "980914ec-c08d-4f4d-b4e9-f457544d4832",
+    "equilibrium_samples": 1001,
+    "controlled_start_before_ack_visibility_regression": "passed",
+    "artifacts": "/tmp/pendulum-merge19/browser-invalid-final"
+  },
+  "source_ci_run": 41574334968,
+  "t02_invocation": "npm_config_offline=true node scripts/browser-benchmarks.mjs; same cached agent-browser@0.41.1 and real Chrome",
+  "manual_button_export_regression": "passed",
+  "invalid_assessment_ui_and_export": "passed"
+}

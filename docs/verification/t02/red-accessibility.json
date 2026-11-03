@@ -1,0 +1,104 @@
+{
+  "success": true,
+  "data": {
+    "axeVersion": "4.12.1",
+    "counts": {
+      "inapplicable": 42,
+      "incomplete": 1,
+      "passes": 46,
+      "violations": 1
+    },
+    "incomplete": [
+      {
+        "help": "Elements must meet minimum color contrast ratio thresholds",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI",
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodeCount": 5,
+        "nodes": [
+          {
+            "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because element contains an image node",
+            "html": "<text x=\"300\" y=\"189.5\" text-anchor=\"middle\" fill=\"#52645f\" font-size=\"10\">-1 m</text>",
+            "target": ["text[x=\"300\"]"]
+          },
+          {
+            "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because element contains an image node",
+            "html": "<text x=\"420\" y=\"189.5\" text-anchor=\"middle\" fill=\"#52645f\" font-size=\"10\">-0.5 m</text>",
+            "target": ["text[x=\"420\"]"]
+          },
+          {
+            "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because element contains an image node",
+            "html": "<text x=\"540\" y=\"189.5\" text-anchor=\"middle\" fill=\"#52645f\" font-size=\"10\">0 m</text>",
+            "target": ["text[x=\"540\"]"]
+          },
+          {
+            "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because element contains an image node",
+            "html": "<text x=\"660\" y=\"189.5\" text-anchor=\"middle\" fill=\"#52645f\" font-size=\"10\">0.5 m</text>",
+            "target": ["text[x=\"660\"]"]
+          },
+          {
+            "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because element contains an image node",
+            "html": "<text x=\"780\" y=\"189.5\" text-anchor=\"middle\" fill=\"#52645f\" font-size=\"10\">1 m</text>",
+            "target": ["text[x=\"780\"]"]
+          }
+        ],
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ]
+      }
+    ],
+    "lifecycle": {
+      "effectiveLaunch": {
+        "browserLaunched": true,
+        "engine": "chrome",
+        "launchHash": 9467515241851479685
+      },
+      "launched": false,
+      "relaunchedBrowser": false,
+      "restartedBackground": false,
+      "restoreStatus": "not_configured",
+      "reused": true,
+      "saveStatus": "not_attempted"
+    },
+    "url": "http://localhost:4174/",
+    "violations": [
+      {
+        "help": "Scrollable region must have keyboard access",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/scrollable-region-focusable?application=axeAPI",
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "nodeCount": 1,
+        "nodes": [
+          {
+            "failureSummary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable",
+            "html": "<pre>",
+            "target": ["details[data-id=\"energy-30s\"] > pre"]
+          }
+        ],
+        "tags": [
+          "cat.keyboard",
+          "wcag2a",
+          "wcag211",
+          "wcag213",
+          "TTv5",
+          "TT4.a",
+          "EN-301-549",
+          "EN-9.2.1.1",
+          "EN-9.2.1.3",
+          "RGAAv4",
+          "RGAA-7.3.2"
+        ]
+      }
+    ]
+  },
+  "error": null
+}

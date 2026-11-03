@@ -1,0 +1,30 @@
+✔ 冻结基准通过同一实验会话保持两个精确平衡点，输出完整输入及独立误差 (57.841125ms)
+✖ 自然运动、多圈及配重基准用独立动量参考核对四状态和全部质量的能量 (59.910167ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 209.198875
+
+✖ failing tests:
+
+test at tests/benchmarks.test.ts:22:1
+✖ 自然运动、多圈及配重基准用独立动量参考核对四状态和全部质量的能量 (59.910167ms)
+  AssertionError [ERR_ASSERTION]: 缺少release
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/benchmarks.test.ts:28:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

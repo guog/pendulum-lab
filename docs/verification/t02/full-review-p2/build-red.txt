@@ -1,0 +1,30 @@
+✖ 真实构建清单识别未暂存及已暂存的源码删除，恢复后身份回到干净版本 (1200.684333ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1285.232084
+
+✖ failing tests:
+
+test at tests/build-identity.test.ts:8:1
+✖ 真实构建清单识别未暂存及已暂存的源码删除，恢复后身份回到干净版本 (1200.684333ms)
+  AssertionError [ERR_ASSERTION]: 删除受控源码必须标记为已修改
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/build-identity.test.ts:39:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

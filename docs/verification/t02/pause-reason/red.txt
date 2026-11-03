@@ -1,0 +1,32 @@
+✔ 异步导出冻结整批原始记录与结果，后续继续推进不改写导出快照 (40.593459ms)
+✔ 终止只使已经开始的当前基准无效，尚未创建的项目保持未执行 (41.361084ms)
+✖ 基准暂停证据区分人工与后台原因，默认公开暂停为人工操作 (4.209083ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 2
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 180.12425
+
+✖ failing tests:
+
+test at tests/benchmark-lifecycle.test.ts:70:1
+✖ 基准暂停证据区分人工与后台原因，默认公开暂停为人工操作 (4.209083ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'background'
+  - 'manual'
+  
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/benchmark-lifecycle.test.ts:83:12)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'background',
+    expected: 'manual',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

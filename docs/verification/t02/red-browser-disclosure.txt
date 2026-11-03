@@ -1,0 +1,19 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: The input did not match the regular expression /最大相对能量漂移/. Input:
+
+'30秒无耗散能量漂移 · 通过'
+
+    at file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-benchmarks.mjs:125:12
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: '30秒无耗散能量漂移 · 通过',
+  expected: /最大相对能量漂移/,
+  operator: 'match',
+  diff: 'simple'
+}
+
+Node.js v26.7.0
