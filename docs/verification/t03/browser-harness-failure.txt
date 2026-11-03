@@ -1,0 +1,27 @@
+simple/near-zero: passed, actual file read back and verified
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: wait #download
+
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+✗ Wait timed out after 25000ms
+
+
+1 !== 0
+
+    at browser (file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-actuation.mjs:34:10)
+    at file:///Users/guog/projects/github/guog/pendulum-lab/scripts/browser-actuation.mjs:92:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 1,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v26.7.0

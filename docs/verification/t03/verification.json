@@ -1,0 +1,2197 @@
+{
+  "status": "passed",
+  "scenario": "T03 real Chrome macOS localhost",
+  "chrome_version": "Google Chrome 156.0.8078.80",
+  "os": "15.8.2",
+  "architecture": "arm64",
+  "cases": [
+    {
+      "preset": "simple",
+      "id": "near-zero",
+      "experiment_id": "36ed106e-7329-45bf-aefe-172593dd4537",
+      "status": "passed",
+      "sim_time_s": 0.2,
+      "sample_count": 201,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 2.1510571102112408e-16,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "匀加速车速误差",
+          "actual": 1.4432899320127035e-15,
+          "limit": 1e-9,
+          "unit": "m/s",
+          "basis": "零重力水平杆：总质量平移，v=v0+Ft/S。"
+        },
+        {
+          "name": "匀加速车位误差",
+          "actual": 7.979727989493313e-17,
+          "limit": 1e-9,
+          "unit": "m",
+          "basis": "x=v0t+Ft²/(2S)。"
+        },
+        {
+          "name": "执行器做功误差",
+          "actual": 0,
+          "limit": 1e-9,
+          "unit": "J",
+          "basis": "恒力W=FΔx。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [],
+      "sha256": "7695d8bee577852cd5dfc17900f4e824f0e42bfd65c7e71ea182e21204e2b62d",
+      "gzip_sha256": "4a510124b70f41c57b35e9a7f4356d3b0dd6dc8a8b5945fe08d449caa644fbd6",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "simple",
+      "id": "force-limit",
+      "experiment_id": "0e734e28-664c-4413-a599-70aae9234cd1",
+      "status": "passed",
+      "sim_time_s": 0.02,
+      "sample_count": 21,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 1.6653345369377348e-16,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "匀加速车速误差",
+          "actual": 3.3306690738754696e-16,
+          "limit": 1e-9,
+          "unit": "m/s",
+          "basis": "零重力水平杆：总质量平移，v=v0+Ft/S。"
+        },
+        {
+          "name": "匀加速车位误差",
+          "actual": 3.469446951953614e-18,
+          "limit": 1e-9,
+          "unit": "m",
+          "basis": "x=v0t+Ft²/(2S)。"
+        },
+        {
+          "name": "执行器做功误差",
+          "actual": 5.551115123125783e-17,
+          "limit": 1e-9,
+          "unit": "J",
+          "basis": "恒力W=FΔx。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [
+        {
+          "condition": "limit_force",
+          "start_time_s": 0,
+          "end_time_s": 0.02,
+          "duration_s": 0.02,
+          "active_at_end": true,
+          "causes": ["limit_force"]
+        }
+      ],
+      "sha256": "6b9a893e4ccd6094e03b7964bfe7e3bb150cce71771f1218a1cc0260f715a6d6",
+      "gzip_sha256": "bbb606c81e0d4f383607079252908eeaf496cc8eb8a6be3e203efaff6e1c3938",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "simple",
+      "id": "power-drive",
+      "experiment_id": "0393fceb-5a9d-4d8d-aa2a-f05054bcd1f0",
+      "status": "passed",
+      "sim_time_s": 0.05,
+      "sample_count": 51,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 8.881784197001252e-16,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 4.251821117406962e-12,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "恒功率车速平方误差",
+          "actual": 1.149169648329007e-11,
+          "limit": 1e-8,
+          "unit": "m²/s²",
+          "basis": "独立关系：Δ(Sv²/2)=Pt。"
+        },
+        {
+          "name": "执行器恒功率做功误差",
+          "actual": 1.1102230246251565e-16,
+          "limit": 1e-8,
+          "unit": "J",
+          "basis": "正负功率均W=Pt。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [
+        {
+          "condition": "limit_force",
+          "start_time_s": 0,
+          "end_time_s": 0.05,
+          "duration_s": 0.05,
+          "active_at_end": true,
+          "causes": ["limit_force"]
+        },
+        {
+          "condition": "limit_power",
+          "start_time_s": 0,
+          "end_time_s": 0.05,
+          "duration_s": 0.05,
+          "active_at_end": true,
+          "causes": ["limit_power"]
+        }
+      ],
+      "sha256": "e3e6ca1b6c97c893ad6746669dfe401a79abc7d608697a36c5934b31f8708f27",
+      "gzip_sha256": "8abcdfb70491a4f1f676967665565eaf38e2d6a43a43ad9a83d4336c4478805f",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "simple",
+      "id": "power-brake",
+      "experiment_id": "b2fbd2c9-6180-4c5b-ad64-1f515bce49e1",
+      "status": "passed",
+      "sim_time_s": 0.05,
+      "sample_count": 51,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 1.4792839175825634e-10,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "恒功率车速平方误差",
+          "actual": 3.998068542898636e-10,
+          "limit": 1e-8,
+          "unit": "m²/s²",
+          "basis": "独立关系：Δ(Sv²/2)=Pt。"
+        },
+        {
+          "name": "执行器恒功率做功误差",
+          "actual": 1.1102230246251565e-16,
+          "limit": 1e-8,
+          "unit": "J",
+          "basis": "正负功率均W=Pt。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [
+        {
+          "condition": "limit_force",
+          "start_time_s": 0,
+          "end_time_s": 0.05,
+          "duration_s": 0.05,
+          "active_at_end": true,
+          "causes": ["limit_force"]
+        },
+        {
+          "condition": "limit_power",
+          "start_time_s": 0,
+          "end_time_s": 0.05,
+          "duration_s": 0.05,
+          "active_at_end": true,
+          "causes": ["limit_power"]
+        }
+      ],
+      "sha256": "de78b9736e76767640313738613c45ce4f6ed5fb1902163e3bb361e8ac97c737",
+      "gzip_sha256": "eaea82d7cf8b495776ec5f717fb19e63bf6d7a77a935fa29f633cba14bde5210",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "simple",
+      "id": "speed-direction",
+      "experiment_id": "c45ee08a-40e4-4210-b77d-8f355b407b58",
+      "status": "passed",
+      "sim_time_s": 0.2,
+      "sample_count": 201,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 1.1102230246251565e-14,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "上限后制动车速误差",
+          "actual": 8.43769498715119e-15,
+          "limit": 1e-9,
+          "unit": "m/s",
+          "basis": "前0.1s禁止正向加速，后0.1s施加−10N制动。"
+        },
+        {
+          "name": "速度方向限制事件",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "限制起止须可审计。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [
+        {
+          "condition": "limit_speed_direction",
+          "start_time_s": 0,
+          "end_time_s": 0.1,
+          "duration_s": 0.1,
+          "active_at_end": false,
+          "causes": ["limit_speed_direction"]
+        }
+      ],
+      "sha256": "917fcba477d48f48e083405fecbe995430dfd9f069e9d0bb7eb74b25df06ebe0",
+      "gzip_sha256": "e555a9ab4c5378a26cdcea4cc5b6a3f9483d8c98375b8b50e14b6c12c84393f4",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "simple",
+      "id": "external-overspeed",
+      "experiment_id": "f167dd25-4a9b-4757-aee4-ee76b34eefaa",
+      "status": "passed",
+      "sim_time_s": 0.21,
+      "sample_count": 211,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 1.9539925233402755e-14,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "真实超速与取消资格",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "保留真实速度，超速后资格不能恢复。"
+        },
+        {
+          "name": "超速分类原因",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "记录入射区间的外力或耦合原因。"
+        },
+        {
+          "name": "反向外力后车速误差",
+          "actual": 0,
+          "limit": 1e-9,
+          "unit": "m/s",
+          "basis": "等时长±10N冲量抵消；随后0.01s无外力。"
+        },
+        {
+          "name": "超速区间恢复",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "恢复事件包含起止与持续时间。"
+        }
+      ],
+      "qualification_reasons": ["overspeed"],
+      "condition_intervals": [
+        {
+          "condition": "overspeed",
+          "start_time_s": 0.001,
+          "end_time_s": 0.2,
+          "duration_s": 0.199,
+          "active_at_end": false,
+          "causes": ["horizontal_external", "coupling"]
+        }
+      ],
+      "sha256": "8c566e4a89da5f4553476afe6a04bdee909524a06e2f9d7a3c4f491e36fbb12b",
+      "gzip_sha256": "bba3bc3bc881b9183cd67acc9274af5f084ba800a434681aa327f64811d4c934",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "simple",
+      "id": "coupling-overspeed",
+      "experiment_id": "36240ebf-e121-46b3-b649-c0258c2f7a00",
+      "status": "passed",
+      "sim_time_s": 0.05,
+      "sample_count": 51,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 1.4210854715202004e-14,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "真实超速与取消资格",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "保留真实速度，超速后资格不能恢复。"
+        },
+        {
+          "name": "超速分类原因",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "记录入射区间的外力或耦合原因。"
+        }
+      ],
+      "qualification_reasons": ["overspeed"],
+      "condition_intervals": [
+        {
+          "condition": "overspeed",
+          "start_time_s": 0.019,
+          "end_time_s": 0.05,
+          "duration_s": 0.031000000000000003,
+          "active_at_end": true,
+          "causes": ["coupling"]
+        }
+      ],
+      "sha256": "0f8db81debfe1cd50bf2c116cf8013cb52f3608fa42f5eece13e2623492f59ac",
+      "gzip_sha256": "abca110bb4cc73b0f54c37834ea35a0d13f4c31f4e42b0c25686f0494410a643",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "simple",
+      "id": "joint-torque",
+      "experiment_id": "deb14c77-c75c-4ed7-ba48-7bc27260689d",
+      "status": "passed",
+      "sim_time_s": 0.2,
+      "sample_count": 201,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 9.199238593105008e-15,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "cart_x_m参考误差",
+          "actual": 2.5970024741805986e-13,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "cart_v_m_s参考误差",
+          "actual": 1.0692766116982e-12,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "theta_unwrapped_rad参考误差",
+          "actual": 8.460343536853543e-12,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "theta_dot_rad_s参考误差",
+          "actual": 3.450773000679419e-11,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "dissipated_energy_J参考误差",
+          "actual": 0,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "actuator_work_J参考误差",
+          "actual": 0,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "force_external_work_J参考误差",
+          "actual": 0,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "torque_external_work_J参考误差",
+          "actual": 4.2722075876966414e-13,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [],
+      "sha256": "2d736cd5cb5a9a864677a7c0c6048cea29322fd12c2990158234e842984cfb19",
+      "gzip_sha256": "445c70cc9409fbd442349eceb838f56ce21b847a27a513703c94452690988af0",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "simple",
+      "id": "combined-work",
+      "experiment_id": "73fb6a7f-1ccb-43d7-9671-5cd6e07f06c1",
+      "status": "passed",
+      "sim_time_s": 0.2,
+      "sample_count": 201,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 2.9755503616613055e-12,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "cart_x_m参考误差",
+          "actual": 1.012953609880185e-12,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "cart_v_m_s参考误差",
+          "actual": 1.2401746296575311e-11,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "theta_unwrapped_rad参考误差",
+          "actual": 6.204370350815225e-12,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "theta_dot_rad_s参考误差",
+          "actual": 1.4474466070169e-10,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "dissipated_energy_J参考误差",
+          "actual": 1.6372927319485697e-13,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "actuator_work_J参考误差",
+          "actual": 3.779546120519228e-13,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "force_external_work_J参考误差",
+          "actual": 7.559092241038456e-13,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "torque_external_work_J参考误差",
+          "actual": 4.821143484434742e-13,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [],
+      "sha256": "4f37876afcb5e635709e9cf824d7efdcb68730687740ac0ff547021233666899",
+      "gzip_sha256": "6847d089bde931401bded29f8278ddf1758598deb62078e812011da74a074455",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "simple",
+      "id": "rail-boundary",
+      "experiment_id": "bbcf73b6-773f-424c-a1a4-12949f3ad85f",
+      "status": "passed",
+      "sim_time_s": 0.0004974915756638438,
+      "sample_count": 2,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 2.4123498337802474e-18,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "解析触边时间误差",
+          "actual": 2.2497195079074217e-16,
+          "limit": 1e-10,
+          "unit": "s",
+          "basis": "零重力水平杆：解0.0001=0.2t+(3/S)t²/2。"
+        },
+        {
+          "name": "触边位置误差",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "m",
+          "basis": "滑块中心有效行程，不扣视觉宽度。"
+        },
+        {
+          "name": "部分步执行器做功误差",
+          "actual": 4.5428071027142636e-17,
+          "limit": 1e-10,
+          "unit": "J",
+          "basis": "1N×0.0001m；不把完整步做功写入终止样本。"
+        },
+        {
+          "name": "部分步水平外力做功误差",
+          "actual": 9.085614205428527e-17,
+          "limit": 1e-10,
+          "unit": "J",
+          "basis": "2N×0.0001m。"
+        },
+        {
+          "name": "终止与安全区事件",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "安全区告警；触边不反弹，不执行终止后的排队外力矩。"
+        }
+      ],
+      "qualification_reasons": ["boundary"],
+      "condition_intervals": [
+        {
+          "condition": "safety_buffer",
+          "start_time_s": 0,
+          "end_time_s": 0.0004974915756638438,
+          "duration_s": 0.0004974915756638438,
+          "active_at_end": true,
+          "causes": ["safety_buffer"]
+        }
+      ],
+      "sha256": "83838c62f65ba999a420bc5abd1b6142ab7981902fd6ec4042164b23799588d3",
+      "gzip_sha256": "7af7fd4b5befe54b260ecd708c66272661cfebf0d69c531388228c8d386c4f90",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "near-zero",
+      "experiment_id": "fdb76c0b-385c-44db-a809-e929881dc507",
+      "status": "passed",
+      "sim_time_s": 0.2,
+      "sample_count": 201,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 7.632783294297951e-17,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "匀加速车速误差",
+          "actual": 5.273559366969494e-16,
+          "limit": 1e-9,
+          "unit": "m/s",
+          "basis": "零重力水平杆：总质量平移，v=v0+Ft/S。"
+        },
+        {
+          "name": "匀加速车位误差",
+          "actual": 3.122502256758253e-17,
+          "limit": 1e-9,
+          "unit": "m",
+          "basis": "x=v0t+Ft²/(2S)。"
+        },
+        {
+          "name": "执行器做功误差",
+          "actual": 0,
+          "limit": 1e-9,
+          "unit": "J",
+          "basis": "恒力W=FΔx。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [],
+      "sha256": "bae5d25d212a9b672fdba45c6c20cda495f46dac4e9e140ce6962686877490fa",
+      "gzip_sha256": "0b3429202cfd71688f4f06117af627ab8a1dba958e81ad3cb5de85e6366e8e8c",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "force-limit",
+      "experiment_id": "b43a5f09-f7ad-4f4f-9a69-74e077794c92",
+      "status": "passed",
+      "sim_time_s": 0.02,
+      "sample_count": 21,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 2.7755575615628914e-17,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "匀加速车速误差",
+          "actual": 1.6653345369377348e-16,
+          "limit": 1e-9,
+          "unit": "m/s",
+          "basis": "零重力水平杆：总质量平移，v=v0+Ft/S。"
+        },
+        {
+          "name": "匀加速车位误差",
+          "actual": 1.3010426069826053e-18,
+          "limit": 1e-9,
+          "unit": "m",
+          "basis": "x=v0t+Ft²/(2S)。"
+        },
+        {
+          "name": "执行器做功误差",
+          "actual": 1.3877787807814457e-17,
+          "limit": 1e-9,
+          "unit": "J",
+          "basis": "恒力W=FΔx。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [
+        {
+          "condition": "limit_force",
+          "start_time_s": 0,
+          "end_time_s": 0.02,
+          "duration_s": 0.02,
+          "active_at_end": true,
+          "causes": ["limit_force"]
+        }
+      ],
+      "sha256": "e2a3799f8863342cdfc8301149cc908ca57ad1013e3c32f18755bd61df91beec",
+      "gzip_sha256": "370f478c90227a11bfb015bb6f21056794bb035c37acc3d14206f4709fc5e515",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "power-drive",
+      "experiment_id": "30181f6e-a363-4e58-96c4-c5ac634627c9",
+      "status": "passed",
+      "sim_time_s": 0.05,
+      "sample_count": 51,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 8.881784197001252e-16,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 7.08988423525625e-13,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "恒功率车速平方误差",
+          "actual": 1.1343148642595224e-12,
+          "limit": 1e-8,
+          "unit": "m²/s²",
+          "basis": "独立关系：Δ(Sv²/2)=Pt。"
+        },
+        {
+          "name": "执行器恒功率做功误差",
+          "actual": 1.1102230246251565e-16,
+          "limit": 1e-8,
+          "unit": "J",
+          "basis": "正负功率均W=Pt。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [
+        {
+          "condition": "limit_force",
+          "start_time_s": 0,
+          "end_time_s": 0.05,
+          "duration_s": 0.05,
+          "active_at_end": true,
+          "causes": ["limit_force"]
+        },
+        {
+          "condition": "limit_power",
+          "start_time_s": 0,
+          "end_time_s": 0.05,
+          "duration_s": 0.05,
+          "active_at_end": true,
+          "causes": ["limit_power"]
+        }
+      ],
+      "sha256": "fd10232284d55e3b5ca2b20be618980d32aa8dfe914eb719234f807619dfbde2",
+      "gzip_sha256": "3227eceacf14b63c038731d2ab1943f009bf3ec0d5037ab7ef8a6512ff16e610",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "power-brake",
+      "experiment_id": "f1c64669-badb-4b00-816c-f8d050606ac9",
+      "status": "passed",
+      "sim_time_s": 0.05,
+      "sample_count": 51,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 3.999078845851045e-12,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "恒功率车速平方误差",
+          "actual": 6.398659380124627e-12,
+          "limit": 1e-8,
+          "unit": "m²/s²",
+          "basis": "独立关系：Δ(Sv²/2)=Pt。"
+        },
+        {
+          "name": "执行器恒功率做功误差",
+          "actual": 1.1102230246251565e-16,
+          "limit": 1e-8,
+          "unit": "J",
+          "basis": "正负功率均W=Pt。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [
+        {
+          "condition": "limit_force",
+          "start_time_s": 0,
+          "end_time_s": 0.05,
+          "duration_s": 0.05,
+          "active_at_end": true,
+          "causes": ["limit_force"]
+        },
+        {
+          "condition": "limit_power",
+          "start_time_s": 0,
+          "end_time_s": 0.05,
+          "duration_s": 0.05,
+          "active_at_end": true,
+          "causes": ["limit_power"]
+        }
+      ],
+      "sha256": "bb64f73bd62c63f16283a84db4dba3193785842e9f566c2478932401bf5ae08a",
+      "gzip_sha256": "66ee0957341b71c77e1b287255a2b78524d048de88bc72ea1edaf440a28f8882",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "speed-direction",
+      "experiment_id": "7159fc1e-d1b2-459b-97be-de3e8a5b9a58",
+      "status": "passed",
+      "sim_time_s": 0.2,
+      "sample_count": 201,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 1.5543122344752192e-15,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "上限后制动车速误差",
+          "actual": 6.661338147750939e-16,
+          "limit": 1e-9,
+          "unit": "m/s",
+          "basis": "前0.1s禁止正向加速，后0.1s施加−10N制动。"
+        },
+        {
+          "name": "速度方向限制事件",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "限制起止须可审计。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [
+        {
+          "condition": "limit_speed_direction",
+          "start_time_s": 0,
+          "end_time_s": 0.1,
+          "duration_s": 0.1,
+          "active_at_end": false,
+          "causes": ["limit_speed_direction"]
+        }
+      ],
+      "sha256": "b55405583360a0d32924e9f8b737c8307355a7aca968c2fa062793c3c0e95981",
+      "gzip_sha256": "194fbdfd60facb9e6dc45d9394e0a2347821f91ed36048ff111ed09cdc0fb4c9",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "external-overspeed",
+      "experiment_id": "4cd98fab-0f95-4cf8-926f-de5412c1e901",
+      "status": "passed",
+      "sim_time_s": 0.21,
+      "sample_count": 211,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 2.220446049250313e-15,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "真实超速与取消资格",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "保留真实速度，超速后资格不能恢复。"
+        },
+        {
+          "name": "超速分类原因",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "记录入射区间的外力或耦合原因。"
+        },
+        {
+          "name": "反向外力后车速误差",
+          "actual": 2.220446049250313e-16,
+          "limit": 1e-9,
+          "unit": "m/s",
+          "basis": "等时长±10N冲量抵消；随后0.01s无外力。"
+        },
+        {
+          "name": "超速区间恢复",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "恢复事件包含起止与持续时间。"
+        }
+      ],
+      "qualification_reasons": ["overspeed"],
+      "condition_intervals": [
+        {
+          "condition": "overspeed",
+          "start_time_s": 0.002,
+          "end_time_s": 0.199,
+          "duration_s": 0.197,
+          "active_at_end": false,
+          "causes": ["horizontal_external", "coupling"]
+        }
+      ],
+      "sha256": "17749aa2794d11486b99508d898eb866c9835459f32cf2b333119673c7fe6848",
+      "gzip_sha256": "f7dbe6cb3cd70c4830fa82a905b3f36e50e709ed9e6a018e275685cfcfdca170",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "coupling-overspeed",
+      "experiment_id": "12d1f856-abf0-4a1d-8783-cc951b5a7463",
+      "status": "passed",
+      "sim_time_s": 0.05,
+      "sample_count": 51,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 3.730349362740526e-14,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "真实超速与取消资格",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "保留真实速度，超速后资格不能恢复。"
+        },
+        {
+          "name": "超速分类原因",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "记录入射区间的外力或耦合原因。"
+        }
+      ],
+      "qualification_reasons": ["overspeed"],
+      "condition_intervals": [
+        {
+          "condition": "overspeed",
+          "start_time_s": 0.013000000000000001,
+          "end_time_s": 0.05,
+          "duration_s": 0.037000000000000005,
+          "active_at_end": true,
+          "causes": ["coupling"]
+        }
+      ],
+      "sha256": "1cf3ee088b2862eb887d47f6d6ca0f947f87656976b33dd1b9bf45c5d1493b5b",
+      "gzip_sha256": "0ac2031b6be8fe96e6f19313b1ca68b429bc6baa9e17c03f6b5f3b0d98142c6d",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "joint-torque",
+      "experiment_id": "2036acc1-cf18-47d8-9875-9a565df5ed95",
+      "status": "passed",
+      "sim_time_s": 0.2,
+      "sample_count": 201,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 1.145784855882681e-15,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "cart_x_m参考误差",
+          "actual": 7.249105829498781e-14,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "cart_v_m_s参考误差",
+          "actual": 2.7934946023044915e-13,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "theta_unwrapped_rad参考误差",
+          "actual": 1.4548362514688051e-12,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "theta_dot_rad_s参考误差",
+          "actual": 5.587530438333488e-12,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "dissipated_energy_J参考误差",
+          "actual": 0,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "actuator_work_J参考误差",
+          "actual": 0,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "force_external_work_J参考误差",
+          "actual": 0,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "torque_external_work_J参考误差",
+          "actual": 6.320595088982195e-14,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [],
+      "sha256": "7887d8c1f138565a5471e081248c33c1c74f9e6ddb759a1d9fd613fd81b0511b",
+      "gzip_sha256": "8d472c4661f3d354f71561cd4a1e552d876c165045738705af80d536f595357f",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "combined-work",
+      "experiment_id": "730c82dc-1b64-46ed-a257-78fd2adba8a0",
+      "status": "passed",
+      "sim_time_s": 0.2,
+      "sample_count": 201,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 2.5283351801075327e-12,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "cart_x_m参考误差",
+          "actual": 2.1979640330016537e-13,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "cart_v_m_s参考误差",
+          "actual": 4.2389980414725414e-12,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "theta_unwrapped_rad参考误差",
+          "actual": 2.027489287570461e-12,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "theta_dot_rad_s参考误差",
+          "actual": 3.880185062143937e-11,
+          "limit": 1e-7,
+          "unit": "SI",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "dissipated_energy_J参考误差",
+          "actual": 6.115594142208636e-14,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "actuator_work_J参考误差",
+          "actual": 4.455810720394027e-14,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "force_external_work_J参考误差",
+          "actual": 8.911621440788053e-14,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        },
+        {
+          "name": "torque_external_work_J参考误差",
+          "actual": 8.765557724110806e-14,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "独立广义动量DOP853，两精度交叉验证；21个共同采样时刻。"
+        }
+      ],
+      "qualification_reasons": [],
+      "condition_intervals": [],
+      "sha256": "3573095b41032056bf02eb2fa562473bf2352207eb8986a398da8b6391dcc0a3",
+      "gzip_sha256": "bbffc6b30a5c08985bb31ef07545b98d37ed0c52908aeb1224b5877f526b0e99",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    },
+    {
+      "preset": "standard",
+      "id": "rail-boundary",
+      "experiment_id": "51e0bc5c-3d3b-4cca-9427-906a6e3d7ba6",
+      "status": "passed",
+      "sim_time_s": 0.0004985089330621122,
+      "sample_count": 2,
+      "metrics": [
+        {
+          "name": "最大力超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "N",
+          "basis": "每物理步记录；驱动及制动均受最大力约束。"
+        },
+        {
+          "name": "最大绝对功率超限",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "W",
+          "basis": "abs(F×v)≤Pmax，包含负功率制动。"
+        },
+        {
+          "name": "超速方向输入",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "达到速度上限时不能主动继续加速；不截断连续状态。"
+        },
+        {
+          "name": "最大分类能量收支残差",
+          "actual": 1.1384122811097797e-18,
+          "limit": 1e-7,
+          "unit": "J",
+          "basis": "E+D−E0−Wactuator−Whorizontal−Wtorque；不以外扰合计替代分类量。"
+        },
+        {
+          "name": "解析触边时间误差",
+          "actual": 1.6761765586625899e-16,
+          "limit": 1e-10,
+          "unit": "s",
+          "basis": "零重力水平杆：解0.0001=0.2t+(3/S)t²/2。"
+        },
+        {
+          "name": "触边位置误差",
+          "actual": 0,
+          "limit": 1e-12,
+          "unit": "m",
+          "basis": "滑块中心有效行程，不扣视觉宽度。"
+        },
+        {
+          "name": "部分步执行器做功误差",
+          "actual": 3.370513503714312e-17,
+          "limit": 1e-10,
+          "unit": "J",
+          "basis": "1N×0.0001m；不把完整步做功写入终止样本。"
+        },
+        {
+          "name": "部分步水平外力做功误差",
+          "actual": 6.741027007428624e-17,
+          "limit": 1e-10,
+          "unit": "J",
+          "basis": "2N×0.0001m。"
+        },
+        {
+          "name": "终止与安全区事件",
+          "actual": 0,
+          "limit": 0,
+          "unit": "违规数",
+          "basis": "安全区告警；触边不反弹，不执行终止后的排队外力矩。"
+        }
+      ],
+      "qualification_reasons": ["boundary"],
+      "condition_intervals": [
+        {
+          "condition": "safety_buffer",
+          "start_time_s": 0,
+          "end_time_s": 0.0004985089330621122,
+          "duration_s": 0.0004985089330621122,
+          "active_at_end": true,
+          "causes": ["safety_buffer"]
+        }
+      ],
+      "sha256": "431de9332b9c6de81cae2237f96f922aee974deb8d6920e801a6d3528c06f157",
+      "gzip_sha256": "0c1c6c99733e5796412280b00a6d2fe1e447e571ae07555d4dbbba86764bc3d4",
+      "build_identity": {
+        "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+        "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+        "source_dirty": true
+      }
+    }
+  ],
+  "axe_violations": 0,
+  "download_readback": "passed",
+  "wrong_file_rejection": "passed",
+  "wrong_file_rejection_count": 2,
+  "desktop_widths": [1440, 1100],
+  "computed_typography": {
+    "body": "16px",
+    "h1": "26px",
+    "h2": "14px"
+  },
+  "automated_checks": {
+    "full_check": "passed",
+    "tests": 52,
+    "typecheck": "passed",
+    "production_build": "passed"
+  },
+  "review_base": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+  "standards_review": {
+    "findings": 0
+  },
+  "spec_review": {
+    "initial_P2_findings": 2,
+    "resolved": 2,
+    "remaining": 0
+  },
+  "t01_regression": {
+    "status": "passed",
+    "scenario": "T01 real Chrome + macOS + localhost",
+    "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chrome_version": "Google Chrome 156.0.8078.80",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "build_identity": {
+      "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+      "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+      "source_dirty": true
+    },
+    "release_experiment_id": "3c66e55d-f3b5-4626-a1aa-aa1b7450c3e2",
+    "equilibrium_experiment_id": "f0d825ca-6c51-4cd2-a7b1-57ba11f2cdca",
+    "equilibrium_samples": 1001,
+    "controlled_start_before_ack_visibility_regression": "passed",
+    "artifacts": "/tmp/pendulum-issue8/verified"
+  },
+  "t02_regression": {
+    "status": "passed",
+    "chrome_version": "Google Chrome 156.0.8078.80",
+    "environment": {
+      "os": "15.8.2",
+      "arch": "arm64",
+      "cpu": "Apple M1 Max",
+      "memory_bytes": 34359738368
+    },
+    "reports": [
+      {
+        "preset": "standard",
+        "batch_id": "6cf1a357-3964-4c60-af2a-07e6e53ea889",
+        "source": {
+          "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+          "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+          "source_dirty": true
+        },
+        "counts": {
+          "passed": 14,
+          "failed": 0,
+          "invalid": 2,
+          "blocked": 0
+        },
+        "metrics": [
+          {
+            "id": "convergence-0.5ms",
+            "metrics": [
+              {
+                "name": "独立参考车位差",
+                "actual": 8.973516374410906e-13,
+                "limit": 1e-6,
+                "unit": "m",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考车速差",
+                "actual": 6.090572490791146e-12,
+                "limit": 1e-5,
+                "unit": "m/s",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考角差",
+                "actual": 1.9328538769514125e-11,
+                "limit": 1e-6,
+                "unit": "rad",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考角速度差",
+                "actual": 7.40209005201109e-11,
+                "limit": 0.0001,
+                "unit": "rad/s",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "初始机械能误差",
+                "actual": 0,
+                "limit": 1e-12,
+                "unit": "J",
+                "basis": "独立质量积分：均匀杆+点质量，T=S v²/2−A cosθ vω+Bω²/2，V=Ag(1+cosθ)。"
+              },
+              {
+                "name": "水平质心运动误差",
+                "actual": 1.03292374653563e-13,
+                "limit": 1e-7,
+                "unit": "kg·m",
+                "basis": "无水平外力时，系统水平质心匀速；SΔx−AΔsinθ=Pₓ(0)t。"
+              },
+              {
+                "name": "两步长最大车位差",
+                "actual": 1.4114584501179195e-11,
+                "limit": 0.001,
+                "unit": "m",
+                "basis": "10s冻结光滑无控制场景，全部10001个共同1ms时刻直接比较原精度累计角和车位；角差≤0.1°，车位差≤1mm。"
+              },
+              {
+                "name": "两步长最大角差",
+                "actual": 2.6593882651582135e-10,
+                "limit": 0.0017453292519943296,
+                "unit": "rad",
+                "basis": "10s冻结光滑无控制场景，全部10001个共同1ms时刻直接比较原精度累计角和车位；角差≤0.1°，车位差≤1mm。"
+              }
+            ]
+          },
+          {
+            "id": "energy-30s",
+            "metrics": [
+              {
+                "name": "独立参考车位差",
+                "actual": 2.566295786987638e-11,
+                "limit": 1e-6,
+                "unit": "m",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考车速差",
+                "actual": 1.4855969232563382e-10,
+                "limit": 1e-5,
+                "unit": "m/s",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考角差",
+                "actual": 4.805071895930269e-10,
+                "limit": 1e-6,
+                "unit": "rad",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考角速度差",
+                "actual": 1.7426429188560633e-9,
+                "limit": 0.0001,
+                "unit": "rad/s",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "初始机械能误差",
+                "actual": 0,
+                "limit": 1e-12,
+                "unit": "J",
+                "basis": "独立质量积分：均匀杆+点质量，T=S v²/2−A cosθ vω+Bω²/2，V=Ag(1+cosθ)。"
+              },
+              {
+                "name": "水平质心运动误差",
+                "actual": 3.3661962106634746e-12,
+                "limit": 1e-7,
+                "unit": "kg·m",
+                "basis": "无水平外力时，系统水平质心匀速；SΔx−AΔsinθ=Pₓ(0)t。"
+              },
+              {
+                "name": "最大相对能量漂移",
+                "actual": 2.7978253987010405e-11,
+                "limit": 0.001,
+                "unit": "比例",
+                "basis": "Eref=0.613125J，非零；30s全部30001个物理步点最大|E−Eref|/|Eref|≤0.1%。"
+              }
+            ]
+          }
+        ],
+        "file_sha256": "0582b296cf6724029bfbd736ad9db7518dde79f9d03c3f8d0bd048243db731ba",
+        "gzip_sha256": "6d178ef68120f46ff329e76a18f92fc419e6923e2aee87b8848a90708a8ee10c"
+      },
+      {
+        "preset": "simple",
+        "batch_id": "5576f88d-3211-4fef-8f77-9e5d93737896",
+        "source": {
+          "source_revision": "66f0c75c403ef4a601a87567aa4a524a7eb8f8a0",
+          "source_sha256": "f78e4b9546f3083f2c66c6598a311eef4a609f350a469e98be33c1f75ade2687",
+          "source_dirty": true
+        },
+        "counts": {
+          "passed": 15,
+          "failed": 0,
+          "invalid": 1,
+          "blocked": 0
+        },
+        "metrics": [
+          {
+            "id": "convergence-0.5ms",
+            "metrics": [
+              {
+                "name": "独立参考车位差",
+                "actual": 1.309442138053285e-12,
+                "limit": 1e-6,
+                "unit": "m",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考车速差",
+                "actual": 1.0905498726287988e-11,
+                "limit": 1e-5,
+                "unit": "m/s",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考角差",
+                "actual": 4.034550471487819e-11,
+                "limit": 1e-6,
+                "unit": "rad",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考角速度差",
+                "actual": 1.964162166245842e-10,
+                "limit": 0.0001,
+                "unit": "rad/s",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "初始机械能误差",
+                "actual": 0,
+                "limit": 1e-12,
+                "unit": "J",
+                "basis": "独立质量积分：均匀杆+点质量，T=S v²/2−A cosθ vω+Bω²/2，V=Ag(1+cosθ)。"
+              },
+              {
+                "name": "水平质心运动误差",
+                "actual": 8.10185252220208e-14,
+                "limit": 1e-7,
+                "unit": "kg·m",
+                "basis": "无水平外力时，系统水平质心匀速；SΔx−AΔsinθ=Pₓ(0)t。"
+              },
+              {
+                "name": "两步长最大车位差",
+                "actual": 1.9477773560705458e-11,
+                "limit": 0.001,
+                "unit": "m",
+                "basis": "10s冻结光滑无控制场景，全部10001个共同1ms时刻直接比较原精度累计角和车位；角差≤0.1°，车位差≤1mm。"
+              },
+              {
+                "name": "两步长最大角差",
+                "actual": 5.765006250157967e-10,
+                "limit": 0.0017453292519943296,
+                "unit": "rad",
+                "basis": "10s冻结光滑无控制场景，全部10001个共同1ms时刻直接比较原精度累计角和车位；角差≤0.1°，车位差≤1mm。"
+              }
+            ]
+          },
+          {
+            "id": "energy-30s",
+            "metrics": [
+              {
+                "name": "独立参考车位差",
+                "actual": 2.8266975565793828e-11,
+                "limit": 1e-6,
+                "unit": "m",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考车速差",
+                "actual": 2.0874843520424236e-10,
+                "limit": 1e-5,
+                "unit": "m/s",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考角差",
+                "actual": 8.351714875232119e-10,
+                "limit": 1e-6,
+                "unit": "rad",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "独立参考角速度差",
+                "actual": 3.657952774016593e-9,
+                "limit": 0.0001,
+                "unit": "rad/s",
+                "basis": "momentum-dop853-2；41个冻结时刻；累计角直接相减。"
+              },
+              {
+                "name": "初始机械能误差",
+                "actual": 0,
+                "limit": 1e-12,
+                "unit": "J",
+                "basis": "独立质量积分：均匀杆+点质量，T=S v²/2−A cosθ vω+Bω²/2，V=Ag(1+cosθ)。"
+              },
+              {
+                "name": "水平质心运动误差",
+                "actual": 2.9198379825068344e-12,
+                "limit": 1e-7,
+                "unit": "kg·m",
+                "basis": "无水平外力时，系统水平质心匀速；SΔx−AΔsinθ=Pₓ(0)t。"
+              },
+              {
+                "name": "最大相对能量漂移",
+                "actual": 6.584935107008257e-11,
+                "limit": 0.001,
+                "unit": "比例",
+                "basis": "Eref=0.24034499999999998J，非零；30s全部30001个物理步点最大|E−Eref|/|Eref|≤0.1%。"
+              }
+            ]
+          }
+        ],
+        "file_sha256": "f6f9c52ed72f6c9c36bcbded118f97024346a53474f8210b83be4b53afbe9f7c",
+        "gzip_sha256": "fbdffc4a358dcd995a8950c3e8845e982a674f0c42ba69d108016567f956492c"
+      }
+    ],
+    "controlled_visibility_pause": "passed",
+    "controlled_start_before_ack_exclusion": "passed in both directions",
+    "download_readback_and_wrong_file_rejection": "passed",
+    "axe_violations": 0,
+    "desktop_widths": [1440, 1100]
+  },
+  "t02_original_columns_comparison": [
+    {
+      "preset": "simple",
+      "new_download_sha256": "f6f9c52ed72f6c9c36bcbded118f97024346a53474f8210b83be4b53afbe9f7c",
+      "previous_archive": "docs/verification/t02/full-review-p2/simple-benchmarks.json.gz",
+      "cases": [
+        {
+          "case": "equilibrium-down",
+          "samples": 1001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "equilibrium-up",
+          "samples": 1001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "release",
+          "samples": 1001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "rotation",
+          "samples": 201,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "rotation-centered",
+          "samples": 201,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "weight-zero",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "weight-pivot",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "weight-tip",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "coulomb",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "cart-viscous",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "joint-viscous",
+          "samples": 201,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "combined-damping",
+          "samples": 1001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "convergence-1ms",
+          "samples": 10001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "convergence-0.5ms",
+          "samples": 10001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "energy-30s",
+          "samples": 30001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "numerical-failure",
+          "samples": 1,
+          "all_original_columns_unchanged": true
+        }
+      ]
+    },
+    {
+      "preset": "standard",
+      "new_download_sha256": "0582b296cf6724029bfbd736ad9db7518dde79f9d03c3f8d0bd048243db731ba",
+      "previous_archive": "docs/verification/t02/full-review-p2/standard-benchmarks.json.gz",
+      "cases": [
+        {
+          "case": "equilibrium-down",
+          "samples": 1001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "equilibrium-up",
+          "samples": 1001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "release",
+          "samples": 1001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "rotation",
+          "samples": 137,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "rotation-centered",
+          "samples": 201,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "weight-zero",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "weight-pivot",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "weight-tip",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "coulomb",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "cart-viscous",
+          "samples": 101,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "joint-viscous",
+          "samples": 201,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "combined-damping",
+          "samples": 1001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "convergence-1ms",
+          "samples": 10001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "convergence-0.5ms",
+          "samples": 10001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "energy-30s",
+          "samples": 30001,
+          "all_original_columns_unchanged": true
+        },
+        {
+          "case": "numerical-failure",
+          "samples": 1,
+          "all_original_columns_unchanged": true
+        }
+      ]
+    }
+  ],
+  "evidence_files": {
+    "standard-combined-work.json.gz": "bbffc6b30a5c08985bb31ef07545b98d37ed0c52908aeb1224b5877f526b0e99",
+    "simple-coupling-overspeed.json.gz": "abca110bb4cc73b0f54c37834ea35a0d13f4c31f4e42b0c25686f0494410a643",
+    "standard-joint-torque.json.gz": "8d472c4661f3d354f71561cd4a1e552d876c165045738705af80d536f595357f",
+    "simple-rail-boundary.png": "0aad924c74b47216b908465cd49fb2442ebf152ff3542b22f709c0be0cac0b27",
+    "check.txt": "824b13463078370228e0f5bbad295aa09bfc72ad21dd91af2a990de9753278ee",
+    "standard-speed-direction.json.gz": "194fbdfd60facb9e6dc45d9394e0a2347821f91ed36048ff111ed09cdc0fb4c9",
+    "simple-joint-torque.json.gz": "445c70cc9409fbd442349eceb838f56ce21b847a27a513703c94452690988af0",
+    "simple-rail-boundary.json.gz": "7af7fd4b5befe54b260ecd708c66272661cfebf0d69c531388228c8d386c4f90",
+    "simple-external-overspeed.json.gz": "bba3bc3bc881b9183cd67acc9274af5f084ba800a434681aa327f64811d4c934",
+    "summary-red.txt": "57c7340cc800b5b535d1040cf8185cf0614d767010eb75b4957a0f4f990851db",
+    "standard-rail-boundary.png": "ccc29797afd229d5a3d0ca2135fb2cbcb23a59af3a95fd637ea8ff6e5756d4e2",
+    "simple-near-zero.json.gz": "4a510124b70f41c57b35e9a7f4356d3b0dd6dc8a8b5945fe08d449caa644fbd6",
+    "standard-combined-work.png": "03f105ee05f6eaea054de17daa03d8141d20445526594cd18d75fb094df88184",
+    "standard-rail-boundary.json.gz": "0c1c6c99733e5796412280b00a6d2fe1e447e571ae07555d4dbbba86764bc3d4",
+    "browser-green.txt": "89b13d8b7045fdb6da5cc3a7628dcc4a5d4fd9cc7b8d306c51c4052edc549124",
+    "standard-coupling-overspeed.json.gz": "0ac2031b6be8fe96e6f19313b1ca68b429bc6baa9e17c03f6b5f3b0d98142c6d",
+    "actuation-green.txt": "aafd3f7f8339af8c7e3560540a68396752adcbc3fdef98a293f684204f5e560b",
+    "overspeed-red.txt": "72e84d8456aaaf3eb6a27a8a09baa1aff25d13920e39aca78e4d60b16d4e302a",
+    "standard-power-brake.json.gz": "66ee0957341b71c77e1b287255a2b78524d048de88bc72ea1edaf440a28f8882",
+    "standard-external-overspeed.json.gz": "f7dbe6cb3cd70c4830fa82a905b3f36e50e709ed9e6a018e275685cfcfdca170",
+    "simple-power-drive.json.gz": "8abcdfb70491a4f1f676967665565eaf38e2d6a43a43ad9a83d4336c4478805f",
+    "simple-force-limit.json.gz": "bbb606c81e0d4f383607079252908eeaf496cc8eb8a6be3e203efaff6e1c3938",
+    "simple-speed-direction.json.gz": "e555a9ab4c5378a26cdcea4cc5b6a3f9483d8c98375b8b50e14b6c12c84393f4",
+    "force-red.txt": "3f7ed2605032f0dbd8963fb186da810c81e9f94bd61d96c822b004d213e63737",
+    "browser-harness-failure.txt": "f886c2dddfa3fd12d91809ae5628abf2315691f1e317f75059307593aeba67c7",
+    "standard-near-zero.json.gz": "0b3429202cfd71688f4f06117af627ab8a1dba958e81ad3cb5de85e6366e8e8c",
+    "simple-combined-work.png": "d225f8299c8825e4fa68aaeacacb45ee963244bddc4755617b24f167919d1145",
+    "boundary-red.txt": "c572ddf4ab9bf75ecc56188fd19b7c1b3636598d193a352cbafc09a4cc472f7d",
+    "standard-force-limit.json.gz": "370f478c90227a11bfb015bb6f21056794bb035c37acc3d14206f4709fc5e515",
+    "standard-power-drive.json.gz": "3227eceacf14b63c038731d2ab1943f009bf3ec0d5037ab7ef8a6512ff16e610",
+    "simple-combined-work.json.gz": "6847d089bde931401bded29f8278ddf1758598deb62078e812011da74a074455",
+    "simple-power-brake.json.gz": "eaea82d7cf8b495776ec5f717fb19e63bf6d7a77a935fa29f633cba14bde5210"
+  },
+  "selected_case_reporting_regression": {
+    "cases": 2,
+    "status": "passed",
+    "wrong_file_rejection": "not_executed",
+    "wrong_file_rejection_count": 0,
+    "source": "selected-verification.json"
+  }
+}

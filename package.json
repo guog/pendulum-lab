@@ -20,7 +20,7 @@
     "preview": "vite preview --host localhost",
     "typecheck": "tsc --noEmit",
     "test:app": "node --test tests/*.test.ts",
-    "test:browser": "node scripts/browser-smoke.mjs && node scripts/browser-benchmarks.mjs",
+    "test:browser": "node scripts/browser-smoke.mjs && node scripts/browser-benchmarks.mjs && node scripts/browser-actuation.mjs",
     "test": "node --test scripts/*.test.mjs tests/*.test.ts"
   },
   "devDependencies": {

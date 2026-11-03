@@ -1,8 +1,10 @@
+import type { ActuationCaseId } from './actuator-benchmarks.ts'
 import { energy, type Physics, type State } from './dynamics.ts'
 import { buildIdentity, type BuildIdentity } from './build-info.ts'
+import type { InputCommand } from './actuation.ts'
 
 export type PresetId = 'simple' | 'standard'
-export type BenchmarkId = 'release' | 'equilibrium'
+export type BenchmarkId = 'release' | 'equilibrium' | ActuationCaseId
 export type ExperimentConfig = {
   schema_version: 1
   preset: PresetId
@@ -11,7 +13,7 @@ export type ExperimentConfig = {
   benchmark_description: string
   environment: { user_agent: string; language: string | null; logical_processors: number | null }
   execution_mode: 'memory-research'
-  control_mode: 'free'
+  control_mode: 'free' | 'prescribed'
   build_identity: BuildIdentity | null
   versions: {
     application: string
@@ -23,6 +25,7 @@ export type ExperimentConfig = {
   physics: Physics
   preset_overrides: Record<string, number>
   initial_state: State
+  input_program?: InputCommand[]
   timing: {
     physics_step_s: number
     control_period_s: number
@@ -56,7 +59,10 @@ const presets = {
   },
 }
 
-export function createConfig(preset: PresetId, benchmark: BenchmarkId): ExperimentConfig {
+export function createConfig(
+  preset: PresetId,
+  benchmark: 'release' | 'equilibrium',
+): ExperimentConfig {
   if (!Object.hasOwn(presets, preset) || !['release', 'equilibrium'].includes(benchmark))
     throw new Error('未知工况或基准')
   return {
@@ -78,9 +84,9 @@ export function createConfig(preset: PresetId, benchmark: BenchmarkId): Experime
     control_mode: 'free',
     build_identity: structuredClone(buildIdentity),
     versions: {
-      application: '0.0.0+t01',
+      application: '0.0.0+t03',
       build: buildIdentity?.source_sha256 ?? null,
-      model: 'rigid-cartpole-rk4-2',
+      model: 'rigid-cartpole-rk4-3',
       controller: 'none',
       rules: 'QV-1',
     },
@@ -112,10 +118,16 @@ export function createConfig(preset: PresetId, benchmark: BenchmarkId): Experime
 export function validateConfig(config: ExperimentConfig) {
   if (
     config.schema_version !== 1 ||
-    config.control_mode !== 'free' ||
+    !['free', 'prescribed'].includes(config.control_mode) ||
     config.execution_mode !== 'memory-research'
   )
     throw new Error('不支持的实验格式或模式')
+  if (
+    config.control_mode === 'free' &&
+    Array.isArray(config.input_program) &&
+    config.input_program.some((command) => command?.force_requested_N)
+  )
+    throw new Error('预定执行器请求必须显式使用prescribed模式')
   const ranges: Record<keyof Physics, [number, number]> = {
     rod_length_m: [0.2, 1.2],
     rod_mass_kg: [0.05, 1],
@@ -148,6 +160,31 @@ export function validateConfig(config: ExperimentConfig) {
   if (!Object.values(energy(config.initial_state, config.physics)).every(Number.isFinite))
     throw new Error('初始状态的能量超出可计算范围')
   const { physics_step_s, sample_period_s, control_period_s, duration_s } = config.timing
+  if (config.input_program !== undefined) {
+    if (!Array.isArray(config.input_program) || config.input_program.length > 10_000)
+      throw new Error('非法输入程序或超出容量')
+    for (const command of config.input_program) {
+      if (
+        !command ||
+        typeof command !== 'object' ||
+        !Number.isFinite(command.at_s) ||
+        command.at_s < 0 ||
+        command.at_s > duration_s ||
+        Math.abs(Math.round(command.at_s / physics_step_s) * physics_step_s - command.at_s) > 1e-12
+      )
+        throw new Error('输入时刻必须位于窗口内的物理步边界')
+      const fields = Object.keys(command).filter((key) => key !== 'at_s')
+      if (
+        !fields.length ||
+        fields.some(
+          (key) =>
+            !['force_requested_N', 'force_external_N', 'torque_external_Nm'].includes(key) ||
+            !Number.isFinite(command[key as keyof InputCommand]),
+        )
+      )
+        throw new Error('非法受力输入')
+    }
+  }
   if (![0.001, 0.0005].includes(physics_step_s)) throw new Error('不支持的物理步长')
   if (![0.001, 0.01, 0.1].includes(sample_period_s)) throw new Error('不支持的采样周期')
   if (control_period_s !== 0.01) throw new Error('当前控制周期必须为10ms')

@@ -1,3 +1,5 @@
+import { actuator, zeroForces, type Forces } from './actuation.ts'
+
 export type State = {
   cart_x_m: number
   cart_v_m_s: number
@@ -23,7 +25,7 @@ export type Physics = {
   friction_smoothing_m_s: number
 }
 
-type Vector = [number, number, number, number, number]
+type Vector = [number, number, number, number, number, number, number, number]
 
 function turningFractions(linear: number, quadratic: number, cubic: number) {
   const scale = Math.max(Math.abs(linear), Math.abs(quadratic), Math.abs(cubic))
@@ -54,6 +56,9 @@ function stepOutput(result: number[]) {
       theta_dot_rad_s: result[3]!,
     },
     dissipated_delta_J: result[4]!,
+    actuator_work_delta_J: result[5]!,
+    force_external_work_delta_J: result[6]!,
+    torque_external_work_delta_J: result[7]!,
   }
 }
 
@@ -68,7 +73,7 @@ function massProperties(physics: Physics) {
   return { mass, moment, inertia }
 }
 
-export function integrate(state: State, physics: Physics, dt: number) {
+export function integrate(state: State, physics: Physics, dt: number, forces: Forces = zeroForces) {
   const { mass, moment, inertia } = massProperties(physics)
   function derivative([, velocity, theta, omega]: Vector): Vector {
     const sine = theta % Math.PI === 0 ? 0 : Math.sin(theta)
@@ -78,14 +83,18 @@ export function integrate(state: State, physics: Physics, dt: number) {
       -physics.cart_coulomb_N * Math.tanh(velocity / physics.friction_smoothing_m_s) -
       physics.cart_viscous_N_s_m * velocity
     const jointTorque = -physics.joint_viscous_Nm_s_rad * omega
-    const horizontal = friction - moment * sine * omega ** 2
-    const torque = jointTorque + moment * physics.gravity_m_s2 * sine
+    const actual = actuator(forces.force_requested_N, velocity, physics).force_actual_N
+    const horizontal = actual + forces.force_external_N + friction - moment * sine * omega ** 2
+    const torque = forces.torque_external_Nm + jointTorque + moment * physics.gravity_m_s2 * sine
     return [
       velocity,
       (inertia * horizontal + coupling * torque) / determinant,
       omega,
       (coupling * horizontal + mass * torque) / determinant,
       -friction * velocity - jointTorque * omega,
+      actual * velocity,
+      forces.force_external_N * velocity,
+      forces.torque_external_Nm * omega,
     ]
   }
   const initial: Vector = [
@@ -94,6 +103,9 @@ export function integrate(state: State, physics: Physics, dt: number) {
     state.theta_unwrapped_rad,
     state.theta_dot_rad_s,
     0,
+    0,
+    0,
+    0,
   ]
   const add = (base: Vector, slope: Vector, scale: number): Vector => [
     base[0] + slope[0] * scale,
@@ -101,6 +113,9 @@ export function integrate(state: State, physics: Physics, dt: number) {
     base[2] + slope[2] * scale,
     base[3] + slope[3] * scale,
     base[4] + slope[4] * scale,
+    base[5] + slope[5] * scale,
+    base[6] + slope[6] * scale,
+    base[7] + slope[7] * scale,
   ]
   const k1 = derivative(initial)
   const k2 = derivative(add(initial, k1, dt / 2))

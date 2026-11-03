@@ -1,0 +1,28 @@
+✖ 零速受限请求推动水平杆，执行器与水平外力分别做功并满足独立匀加速解 (5.226792ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 94.3675
+
+✖ failing tests:
+
+test at tests/actuation.test.ts:8:1
+✖ 零速受限请求推动水平杆，执行器与水平外力分别做功并满足独立匀加速解 (5.226792ms)
+  AssertionError [ERR_ASSERTION]: 0 != 0.0025
+      at close (file:///Users/guog/projects/github/guog/pendulum-lab/tests/actuation.test.ts:6:10)
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/actuation.test.ts:19:3)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -1,3 +1,4 @@
+import { createActuationConfig } from './actuator-benchmarks.ts'
 import { createConfig, createSession } from './session.ts'
 import type { Request, Reply } from './protocol.ts'
 
@@ -48,7 +49,11 @@ context.onmessage = async ({ data: { request_id, command } }) => {
     switch (command.type) {
       case 'configure':
         suspendPump()
-        session = createSession(createConfig(command.preset, command.benchmark))
+        session = createSession(
+          command.benchmark === 'release' || command.benchmark === 'equilibrium'
+            ? createConfig(command.preset, command.benchmark)
+            : createActuationConfig(command.preset, command.benchmark),
+        )
         runningWallMs = 0
         break
       case 'start':

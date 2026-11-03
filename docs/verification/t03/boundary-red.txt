@@ -1,0 +1,35 @@
+✔ 零速受限请求推动水平杆，执行器与水平外力分别做功并满足独立匀加速解 (6.694708ms)
+✔ 正反向驱动和制动每步限制绝对机械功率，达到速度上限只允许制动 (2.648625ms)
+✔ 外力造成超速保留连续状态、记录违规起止持续时间并永久取消正式资格 (1.314041ms)
+✖ 初始或同刻触边优先于输入，终止样本保留入射力与部分步分类做功 (2.686625ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 100.932542
+
+✖ failing tests:
+
+test at tests/actuation.test.ts:96:1
+✖ 初始或同刻触边优先于输入，终止样本保留入射力与部分步分类做功 (2.686625ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(!output.events.some((event) => event.event_type === 'input'))
+  
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/actuation.test.ts:107:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

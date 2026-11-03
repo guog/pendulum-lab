@@ -1,0 +1,31 @@
+✔ 零速受限请求推动水平杆，执行器与水平外力分别做功并满足独立匀加速解 (6.55525ms)
+✔ 正反向驱动和制动每步限制绝对机械功率，达到速度上限只允许制动 (2.343875ms)
+✖ 外力造成超速保留连续状态、记录违规起止持续时间并永久取消正式资格 (0.733541ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 2
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 99.5885
+
+✖ failing tests:
+
+test at tests/actuation.test.ts:71:1
+✖ 外力造成超速保留连续状态、记录违规起止持续时间并永久取消正式资格 (0.733541ms)
+  AssertionError [ERR_ASSERTION]: 缺少逐步超速事件
+      at TestContext.<anonymous> (file:///Users/guog/projects/github/guog/pendulum-lab/tests/actuation.test.ts:89:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
