@@ -264,6 +264,7 @@ export function createSession(input: ExperimentConfig) {
         })
     }
     if (physicallyStable && qualificationReasons.size === 0) {
+      exportConfirmed = false
       stableSnapshot = structuredClone({
         sim_time_s: time(),
         stable_since_s: stableStart * dt,
