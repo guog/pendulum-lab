@@ -2,7 +2,7 @@
 
 ## 当前阶段与来源资料
 
-仓库当前维护需求资料与工程工具。新增应用实现需明确开发授权，并遵守需求中的阶段闸门。
+仓库当前包含需求资料、工程工具和T01最小独立物理实验。后续应用实现需有对应开发授权，并遵守需求中的阶段闸门；用户调用implement已授权的任务按其明确范围执行。
 `docs/origin/` 是原始需求来源，工程初始化和格式化保持其内容不变。
 第三方 `.agents/skills/` 与 `skills-lock.json` 由技能安装流程维护。
 
@@ -58,10 +58,10 @@ npm run format
 printf '%s\n' 'docs: update contribution guide' | npm run lint:commit
 ```
 
-`check` 执行格式检查、Markdown lint 与来源校验工具测试。配置排除了来源资料、第三方技能及锁文件的格式化。
+`check` 执行格式检查、Markdown lint、TypeScript类型检查、工具与会话行为测试及生产构建。配置排除了来源资料、第三方技能及锁文件的格式化。
 依赖锁文件仍由 `npm ci` 校验安装一致性。
 package.json 暂时覆盖 re2js 与 katex 至安全修复版本；上游解除受影响版本锁定后移除对应 overrides。
-当前没有应用测试、构建或性能验收；应用建立后增加真实检查，再纳入 CI。
+当前已有T01会话行为测试与静态应用构建，随`check`进入CI。真实目标Chrome检查使用`npm run test:browser`单独运行并保留实际截图/文件；未执行的物理、控制、目录或性能验收不得由这些工具检查替代。
 保留原有 Prettier 风格配置，以 `package.json` 中的脚本作为命令来源。
 
 GitHub Actions 在 PR、main 与 codex/ 分支推送时运行；手动运行入口在工作流进入默认分支后可用。
