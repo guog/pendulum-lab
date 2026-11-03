@@ -117,7 +117,8 @@ function updateControls() {
   pause.textContent = status === 'paused' ? '继续' : '暂停'
   stop.disabled = busy || (status !== 'running' && status !== 'paused')
   reset.disabled = busy || workerFailed || !current || status === 'ready'
-  preset.disabled = busy || workerFailed || status === 'running'
+  preset.disabled =
+    busy || workerFailed || status === 'running' || current?.config.benchmark === 'swing-up'
   benchmark.disabled = busy || workerFailed || status === 'running'
   const exportable = !workerFailed && !!current?.samples.length && status !== 'running'
   exportButton.disabled = busy || !exportable
@@ -185,13 +186,15 @@ function render() {
   )
   write(
     'end-reason',
-    last?.event_type === 'boundary'
-      ? '触边终止；无碰撞反弹'
-      : last?.event_type === 'numerical_error'
-        ? '数值异常，保留最后有效状态'
-        : current.status === 'completed'
-          ? `${config.timing.duration_s}秒观察窗口结束，未做控制判定`
-          : '自动起摆及控制验收未执行',
+    config.control_mode === 'automatic'
+      ? `${current.controller?.state.phase === 'balance' ? '稳摆' : '起摆'} · ${current.first_stable.status === 'passed' ? (verifiedKey === key() ? '首次连续5秒稳定；快照证据已导出校验，扰动功能尚未执行' : '首次连续5秒稳定，候选快照待导出校验；扰动测试阻塞') : current.first_stable.status === 'failed' ? '首次稳定失败，扰动测试阻塞' : '等待首次稳定；无合格快照，扰动测试阻塞'}`
+      : last?.event_type === 'boundary'
+        ? '触边终止；无碰撞反弹'
+        : last?.event_type === 'numerical_error'
+          ? '数值异常，保留最后有效状态'
+          : current.status === 'completed'
+            ? `${config.timing.duration_s}秒观察窗口结束，未做控制判定`
+            : '自动起摆及控制验收未执行',
   )
   for (const view of views) {
     write(view.value, state[view.field].toFixed(4))
@@ -203,12 +206,21 @@ function render() {
       config.timing.duration_s,
     )
   }
-  write('observation-title', config.control_mode === 'prescribed' ? '受限执行器与外扰' : '自由运动')
+  write(
+    'observation-title',
+    config.control_mode === 'automatic'
+      ? '自动起摆与稳摆'
+      : config.control_mode === 'prescribed'
+        ? '受限执行器与外扰'
+        : '自由运动',
+  )
   write(
     'input-note',
-    config.control_mode === 'prescribed'
-      ? '冻结受力输入 · 允许连续旋转'
-      : '无驱动力 · 允许连续旋转',
+    config.control_mode === 'automatic'
+      ? '版本化控制器 · 允许连续旋转'
+      : config.control_mode === 'prescribed'
+        ? '冻结受力输入 · 允许连续旋转'
+        : '无驱动力 · 允许连续旋转',
   )
   const lastSample = current.samples.at(-1)
   for (const view of forceViews) {
@@ -382,12 +394,15 @@ async function configure() {
     }
     return
   }
-  const selectedPreset: PresetId = preset.value === 'simple' ? 'simple' : 'standard'
+  const selectedPreset: PresetId =
+    benchmark.value === 'swing-up' ? 'simple' : preset.value === 'simple' ? 'simple' : 'standard'
   const selectedBenchmark: BenchmarkId = Object.hasOwn(actuationCases, benchmark.value)
     ? (benchmark.value as ActuationCaseId)
-    : benchmark.value === 'equilibrium'
-      ? 'equilibrium'
-      : 'release'
+    : benchmark.value === 'swing-up'
+      ? 'swing-up'
+      : benchmark.value === 'equilibrium'
+        ? 'equilibrium'
+        : 'release'
   await action(async () => {
     await call({ type: 'configure', preset: selectedPreset, benchmark: selectedBenchmark })
     exportMessage.textContent = ''
@@ -405,6 +420,7 @@ exportButton.onclick = () =>
       return text
     }, `pendulum-${current.experiment_id}.json`)
     verifiedKey = targetKey
+    scheduleRender()
     exportMessage.textContent = `已写入并读回校验：${name}`
   })
 prepareDownload.onclick = () =>
@@ -431,6 +447,7 @@ verifyFile.onchange = () =>
     if ((await sha256(text)) !== prepared.hash || prepared.key !== key())
       throw new Error('文件与当前证据包不一致，请重新导出后校验。')
     verifiedKey = prepared.key
+    scheduleRender()
     exportMessage.textContent = `已读回校验：${file.name}`
   })
 document.addEventListener('visibilitychange', () => {

@@ -50,7 +50,9 @@ context.onmessage = async ({ data: { request_id, command } }) => {
       case 'configure':
         suspendPump()
         session = createSession(
-          command.benchmark === 'release' || command.benchmark === 'equilibrium'
+          command.benchmark === 'release' ||
+            command.benchmark === 'equilibrium' ||
+            command.benchmark === 'swing-up'
             ? createConfig(command.preset, command.benchmark)
             : createActuationConfig(command.preset, command.benchmark),
         )

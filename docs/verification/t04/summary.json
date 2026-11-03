@@ -1,0 +1,137 @@
+{
+  "text": "稳摆 · 首次连续5秒稳定，候选快照待导出校验；扰动测试阻塞",
+  "result": {
+    "status": "passed",
+    "snapshot": {
+      "sim_time_s": 12.008000000000001,
+      "stable_since_s": 7.008,
+      "config": {
+        "schema_version": 1,
+        "preset": "simple",
+        "preset_version": "qv1-1",
+        "benchmark": "swing-up",
+        "benchmark_description": "简单工况：从精确静止下垂自动起摆，30秒内完成连续5秒稳定。",
+        "environment": {
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+          "language": "zh-CN",
+          "logical_processors": 10
+        },
+        "execution_mode": "memory-research",
+        "control_mode": "automatic",
+        "build_identity": {
+          "source_revision": "c3f2aef140bd916f0569afe01528db5347f850a5",
+          "source_sha256": "41c10b1a825c2e75c85bbfdde264058f25a5939b44206163182b7a13def8100b",
+          "source_dirty": true
+        },
+        "versions": {
+          "application": "0.0.0+t03",
+          "build": "41c10b1a825c2e75c85bbfdde264058f25a5939b44206163182b7a13def8100b",
+          "model": "rigid-cartpole-rk4-4",
+          "controller": "swing-energy-1",
+          "rules": "QV-1"
+        },
+        "physics": {
+          "rod_length_m": 0.35,
+          "rod_mass_kg": 0.12,
+          "cart_mass_kg": 0.6,
+          "counterweight_mass_kg": 0.02,
+          "counterweight_position_m": 0.175,
+          "track_length_m": 3,
+          "force_max_N": 35,
+          "speed_max_m_s": 2.5,
+          "power_max_W": 80,
+          "gravity_m_s2": 9.81,
+          "safety_buffer_m": 0.1,
+          "cart_coulomb_N": 0.2,
+          "cart_viscous_N_s_m": 0.1,
+          "joint_viscous_Nm_s_rad": 0.002,
+          "friction_smoothing_m_s": 0.01
+        },
+        "preset_overrides": {},
+        "initial_state": {
+          "cart_x_m": 0,
+          "cart_v_m_s": 0,
+          "theta_unwrapped_rad": 3.141592653589793,
+          "theta_dot_rad_s": 0
+        },
+        "timing": {
+          "physics_step_s": 0.001,
+          "control_period_s": 0.01,
+          "sample_period_s": 0.01,
+          "duration_s": 30
+        }
+      },
+      "controller_definition": {
+        "version": "swing-energy-1",
+        "algorithm": "energy pump with linear balance",
+        "startup_N": 1,
+        "startup_s": 0.1,
+        "energy_gain": 20,
+        "position_gain": 1.5,
+        "velocity_gain": 2,
+        "balance_gains": [3, 4, 40, 5],
+        "enter_angle_rad": 0.5,
+        "exit_angle_rad": 0.7,
+        "enter_speed_rad_s": 2,
+        "budget_ms": 10
+      },
+      "state": {
+        "cart_x_m": -0.06968380760224109,
+        "cart_v_m_s": -0.026328216741843363,
+        "theta_unwrapped_rad": 6.279481039973925,
+        "theta_dot_rad_s": 0.001461682954139369
+      },
+      "controller": {
+        "phase": "balance",
+        "updates": 1201,
+        "request": -0.173549702085693
+      },
+      "forces": {
+        "force_requested_N": -0.173549702085693,
+        "force_external_N": 0,
+        "torque_external_Nm": 0
+      },
+      "physics_tick": 12008,
+      "control_phase_steps": 8,
+      "sample_phase_steps": 8,
+      "energy": {
+        "initial": {
+          "kinetic_energy_J": 0,
+          "potential_energy_J": 0
+        },
+        "actuator_work_J": 1.3146588719314867,
+        "external_force_work_J": 0,
+        "external_torque_work_J": 0,
+        "dissipated_J": 0.8337131018971207
+      }
+    },
+    "stable_since_s": 7.008,
+    "disturbance_eligibility": "blocked_pending_export"
+  },
+  "controller": {
+    "definition": {
+      "version": "swing-energy-1",
+      "algorithm": "energy pump with linear balance",
+      "startup_N": 1,
+      "startup_s": 0.1,
+      "energy_gain": 20,
+      "position_gain": 1.5,
+      "velocity_gain": 2,
+      "balance_gains": [3, 4, 40, 5],
+      "enter_angle_rad": 0.5,
+      "exit_angle_rad": 0.7,
+      "enter_speed_rad_s": 2,
+      "budget_ms": 10
+    },
+    "state": {
+      "phase": "balance",
+      "updates": 1201,
+      "request": -0.173549702085693
+    },
+    "diagnostics": {
+      "max_update_ms": 0.2999999523162842,
+      "budget_ms": 10
+    }
+  },
+  "experiment_id": "7648ac74-a170-43b7-92c7-096b36039b15"
+}
