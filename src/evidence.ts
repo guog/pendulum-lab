@@ -99,7 +99,7 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
       qualification_reasons: output.qualification_reasons,
       condition_intervals: output.condition_intervals,
       first_stable: output.controller ? output.first_stable : 'not_executed',
-      endurance: 'not_executed',
+      endurance: output.endurance,
       horizontal_disturbance: 'not_executed',
       torque_disturbance: 'not_executed',
       sim_time_s: output.sim_time_s,

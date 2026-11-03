@@ -1,3 +1,4 @@
+import { createEnduranceAssessment, stabilityFailures } from './endurance.ts'
 import { createController, controllerDefinition } from './controller.ts'
 import { actuator, zeroForces, type Forces } from './actuation.ts'
 import { integrate, energy, type State } from './dynamics.ts'
@@ -59,6 +60,10 @@ export function createSession(input: ExperimentConfig) {
   let physicallyStable = false
   let stableSnapshot: StableSnapshot | null = null
   let exportConfirmed = false
+  let enduranceStart: number | null = null
+  let enduranceEnd: number | null = null
+  let enduranceStatus: 'not_executed' | 'running' | 'passed' | 'failed' | 'invalid' = 'not_executed'
+  let enduranceAssessment: ReturnType<typeof createEnduranceAssessment> | null = null
   let maxControlMs = 0
   let stabilityStatus: 'not_executed' | 'pending' | 'passed' | 'failed' = controller
     ? 'pending'
@@ -203,6 +208,12 @@ export function createSession(input: ExperimentConfig) {
       track_limit_m: config.physics.track_length_m / 2,
     })
   }
+  const failEndurance = (reason: string) => {
+    if (enduranceStatus !== 'running') return
+    enduranceStatus = reason === 'user_stopped' ? 'invalid' : 'failed'
+    enduranceEnd = time()
+    event('endurance_failed', { ...state, reason })
+  }
   const updateController = () => {
     if (!controller) return
     const started = performance.now()
@@ -225,16 +236,7 @@ export function createSession(input: ExperimentConfig) {
   }
   const checkStability = () => {
     if (!controller || stabilityStatus !== 'pending') return
-    const angle = Math.atan2(
-      Math.sin(state.theta_unwrapped_rad),
-      Math.cos(state.theta_unwrapped_rad),
-    )
-    const failures = [
-      ...(Math.abs(angle) > Math.PI / 60 ? ['angle'] : []),
-      ...(Math.abs(state.theta_dot_rad_s) > 0.2 ? ['angular_velocity'] : []),
-      ...(Math.abs(state.cart_x_m) > 0.1 ? ['position'] : []),
-      ...(Math.abs(state.cart_v_m_s) > 0.1 ? ['velocity'] : []),
-    ]
+    const failures = stabilityFailures(state)
     const enteredFailures = failures.filter((failure) => !previousFailures.has(failure))
     if (enteredFailures.length)
       event('stability_violation', {
@@ -286,8 +288,10 @@ export function createSession(input: ExperimentConfig) {
       })
       stabilityStatus = 'passed'
       event('first_stable', { state, snapshot: stableSnapshot })
-      status = 'completed'
-      finishConditions()
+      enduranceStart = tick
+      enduranceAssessment = createEnduranceAssessment(tick, dt)
+      enduranceStatus = 'running'
+      event('endurance_start', { state, start_s: time(), deadline_s: time() + 20 })
     }
   }
   const sample = () => {
@@ -370,6 +374,7 @@ export function createSession(input: ExperimentConfig) {
           status = 'error'
           qualificationReasons.add('numerical_error')
           finishConditions()
+          failEndurance('numerical_error')
           event('numerical_error', {
             attempted_sim_time_s: time() + dt,
             reason: '非有限数值，保留最后有效状态',
@@ -388,6 +393,7 @@ export function createSession(input: ExperimentConfig) {
           status = 'stopped'
           observe()
           boundaryEvent()
+          failEndurance('boundary')
           sample()
           break
         }
@@ -402,16 +408,31 @@ export function createSession(input: ExperimentConfig) {
         if (controller && tick % controlSteps === 0) updateController()
         observe(previousForces)
         if (qualificationReasons.has('controller_error')) {
+          failEndurance('controller_error')
           finishConditions()
           sample()
           break
         }
         checkStability()
-        if (stableSnapshot !== null) {
-          sample()
-          break
+        if (enduranceStatus === 'running' && enduranceStart !== null && tick > enduranceStart) {
+          const failures = stabilityFailures(state)
+          enduranceStatus = enduranceAssessment!.observe(tick, state, qualificationReasons.size > 0)
+          if (enduranceStatus !== 'running') {
+            enduranceEnd = time()
+            event(enduranceStatus === 'failed' ? 'endurance_failed' : 'endurance_passed', {
+              ...state,
+              failed_thresholds: failures,
+              qualification_reasons: [...qualificationReasons],
+            })
+          }
+          if (enduranceStatus !== 'running') {
+            status = 'completed'
+            finishConditions()
+            sample()
+            break
+          }
         }
-        if (tick >= durationSteps) {
+        if (tick >= durationSteps && stableSnapshot === null) {
           status = 'completed'
           if (controller && stabilityStatus === 'pending') stabilityStatus = 'failed'
           finishConditions()
@@ -433,6 +454,7 @@ export function createSession(input: ExperimentConfig) {
     stop() {
       if (status !== 'running' && status !== 'paused') return
       status = 'stopped'
+      failEndurance('user_stopped')
       finishConditions()
       event('stop', { reason: 'user' })
       sample()
@@ -461,6 +483,9 @@ export function createSession(input: ExperimentConfig) {
       physicalStableSince = physicalFirstStable = null
       exportConfirmed = false
       stabilityStatus = controller ? 'pending' : 'not_executed'
+      enduranceStart = enduranceEnd = null
+      enduranceStatus = 'not_executed'
+      enduranceAssessment = null
       experiment_id = crypto.randomUUID()
       created_at_utc = new Date().toISOString()
     },
@@ -486,7 +511,9 @@ export function createSession(input: ExperimentConfig) {
                     ? 'not_executed'
                     : 'blocked',
           reason:
-            status === 'stopped' && !qualificationReasons.has('boundary')
+            stabilityStatus !== 'passed' &&
+            status === 'stopped' &&
+            !qualificationReasons.has('boundary')
               ? 'user_stopped'
               : stabilityStatus === 'passed' && !exportConfirmed
                 ? 'pending_export'
@@ -503,6 +530,17 @@ export function createSession(input: ExperimentConfig) {
               ? 'eligible'
               : 'blocked_pending_export'
             : 'blocked',
+        },
+        endurance: {
+          status:
+            enduranceStatus === 'not_executed' &&
+            controller &&
+            ['completed', 'stopped', 'error'].includes(status)
+              ? 'blocked'
+              : enduranceStatus,
+          start_s: enduranceStart === null ? null : enduranceStart * dt,
+          end_s: enduranceEnd,
+          rules_version: config.versions.rules,
         },
         controller: controller
           ? {

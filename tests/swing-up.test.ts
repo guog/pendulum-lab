@@ -35,6 +35,7 @@ test('首次稳定需要逐步连续五秒并产生同一时刻的完整快照',
   const completed = output.events.find((event) => event.event_type === 'first_stable')!
   assert.ok(Math.abs(completed.sim_time_s - entered.sim_time_s - 5) < 1e-9)
   assert.deepEqual(output.first_stable.snapshot.state, completed.payload.state)
+  session.pause()
   const bundle = await session.exportEvidence()
   assert.equal(JSON.parse(bundle.files['result.json']!).first_stable.status, 'blocked')
   const saved = JSON.parse(bundle.files['snapshot.json']!)
@@ -146,6 +147,7 @@ test('读回确认同一证据后快照可用，旧版本或其他实验的确�
   const session = createSession(createConfig('simple', 'swing-up'))
   session.start()
   session.advance(30)
+  session.pause()
   const bundle = await session.exportEvidence()
   const exported = session.read()
   assert.equal(exported.first_stable.disturbance_eligibility, 'blocked_pending_export')
@@ -178,6 +180,7 @@ test('首次稳定之前确认的部分记录不能确认之后生成的快照',
   assert.ok(session.read().first_stable.snapshot)
   assert.equal(session.read().first_stable.status, 'blocked')
   assert.equal(session.read().first_stable.disturbance_eligibility, 'blocked_pending_export')
+  session.pause()
   const complete = await session.exportEvidence()
   session.confirmExport(complete.experiment_id, session.read().events.length)
   assert.equal(session.read().first_stable.status, 'passed')
