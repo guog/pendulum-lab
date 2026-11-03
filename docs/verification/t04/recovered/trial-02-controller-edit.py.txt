@@ -1,0 +1,1 @@
+p='src/controller.ts';s=open(p).read().replace('enter_angle_rad: 0.2, exit_angle_rad: 0.4','enter_angle_rad: 0.5, exit_angle_rad: 0.7').replace('-kx * state.cart_x_m - kv * state.cart_v_m_s - kt * angle - kw * state.theta_dot_rad_s','kx * state.cart_x_m + kv * state.cart_v_m_s - kt * angle - kw * state.theta_dot_rad_s');open(p,'w').write(s)

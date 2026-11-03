@@ -1,0 +1,24 @@
+{
+  "source": "Codex session 01a1a07e-b5fb-7860-b8a2-cc89643054a6",
+  "capture": "Original terminal stdout; no interpolation or replay",
+  "records": [
+    {
+      "file": "trial-01-stdout.txt",
+      "timestamp_utc": "2026-11-03T08:21:48.423Z",
+      "call_id": "call_0a7e500aaabd418c90cdc1c8e3efe462",
+      "captured_stdout_sha256": "72d01f28280fd3bff4e343bff2c6f407ba7c85e2e49eab73932ff6e7ea27c3a4",
+      "original_log_record_sha256": "fb434e66803d0b68c601c790bc035457faa312dda3bd3aee76f10721577cdbf8",
+      "physical_state_points": 30,
+      "time_spacing_s": 1
+    },
+    {
+      "file": "trial-02-stdout.txt",
+      "timestamp_utc": "2026-11-03T08:21:54.815Z",
+      "call_id": "call_13238ecf7f3f48cca18980fc14923570",
+      "captured_stdout_sha256": "409aa87b60ff44921e74db4d26350dcb292ba45bc98749fbbc9e95bd12861165",
+      "original_log_record_sha256": "96c88f554eb29661e03cd63c041ef3734e2f79587cc2e504b66bfa3890f71052",
+      "physical_state_points": 30,
+      "time_spacing_s": 1
+    }
+  ]
+}

@@ -6,7 +6,7 @@
 
 真实 macOS Chrome Headless 页面复验从标准工况切换至简单自动起摆，12.008 秒物理时间首次完成五秒稳定；下载并读回校验后，再导出结果记录 `eligible`，用户主动终止页面提示也经验证。两次浏览器导出保存在 `browser-before-confirmation.json.gz` 与 `browser-after-confirmation.json.gz`；步骤和截图一并保存。`npm run check` 通过。
 
-此前丢失的历史整定轨迹不可恢复；该项验收仍有证据缺口。已有独立 Chrome 运行与本次复验不证明工作区崩溃恢复、扰动、耐久或正式重复批次通过。
+此前历史整定的每秒状态片段已从会话日志回收，见 `../recovered/README.md`；完整 10 ms 样本和事件仍不可恢复，该项验收仍有证据缺口。已有独立 Chrome 运行与本次复验不证明工作区崩溃恢复、扰动、耐久或正式重复批次通过。
 
 Assisted-by: LLM
 AI-Agent: OpenAI Codex
