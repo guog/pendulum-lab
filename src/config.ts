@@ -86,7 +86,7 @@ export function createConfig(
     versions: {
       application: '0.0.0+t03',
       build: buildIdentity?.source_sha256 ?? null,
-      model: 'rigid-cartpole-rk4-3',
+      model: 'rigid-cartpole-rk4-4',
       controller: 'none',
       rules: 'QV-1',
     },

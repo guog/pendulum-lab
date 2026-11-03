@@ -13,14 +13,20 @@ export const zeroForces: Forces = {
   torque_external_Nm: 0,
 }
 
-export function actuator(request: number, velocity: number, physics: Physics) {
+export function actuator(
+  request: number,
+  velocity: number,
+  physics: Physics,
+  speedBlocked = Math.abs(velocity) >=
+    physics.speed_max_m_s - 16 * Number.EPSILON * Math.max(1, physics.speed_max_m_s),
+) {
   const reasons: string[] = []
   let force = request
   if (Math.abs(force) > physics.force_max_N) {
     force = Math.sign(force) * physics.force_max_N
     reasons.push('force')
   }
-  if (Math.abs(velocity) >= physics.speed_max_m_s && force * velocity > 0) {
+  if (speedBlocked && force * velocity > 0) {
     force = 0
     reasons.push('speed_direction')
   }

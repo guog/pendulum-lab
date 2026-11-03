@@ -1,11 +1,14 @@
 import { createConfig, type PresetId } from './config.ts'
 
-export const actuationVersion = 'actuation-qv1-1'
+export const actuationVersion = 'actuation-qv1-2'
 export const actuationCases = {
   'near-zero': '近零速推力',
   'force-limit': '最大力限幅',
   'power-drive': '限功率驱动',
   'power-brake': '限功率制动',
+  'speed-crossing': '正向跨入速度上限',
+  'speed-crossing-reverse': '反向跨入速度上限',
+  'pulse-endpoint': '窗口终点结束受力',
   'speed-direction': '速度上限方向约束',
   'external-overspeed': '水平外力致超速与恢复',
   'coupling-overspeed': '摆杆耦合致超速',
@@ -43,6 +46,21 @@ export function createActuationConfig(preset: PresetId, id: ActuationCaseId) {
       config.physics.power_max_W = 5
       config.timing.duration_s = 0.05
       config.input_program = [{ at_s: 0, force_requested_N: id === 'power-drive' ? 40 : -40 }]
+      break
+    case 'speed-crossing':
+    case 'speed-crossing-reverse': {
+      const direction = id === 'speed-crossing' ? 1 : -1
+      config.initial_state.cart_v_m_s = direction * (config.physics.speed_max_m_s - 0.001)
+      config.timing.duration_s = 0.005
+      config.input_program = [{ at_s: 0, force_requested_N: direction * 20 }]
+      break
+    }
+    case 'pulse-endpoint':
+      config.timing.duration_s = 0.1
+      config.input_program = [
+        { at_s: 0, force_requested_N: 1, force_external_N: 2 },
+        { at_s: 0.1, force_requested_N: 0, force_external_N: 0, torque_external_Nm: 0 },
+      ]
       break
     case 'speed-direction':
       config.initial_state.cart_v_m_s = config.physics.speed_max_m_s

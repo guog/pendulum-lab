@@ -261,15 +261,14 @@ export function createSession(input: ExperimentConfig) {
         torqueWork += next.torque_external_work_delta_J
         tick++
         const previousForces = { ...forces }
-        if (tick < durationSteps) applyInputs()
+        applyInputs()
         observe(previousForces)
-        if (tick % sampleSteps === 0) sample()
         if (tick >= durationSteps) {
           status = 'completed'
           finishConditions()
           event('completed', { reason: 'benchmark_duration' })
           sample()
-        }
+        } else if (tick % sampleSteps === 0) sample()
       }
     },
     pause(reason: 'manual' | 'background' = 'manual') {

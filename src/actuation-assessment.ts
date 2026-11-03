@@ -15,7 +15,7 @@ export function assessActuation(output: SessionOutput) {
     status: 'not_executed' | 'invalid' | 'blocked' | 'passed' | 'failed',
     reason: string,
   ) => ({
-    version: 'actuation-assessment-1',
+    version: 'actuation-assessment-2',
     requirement: 'P0-PHY-02/05',
     status,
     reason,
@@ -109,6 +109,78 @@ export function assessActuation(output: SessionOutput) {
       1e-8,
       'J',
       '正负功率均W=Pt。',
+    )
+  }
+  if (id === 'speed-crossing' || id === 'speed-crossing-reverse') {
+    const direction = Math.sign(v0)
+    const delta = p.speed_max_m_s - Math.abs(v0)
+    const switchTime = (mass * delta) / 20
+    metric(
+      '限速切换后车速误差',
+      Math.abs(state.cart_v_m_s - direction * p.speed_max_m_s),
+      1e-10,
+      'm/s',
+      '水平杆零重力：先匀加速到上限，再无驱动力匀速；不截断速度。',
+    )
+    metric(
+      '限速切换后车位误差',
+      Math.abs(state.cart_x_m - direction * (p.speed_max_m_s * t - (delta * switchTime) / 2)),
+      1e-10,
+      'm',
+      '解析分段轨迹，切换时刻t*=S(vmax−|v0|)/20。',
+    )
+    metric(
+      '限速切换执行器做功误差',
+      Math.abs(last.actuator_work_J - (mass * (p.speed_max_m_s ** 2 - v0 ** 2)) / 2),
+      1e-10,
+      'J',
+      '只有达到上限前做功，W=S(vmax²−v0²)/2。',
+    )
+    check(
+      '无自致超速及限制事件',
+      !output.qualification_reasons.includes('overspeed') &&
+        events.some((event) => event.event_type === 'limit_speed_direction_start'),
+      '纯执行器平移不应因积分切换制造超速，限制区间必须记录。',
+    )
+  }
+  if (id === 'pulse-endpoint') {
+    metric(
+      '脉冲终点车速误差',
+      Math.abs(state.cart_v_m_s - (3 * t) / mass),
+      1e-10,
+      'm/s',
+      '请求1N、外力2N在[0,0.1s)保持，v=Ft/S。',
+    )
+    metric(
+      '脉冲终点车位误差',
+      Math.abs(state.cart_x_m - (3 * t * t) / (2 * mass)),
+      1e-10,
+      'm',
+      'x=Ft²/(2S)。',
+    )
+    metric(
+      '脉冲执行器做功误差',
+      Math.abs(last.actuator_work_J - state.cart_x_m),
+      1e-10,
+      'J',
+      '1N×位移。',
+    )
+    metric(
+      '脉冲水平外力做功误差',
+      Math.abs(last.force_external_work_J - 2 * state.cart_x_m),
+      1e-10,
+      'J',
+      '2N×位移；终点归零不抹去已完成做功。',
+    )
+    check(
+      '终点输入及事件',
+      last.force_requested_N === 0 &&
+        last.force_actual_N === 0 &&
+        last.force_external_N === 0 &&
+        last.torque_external_Nm === 0 &&
+        events.filter((event) => event.event_type === 'input' && event.sim_time_s === t).length ===
+          3,
+      '正常完成前处理到期结束命令，再生成唯一终点样本。',
     )
   }
   if (id === 'speed-direction') {

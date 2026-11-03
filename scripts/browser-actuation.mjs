@@ -50,6 +50,9 @@ const cases = [
   'power-drive',
   'power-brake',
   'speed-direction',
+  'speed-crossing',
+  'speed-crossing-reverse',
+  'pulse-endpoint',
   'external-overspeed',
   'coupling-overspeed',
   'joint-torque',
@@ -81,13 +84,26 @@ try {
   })
   browser('--executable-path', chrome, 'open', base)
   browser('set', 'viewport', '1440', '1000')
-  browser('wait', '--text', '准备就绪')
+  browser(
+    'wait',
+    '--fn',
+    'document.querySelector("#status").textContent === "准备就绪" && !document.querySelector("#start").disabled',
+  )
   browser('snapshot', '-i')
   for (const preset of ['simple', 'standard']) {
     browser('select', '#preset', preset)
+    browser(
+      'wait',
+      '--fn',
+      `JSON.parse(document.querySelector('#config').textContent).preset === ${JSON.stringify(preset)} && !document.querySelector('#benchmark').disabled && !document.querySelector('#start').disabled`,
+    )
     for (const id of selectedCases) {
       browser('select', '#benchmark', id)
-      browser('wait', '--text', '准备就绪')
+      browser(
+        'wait',
+        '--fn',
+        `JSON.parse(document.querySelector('#config').textContent).preset === ${JSON.stringify(preset)} && JSON.parse(document.querySelector('#config').textContent).benchmark === ${JSON.stringify(id)} && !document.querySelector('#start').disabled`,
+      )
       assert.match(text('#config'), new RegExp(`"benchmark": "${id}"`))
       if (id === 'combined-work') {
         assert.match(text('#parameters'), /0\.1 N·s\/m/, '冻结输入摘要缺少实际滑块粘性阻力')
@@ -150,7 +166,7 @@ try {
       }
       browser('upload', '#verify-file', path)
       browser('wait', '--text', '当前证据已导出并校验')
-      if (id === 'combined-work' || id === 'rail-boundary') {
+      if (['combined-work', 'rail-boundary', 'speed-crossing', 'pulse-endpoint'].includes(id)) {
         // Open native disclosures for visible evidence; no application state mutation.
         browser(
           'eval',
@@ -181,6 +197,9 @@ try {
         metrics: result.actuation_assessment.metrics,
         qualification_reasons: result.qualification_reasons,
         condition_intervals: result.condition_intervals,
+        last_sample: Object.fromEntries(
+          csv[0].split(',').map((key, index) => [key, csv.at(-1).split(',')[index]]),
+        ),
         sha256: hash(raw),
         gzip_sha256: hash(compressed),
         build_identity: config.build_identity,

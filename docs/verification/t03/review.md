@@ -1,5 +1,7 @@
 # T03：受限执行器、外扰与导轨边界的验证与审查
 
+这是754882e实施阶段的历史记录。随后独立复审新增的终点输入及限速切换问题，其处理与最终状态见[完成验证记录](completion/review.md)；本文件及原始包保留，不把旧结论当作最终合并结论。
+
 本轮实施[Issue #8](https://github.com/guog/pendulum-lab/issues/8)，从最新origin/main的66f0c75c403ef4a601a87567aa4a524a7eb8f8a0创建codex/feat-8-actuator-disturbance-boundary。已实时读取#4、#5、#8及T01/T02契约和已有验证记录，确认#6前置已关闭；关闭状态没有被当作技术通过证据。来源资料docs/origin/保持原样、仍未跟踪。
 
 ## 接口与测试过程

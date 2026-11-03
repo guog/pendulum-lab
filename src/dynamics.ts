@@ -75,7 +75,7 @@ function massProperties(physics: Physics) {
 
 export function integrate(state: State, physics: Physics, dt: number, forces: Forces = zeroForces) {
   const { mass, moment, inertia } = massProperties(physics)
-  function derivative([, velocity, theta, omega]: Vector): Vector {
+  function derivative([, velocity, theta, omega]: Vector, speedBlocked: boolean): Vector {
     const sine = theta % Math.PI === 0 ? 0 : Math.sin(theta)
     const coupling = moment * Math.cos(theta)
     const determinant = mass * inertia - coupling ** 2
@@ -83,7 +83,12 @@ export function integrate(state: State, physics: Physics, dt: number, forces: Fo
       -physics.cart_coulomb_N * Math.tanh(velocity / physics.friction_smoothing_m_s) -
       physics.cart_viscous_N_s_m * velocity
     const jointTorque = -physics.joint_viscous_Nm_s_rad * omega
-    const actual = actuator(forces.force_requested_N, velocity, physics).force_actual_N
+    const actual = actuator(
+      forces.force_requested_N,
+      velocity,
+      physics,
+      speedBlocked,
+    ).force_actual_N
     const horizontal = actual + forces.force_external_N + friction - moment * sine * omega ** 2
     const torque = forces.torque_external_Nm + jointTorque + moment * physics.gravity_m_s2 * sine
     return [
@@ -117,50 +122,109 @@ export function integrate(state: State, physics: Physics, dt: number, forces: Fo
     base[6] + slope[6] * scale,
     base[7] + slope[7] * scale,
   ]
-  const k1 = derivative(initial)
-  const k2 = derivative(add(initial, k1, dt / 2))
-  const k3 = derivative(add(initial, k2, dt / 2))
-  const k4 = derivative(add(initial, k3, dt))
-  const result = initial.map(
-    (value, i) => value + (dt / 6) * (k1[i]! + 2 * k2[i]! + 2 * k3[i]! + k4[i]!),
-  )
-  return {
-    ...stepOutput(result),
-    firstBoundary(limit_m: number) {
-      // RK4 continuous extension: b1=s-3s²/2+2s³/3,
-      // b2=b3=s²-2s³/3, b4=-s²/2+2s³/3, for 0<=s<=1.
-      const coefficients = initial.map(
-        (_, i) =>
-          [
-            k1[i]!,
-            -1.5 * k1[i]! + k2[i]! + k3[i]! - 0.5 * k4[i]!,
-            (2 / 3) * (k1[i]! - k2[i]! - k3[i]! + k4[i]!),
-          ] as const,
-      )
-      const at = (fraction: number) =>
-        fraction === 1
-          ? result
-          : initial.map((value, i) => {
-              const [linear, quadratic, cubic] = coefficients[i]!
-              return value + dt * fraction * (linear + fraction * (quadratic + fraction * cubic))
-            })
-      const [linear, quadratic, cubic] = coefficients[0]!
-      const divisions = [...turningFractions(linear, quadratic, cubic), 1]
+  // Each segment uses a smooth side of the speed switch. Never mix on/off
+  // derivatives in one RK4 quadrature or project the resulting velocity.
+  function segment(base: Vector, duration: number, speedBlocked: boolean) {
+    const k1 = derivative(base, speedBlocked)
+    const k2 = derivative(add(base, k1, duration / 2), speedBlocked)
+    const k3 = derivative(add(base, k2, duration / 2), speedBlocked)
+    const k4 = derivative(add(base, k3, duration), speedBlocked)
+    const result = base.map(
+      (value, i) => value + (duration / 6) * (k1[i]! + 2 * k2[i]! + 2 * k3[i]! + k4[i]!),
+    ) as Vector
+    // RK4 cubic continuous extension, shared by state and all work integrals.
+    const coefficients = base.map(
+      (_, i) =>
+        [
+          k1[i]!,
+          -1.5 * k1[i]! + k2[i]! + k3[i]! - 0.5 * k4[i]!,
+          (2 / 3) * (k1[i]! - k2[i]! - k3[i]! + k4[i]!),
+        ] as const,
+    )
+    const at = (fraction: number): Vector =>
+      fraction === 1
+        ? result
+        : (base.map((value, i) => {
+            const [linear, quadratic, cubic] = coefficients[i]!
+            return (
+              value + duration * fraction * (linear + fraction * (quadratic + fraction * cubic))
+            )
+          }) as Vector)
+    function crossing(
+      coordinate: 0 | 1,
+      reached: (value: number) => boolean,
+      until: number,
+      inside: boolean,
+    ) {
+      const [linear, quadratic, cubic] = coefficients[coordinate]!
+      const divisions = [
+        ...turningFractions(linear, quadratic, cubic).filter((fraction) => fraction < until),
+        until,
+      ]
       let low = 0
-      // Every interval is monotone in x, so its endpoint brackets any first hit,
-      // including an excursion that returns inside before the full step ends.
       for (const end of divisions) {
-        if (Math.abs(at(end)[0]!) >= limit_m) {
+        if (reached(at(end)[coordinate])) {
           let high = end
-          for (let iteration = 0; iteration < 40; iteration++) {
+          for (let iteration = 0; iteration < (inside ? 52 : 40); iteration++) {
             const middle = (low + high) / 2
-            if (Math.abs(at(middle)[0]!) >= limit_m) high = middle
+            if (reached(at(middle)[coordinate])) high = middle
             else low = middle
           }
-          return { duration_s: dt * high, ...stepOutput(at(high)) }
+          // Speed uses the inside root bracket to avoid roundoff-only overspeed.
+          // Both brackets describe the same root to machine precision; no state is clipped.
+          const fraction = inside ? low : high
+          return { fraction, values: at(fraction), bracketEnd: end }
         }
         low = end
       }
+      return undefined
+    }
+    return { result, crossing }
+  }
+  const direction = Math.sign(forces.force_requested_N)
+  const blocked = actuator(
+    forces.force_requested_N,
+    state.cart_v_m_s,
+    physics,
+  ).saturation_reasons.includes('speed_direction')
+  let first = segment(initial, dt, blocked)
+  const speedHit =
+    direction !== 0 && !blocked
+      ? first.crossing(1, (velocity) => direction * velocity >= physics.speed_max_m_s, 1, true)
+      : undefined
+  let switchTime = dt
+  let second: ReturnType<typeof segment> | undefined
+  if (speedHit) {
+    let low = 0
+    let high = dt * speedHit.bracketEnd
+    const reached = (duration: number) =>
+      direction * segment(initial, duration, false).result[1] >= physics.speed_max_m_s
+    // Refine with complete smooth RK4 steps, not interpolation from a trial that
+    // may already have crossed the power-limit corner beyond the speed limit.
+    if (reached(high)) {
+      for (let iteration = 0; iteration < 52; iteration++) {
+        const middle = (low + high) / 2
+        if (reached(middle)) high = middle
+        else low = middle
+      }
+      switchTime = low
+      first = segment(initial, switchTime, false)
+      // Suppress same-direction drive until the next physical step. External
+      // force and coupling are integrated normally; velocity is never clipped.
+      second = segment(first.result, dt - switchTime, true)
+    }
+  }
+  return {
+    ...stepOutput(second?.result ?? first.result),
+    firstBoundary(limit_m: number) {
+      const before = first.crossing(0, (position) => Math.abs(position) >= limit_m, 1, false)
+      if (before) return { duration_s: switchTime * before.fraction, ...stepOutput(before.values) }
+      const after = second?.crossing(0, (position) => Math.abs(position) >= limit_m, 1, false)
+      if (after)
+        return {
+          duration_s: switchTime + (dt - switchTime) * after.fraction,
+          ...stepOutput(after.values),
+        }
       return undefined
     },
   }
