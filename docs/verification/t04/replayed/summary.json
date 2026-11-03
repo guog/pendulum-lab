@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "classification": "new isolated replays; not original historical samples or acceptance evidence",
+  "runs": [
+    {
+      "trial": "01",
+      "experiment_id": "16f2d5d6-22b3-443e-b35a-d92f1c277188",
+      "created_at_utc": "2026-11-03T09:48:01.593Z",
+      "prepared_at_utc": "2026-11-03T09:48:01.807Z",
+      "summary": {
+        "replay": true,
+        "source_stdout_sha256": "72d01f28280fd3bff4e343bff2c6f407ba7c85e2e49eab73932ff6e7ea27c3a4",
+        "sampled_seconds": 30,
+        "max_abs_differences": {
+          "cart_x_m": 0,
+          "cart_v_m_s": 0,
+          "theta_unwrapped_rad": 0,
+          "theta_dot_rad_s": 0
+        },
+        "phase": "swing",
+        "end_s": 30,
+        "sample_count": 3001,
+        "status": "completed",
+        "node": "v26.7.0"
+      },
+      "evidence": "trial-01-replay.json.gz",
+      "evidence_sha256": "403ff3aef89a03a6a3b641768e401de38c02e7d5f9534f91722a06eda5a037e4",
+      "source": "trial-01-source.tar.gz",
+      "source_sha256": "4c74e63b7c060b5e59a09057c073f94355be5a88715159ec435e578678caa11b"
+    },
+    {
+      "trial": "02",
+      "experiment_id": "4dcea975-5cbf-4d86-93b3-afa0a02dacc6",
+      "created_at_utc": "2026-11-03T09:48:01.896Z",
+      "prepared_at_utc": "2026-11-03T09:48:02.101Z",
+      "summary": {
+        "replay": true,
+        "source_stdout_sha256": "409aa87b60ff44921e74db4d26350dcb292ba45bc98749fbbc9e95bd12861165",
+        "sampled_seconds": 30,
+        "max_abs_differences": {
+          "cart_x_m": 0,
+          "cart_v_m_s": 0,
+          "theta_unwrapped_rad": 0,
+          "theta_dot_rad_s": 0
+        },
+        "phase": "balance",
+        "end_s": 30,
+        "sample_count": 3001,
+        "status": "completed",
+        "node": "v26.7.0"
+      },
+      "evidence": "trial-02-replay.json.gz",
+      "evidence_sha256": "36143359c00fd431effead2a1c6701774727cc5899b5244023169f19f71c2ae4",
+      "source": "trial-02-source.tar.gz",
+      "source_sha256": "cde1630e1e174325049b38cf13907c868cb60f2d84aa938cda71eabb52cdbfb5"
+    }
+  ]
+}

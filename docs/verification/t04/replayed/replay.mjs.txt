@@ -1,0 +1,31 @@
+import { readFileSync, writeFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
+import { strict as assert } from 'node:assert'
+import { createHash } from 'node:crypto'
+const [sourceRoot, originalPath, outputPath, expectedSha] = process.argv.slice(2)
+if (!sourceRoot || !originalPath || !outputPath || !expectedSha) throw new Error('Expected source root, original stdout, output path and expected hash')
+const { createConfig, createSession } = await import(pathToFileURL(`${sourceRoot}/src/session.ts`))
+const originalText = readFileSync(originalPath, 'utf8')
+assert.equal(createHash('sha256').update(originalText).digest('hex'), expectedSha)
+const original = originalText.trim().split('\n').map(line => {
+  const match = line.match(/^(\d+) (\S+) (\{.*\}) (\S+)$/)
+  assert.ok(match)
+  return { second: Number(match[1]), status: match[2], state: JSON.parse(match[3]), phase: match[4] }
+})
+assert.equal(original.length, 30)
+const session = createSession(createConfig('simple','swing-up'))
+session.start()
+const errors = { cart_x_m: 0, cart_v_m_s: 0, theta_unwrapped_rad: 0, theta_dot_rad_s: 0 }
+for (const reference of original) {
+  session.advance(1)
+  const output = session.read()
+  assert.equal(output.sim_time_s, reference.second)
+  assert.equal(output.status, reference.status)
+  assert.equal(output.controller.state.phase, reference.phase)
+  for (const key of Object.keys(errors)) errors[key] = Math.max(errors[key], Math.abs(output.state[key] - reference.state[key]))
+}
+for (const value of Object.values(errors)) assert.ok(value <= 1e-6)
+const final = session.read()
+const bundle = await session.exportEvidence()
+writeFileSync(outputPath, JSON.stringify(bundle, null, 2) + '\n', { flag: 'wx' })
+console.log(JSON.stringify({ replay: true, source_stdout_sha256: expectedSha, sampled_seconds: original.length, max_abs_differences: errors, phase: final.controller.state.phase, end_s: final.sim_time_s, sample_count: final.samples.length, status: final.status, node: process.version }))
