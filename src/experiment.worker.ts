@@ -50,7 +50,9 @@ context.onmessage = async ({ data: { request_id, command } }) => {
       case 'configure':
         suspendPump()
         session = createSession(
-          command.benchmark === 'release' || command.benchmark === 'equilibrium'
+          command.benchmark === 'release' ||
+            command.benchmark === 'equilibrium' ||
+            command.benchmark === 'swing-up'
             ? createConfig(command.preset, command.benchmark)
             : createActuationConfig(command.preset, command.benchmark),
         )
@@ -78,6 +80,9 @@ context.onmessage = async ({ data: { request_id, command } }) => {
         suspendPump()
         session.reset()
         runningWallMs = 0
+        break
+      case 'confirm-export':
+        session.confirmExport(command.experiment_id, command.event_count)
         break
       case 'export': {
         const bundle = await session.exportEvidence()

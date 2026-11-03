@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "purpose": "issue-9 independent research batch; no claim about absent prior records",
+  "frozen_at_utc": "2026-11-03T09:31:17.652Z",
+  "build": {
+    "source_revision": "d4bee6e02aee974b2214ad4b4a00053f9cebc403",
+    "source_sha256": "34f68ed6749a49724040780c594e72e896da4147aa324bb6321ac89aa0ea0a3a",
+    "source_dirty": false
+  },
+  "controller": {
+    "version": "swing-energy-1",
+    "algorithm": "energy pump with linear balance",
+    "startup_N": 1,
+    "startup_s": 0.1,
+    "energy_gain": 20,
+    "position_gain": 1.5,
+    "velocity_gain": 2,
+    "balance_gains": [
+      3,
+      4,
+      40,
+      5
+    ],
+    "enter_angle_rad": 0.5,
+    "exit_angle_rad": 0.7,
+    "enter_speed_rad_s": 2,
+    "budget_ms": 10
+  },
+  "physics": {
+    "rod_length_m": 0.35,
+    "rod_mass_kg": 0.12,
+    "cart_mass_kg": 0.6,
+    "counterweight_mass_kg": 0.02,
+    "counterweight_position_m": 0.175,
+    "track_length_m": 3,
+    "force_max_N": 35,
+    "speed_max_m_s": 2.5,
+    "power_max_W": 80,
+    "gravity_m_s2": 9.81,
+    "safety_buffer_m": 0.1,
+    "cart_coulomb_N": 0.2,
+    "cart_viscous_N_s_m": 0.1,
+    "joint_viscous_Nm_s_rad": 0.002,
+    "friction_smoothing_m_s": 0.01
+  },
+  "initial_state": {
+    "cart_x_m": 0,
+    "cart_v_m_s": 0,
+    "theta_unwrapped_rad": 3.141592653589793,
+    "theta_dot_rad_s": 0
+  },
+  "timing": {
+    "physics_step_s": 0.001,
+    "control_period_s": 0.01,
+    "sample_period_s": 0.01,
+    "duration_s": 30
+  },
+  "versions": {
+    "application": "0.0.0+t03",
+    "build": null,
+    "model": "rigid-cartpole-rk4-4",
+    "controller": "swing-energy-1",
+    "rules": "QV-1"
+  },
+  "thresholds": {
+    "angle_deg": 3,
+    "angular_velocity_rad_s": 0.2,
+    "position_m": 0.1,
+    "velocity_m_s": 0.1,
+    "hold_s": 5,
+    "deadline_s": 30
+  },
+  "environment": {
+    "platform": "ProductName:\t\tmacOS\nProductVersion:\t\t15.8.2\nBuildVersion:\t\t24H232",
+    "processor": "Apple M1 Max",
+    "browser": "Google Chrome 156.0.8078.80",
+    "node": "v26.7.0",
+    "execution": "headless Chrome, localhost"
+  },
+  "prior_exploration": {
+    "bundle": "../followup/tuning-gain18.json.gz",
+    "sha256": "225fd1ae5fa8a45a0848a1b5bb2a5d17bd27411b84481050d9ae7a6142166203",
+    "source_archive": "../followup/tuning-source.tar.gz",
+    "source_sha256": "0437408bd6235ee5311a6e245e36888ef905efa72c9510377d72d8b75f2c7a54",
+    "limitation": "Node exploratory run, not the earlier incomplete tuning history"
+  }
+}

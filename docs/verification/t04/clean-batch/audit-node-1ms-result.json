@@ -1,0 +1,12 @@
+{
+  "method": "independent threshold/event audit of saved 1ms Node samples; same model implementation, not Chrome samples",
+  "source_sha256": "92869208e05f30180f28d29536ccfa96a68e10df1e114c68af73c9899a774cc9",
+  "experiment_id": "83876f0e-4cb2-4cb3-abbd-03d307ecb5b0",
+  "samples_checked": 12009,
+  "threshold_entry_events": 11,
+  "stability_entries": 2,
+  "stability_resets": 1,
+  "first_stability_events": 1,
+  "last_sample_s": 12.008000000000001,
+  "status": "passed"
+}

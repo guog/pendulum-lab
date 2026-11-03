@@ -46,6 +46,7 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
     'saturation_reasons',
     'saturated',
   ]
+  const configDigest = await sha256(stringify(output.config))
   const files: Record<string, string> = {
     'config.json': stringify({
       ...output.config,
@@ -76,6 +77,18 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
     ...(Object.hasOwn(actuationCases, output.config.benchmark)
       ? { 'reference.json': stringify(actuationReference) }
       : {}),
+    ...(output.first_stable.snapshot
+      ? {
+          'snapshot.json': stringify({
+            schema_version: 1,
+            experiment_id,
+            config_sha256: configDigest,
+            config_digest_encoding: 'UTF-8 JSON.stringify(config, null, 2) plus newline',
+            ...output.first_stable.snapshot,
+          }),
+        }
+      : {}),
+    ...(output.controller ? { 'controller.json': stringify(output.controller) } : {}),
     'result.json': stringify({
       schema_version: 1,
       experiment_id,
@@ -85,7 +98,7 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
       actuation_assessment: assessActuation(output),
       qualification_reasons: output.qualification_reasons,
       condition_intervals: output.condition_intervals,
-      first_stable: 'not_executed',
+      first_stable: output.controller ? output.first_stable : 'not_executed',
       endurance: 'not_executed',
       horizontal_disturbance: 'not_executed',
       torque_disturbance: 'not_executed',
@@ -93,7 +106,7 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
       last_state: output.state,
       sample_count: output.samples.length,
       rules_version: output.config.versions.rules,
-      limitation: '自由运动或明确受力基准；内存记录需用户显式导出，不承诺崩溃恢复或正式控制验收。',
+      limitation: '内存记录需用户显式导出，不承诺崩溃恢复或正式控制验收。',
     }),
   }
   const entries = await Promise.all(

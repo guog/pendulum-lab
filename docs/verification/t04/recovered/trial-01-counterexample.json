@@ -1,0 +1,13 @@
+{
+  "source_stdout_sha256": "72d01f28280fd3bff4e343bff2c6f407ba7c85e2e49eab73932ff6e7ea27c3a4",
+  "observed_seconds": [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+    27, 28, 29, 30
+  ],
+  "observed_angle_violations": 30,
+  "minimum_angle_error_deg": 19.216517618700053,
+  "candidate_hold_s": 5,
+  "deadline_s": 30,
+  "conclusion": "no_candidate_five_second_window",
+  "scope": "zero-friction exploratory trial only; no 10ms samples or formal acceptance"
+}

@@ -4,7 +4,7 @@ import { buildIdentity, type BuildIdentity } from './build-info.ts'
 import type { InputCommand } from './actuation.ts'
 
 export type PresetId = 'simple' | 'standard'
-export type BenchmarkId = 'release' | 'equilibrium' | ActuationCaseId
+export type BenchmarkId = 'release' | 'equilibrium' | 'swing-up' | ActuationCaseId
 export type ExperimentConfig = {
   schema_version: 1
   preset: PresetId
@@ -13,7 +13,7 @@ export type ExperimentConfig = {
   benchmark_description: string
   environment: { user_agent: string; language: string | null; logical_processors: number | null }
   execution_mode: 'memory-research'
-  control_mode: 'free' | 'prescribed'
+  control_mode: 'free' | 'prescribed' | 'automatic'
   build_identity: BuildIdentity | null
   versions: {
     application: string
@@ -61,19 +61,25 @@ const presets = {
 
 export function createConfig(
   preset: PresetId,
-  benchmark: 'release' | 'equilibrium',
+  benchmark: 'release' | 'equilibrium' | 'swing-up',
 ): ExperimentConfig {
-  if (!Object.hasOwn(presets, preset) || !['release', 'equilibrium'].includes(benchmark))
+  if (
+    !Object.hasOwn(presets, preset) ||
+    !['release', 'equilibrium', 'swing-up'].includes(benchmark)
+  )
     throw new Error('未知工况或基准')
+  if (benchmark === 'swing-up' && preset !== 'simple') throw new Error('自动起摆当前仅支持简单工况')
   return {
     schema_version: 1,
     preset,
     preset_version: 'qv1-1',
     benchmark,
     benchmark_description:
-      benchmark === 'release'
-        ? '零阻力释放：初角为+π/2rad（水平），车居中、两速度为零。显式非平衡初态，仅用于自由运动基准。'
-        : '零阻力静止下垂：初角为+πrad，车居中、两速度为零，不施加隐藏扰动。',
+      benchmark === 'swing-up'
+        ? '简单工况：从精确静止下垂自动起摆，30秒内完成连续5秒稳定。'
+        : benchmark === 'release'
+          ? '零阻力释放：初角为+π/2rad（水平），车居中、两速度为零。显式非平衡初态，仅用于自由运动基准。'
+          : '零阻力静止下垂：初角为+πrad，车居中、两速度为零，不施加隐藏扰动。',
     environment: {
       user_agent: typeof navigator === 'undefined' ? 'not-reported' : navigator.userAgent,
       language: typeof navigator === 'undefined' ? null : (navigator.language ?? null),
@@ -81,25 +87,28 @@ export function createConfig(
         typeof navigator === 'undefined' ? null : (navigator.hardwareConcurrency ?? null),
     },
     execution_mode: 'memory-research',
-    control_mode: 'free',
+    control_mode: benchmark === 'swing-up' ? 'automatic' : 'free',
     build_identity: structuredClone(buildIdentity),
     versions: {
       application: '0.0.0+t03',
       build: buildIdentity?.source_sha256 ?? null,
       model: 'rigid-cartpole-rk4-4',
-      controller: 'none',
+      controller: benchmark === 'swing-up' ? 'swing-energy-1' : 'none',
       rules: 'QV-1',
     },
     physics: {
       ...presets[preset],
       gravity_m_s2: 9.81,
       safety_buffer_m: 0.1,
-      cart_coulomb_N: 0,
-      cart_viscous_N_s_m: 0,
-      joint_viscous_Nm_s_rad: 0,
+      cart_coulomb_N: benchmark === 'swing-up' ? 0.2 : 0,
+      cart_viscous_N_s_m: benchmark === 'swing-up' ? 0.1 : 0,
+      joint_viscous_Nm_s_rad: benchmark === 'swing-up' ? 0.002 : 0,
       friction_smoothing_m_s: 0.01,
     },
-    preset_overrides: { cart_coulomb_N: 0, cart_viscous_N_s_m: 0, joint_viscous_Nm_s_rad: 0 },
+    preset_overrides:
+      benchmark === 'swing-up'
+        ? {}
+        : { cart_coulomb_N: 0, cart_viscous_N_s_m: 0, joint_viscous_Nm_s_rad: 0 },
     initial_state: {
       cart_x_m: 0,
       cart_v_m_s: 0,
@@ -110,7 +119,7 @@ export function createConfig(
       physics_step_s: 0.001,
       control_period_s: 0.01,
       sample_period_s: 0.01,
-      duration_s: 10,
+      duration_s: benchmark === 'swing-up' ? 30 : 10,
     },
   }
 }
@@ -118,10 +127,26 @@ export function createConfig(
 export function validateConfig(config: ExperimentConfig) {
   if (
     config.schema_version !== 1 ||
-    !['free', 'prescribed'].includes(config.control_mode) ||
+    !['free', 'prescribed', 'automatic'].includes(config.control_mode) ||
     config.execution_mode !== 'memory-research'
   )
     throw new Error('不支持的实验格式或模式')
+  if (config.benchmark === 'swing-up' && config.control_mode !== 'automatic')
+    throw new Error('自动起摆必须使用自动控制')
+  if (
+    config.control_mode === 'automatic' &&
+    (config.timing.duration_s !== 30 ||
+      config.initial_state.cart_x_m !== 0 ||
+      config.initial_state.cart_v_m_s !== 0 ||
+      config.initial_state.theta_unwrapped_rad !== Math.PI ||
+      config.initial_state.theta_dot_rad_s !== 0)
+  )
+    throw new Error('自动起摆初态及30秒时限必须保持冻结')
+  if (
+    config.control_mode === 'automatic' &&
+    (config.benchmark !== 'swing-up' || config.preset !== 'simple' || config.input_program?.length)
+  )
+    throw new Error('自动起摆仅支持无外扰的简单工况')
   if (
     config.control_mode === 'free' &&
     Array.isArray(config.input_program) &&

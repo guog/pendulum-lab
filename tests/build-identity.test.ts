@@ -16,9 +16,14 @@ import { dirname, join, resolve } from 'node:path'
 test('真实构建清单识别未暂存及已暂存的源码删除，恢复后身份回到干净版本', () => {
   const fixture = mkdtempSync(join(tmpdir(), 'pendulum-build-identity-'))
   const sourceRoot = process.cwd()
+  // Git hooks export repository-local variables; the fixture must use its own .git.
+  const fixtureEnv = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')),
+  )
   const run = (command: string, args: string[]) =>
     execFileSync(command, args, {
       cwd: fixture,
+      env: fixtureEnv,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
       timeout: 30_000,

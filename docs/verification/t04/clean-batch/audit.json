@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "method": "manifest and config hashes, freeze identity, sampled states and recorded events; no claim of independent between-step verification",
+  "experiment_id": "b3e77ca9-71a2-47a1-bbb0-ac61980e0287",
+  "created_at_utc": "2026-11-03T09:31:24.970Z",
+  "freeze_sha256": "3acb652a0eb511def9aef072e639ca2247becd771e6e3612ca97522aed64c231",
+  "source_sha256": "34f68ed6749a49724040780c594e72e896da4147aa324bb6321ac89aa0ea0a3a",
+  "status": "passed",
+  "freeze_before_start": true,
+  "stable_start_s": 7.008,
+  "first_stable_s": 12.008000000000001,
+  "sample_count": 1202,
+  "event_count": 22,
+  "artifact_sha256": {
+    "before_confirmation_gzip": "79b669003b3a5bb658cf998675aeb9bf79bd40a48fc9447dd014f5a81b6e38d9",
+    "after_confirmation_gzip": "807563e77220c6eeb958d70a78b07ac6e1b59f69ecece51846b4b3d398bfc693",
+    "browser_steps": "8aa3efa91a894d633f39d2b40ecfdeeb7755bb6c4bd633b251c32019795c5700",
+    "screenshot": "6b491d8db81940dd9fec0496dd0fcfef34464bbe01f140250d605a5bc908c15b"
+  },
+  "formal_acceptance": "not_eligible",
+  "manifest_verification": {
+    "before-confirmation.json.gz": {
+      "experiment_id": "b3e77ca9-71a2-47a1-bbb0-ac61980e0287",
+      "sha256": "79b669003b3a5bb658cf998675aeb9bf79bd40a48fc9447dd014f5a81b6e38d9",
+      "files": [
+        {
+          "path": "config.json",
+          "byte_length": 1799,
+          "sha256": "5a606438ffda0e34765b0d6621c677c71ce97c4a2bd0c3593c621c5cea0e9a36"
+        },
+        {
+          "path": "samples/chunk-000001.csv",
+          "byte_length": 376805,
+          "sha256": "6133f3c8d65d6e458f191366743aea21a9e8e68e4cb424f7a3f931f8d3d1aa67"
+        },
+        {
+          "path": "events/part-000001.jsonl",
+          "byte_length": 10841,
+          "sha256": "5677a588ca280772acd0871e7c1973a8607cc09583564677f74379987c8cd6a8"
+        },
+        {
+          "path": "snapshot.json",
+          "byte_length": 3272,
+          "sha256": "014b29a5be6360600fd01040dfc8f440b4d45aaf5e0fa99efca0dffc9405ba5d"
+        },
+        {
+          "path": "controller.json",
+          "byte_length": 577,
+          "sha256": "d199867537d82447f9cf8091e2bd52d922c4fe495beb887a7ae0148df30b0419"
+        },
+        {
+          "path": "result.json",
+          "byte_length": 4958,
+          "sha256": "04be103a3f000ceb163b0b5aebcc61764f6ce980c415239544ac341e10cb64f4"
+        }
+      ],
+      "verified_at_utc": "2026-11-03T09:34:56.234Z"
+    },
+    "after-confirmation.json.gz": {
+      "experiment_id": "b3e77ca9-71a2-47a1-bbb0-ac61980e0287",
+      "sha256": "807563e77220c6eeb958d70a78b07ac6e1b59f69ecece51846b4b3d398bfc693",
+      "files": [
+        {
+          "path": "config.json",
+          "byte_length": 1799,
+          "sha256": "5a606438ffda0e34765b0d6621c677c71ce97c4a2bd0c3593c621c5cea0e9a36"
+        },
+        {
+          "path": "samples/chunk-000001.csv",
+          "byte_length": 376805,
+          "sha256": "6133f3c8d65d6e458f191366743aea21a9e8e68e4cb424f7a3f931f8d3d1aa67"
+        },
+        {
+          "path": "events/part-000001.jsonl",
+          "byte_length": 11089,
+          "sha256": "a27627aeea715258e2e9560f6f238d50a4f8057dd6a86c43c0b86b9769bd6d21"
+        },
+        {
+          "path": "snapshot.json",
+          "byte_length": 3272,
+          "sha256": "014b29a5be6360600fd01040dfc8f440b4d45aaf5e0fa99efca0dffc9405ba5d"
+        },
+        {
+          "path": "controller.json",
+          "byte_length": 577,
+          "sha256": "d199867537d82447f9cf8091e2bd52d922c4fe495beb887a7ae0148df30b0419"
+        },
+        {
+          "path": "result.json",
+          "byte_length": 4931,
+          "sha256": "d1ac83970657d1466a88148fb9b4144b91f8969030970f6411cec9ca4b3871dd"
+        }
+      ],
+      "verified_at_utc": "2026-11-03T09:34:56.237Z"
+    },
+    "supplemental-node-1ms.json.gz": {
+      "experiment_id": "83876f0e-4cb2-4cb3-abbd-03d307ecb5b0",
+      "sha256": "92869208e05f30180f28d29536ccfa96a68e10df1e114c68af73c9899a774cc9",
+      "files": [
+        {
+          "path": "config.json",
+          "byte_length": 1440,
+          "sha256": "1ee21de0b3802e2e5143422cd80fe4a993d576931af9c611d84b72de884ffb0b"
+        },
+        {
+          "path": "samples/chunk-000001.csv",
+          "byte_length": 3786654,
+          "sha256": "3b636b1bf302d514dda4485a6350bfb4178ea7a19a9e12ffb9135940fe96a12f"
+        },
+        {
+          "path": "events/part-000001.jsonl",
+          "byte_length": 10504,
+          "sha256": "bfe27c9b0ca5230d51403586640f58be446660ef580666e5d944ed9df3e3e4be"
+        },
+        {
+          "path": "snapshot.json",
+          "byte_length": 2909,
+          "sha256": "22007aa49c1033b6b97cc278935073546dc590a07bcce5f0f40e8819fbe961ac"
+        },
+        {
+          "path": "controller.json",
+          "byte_length": 577,
+          "sha256": "e1f8bc837bf21f2ca0160230a1d2da1f609ea12ffce2fb6d989060ecfd5672db"
+        },
+        {
+          "path": "result.json",
+          "byte_length": 4580,
+          "sha256": "46534f8feb9524f40815117f51b7a5e1f7585c6e020a3c75e31050377e18500c"
+        }
+      ],
+      "verified_at_utc": "2026-11-03T09:34:56.253Z"
+    }
+  },
+  "browser_batch_verified_at_utc": "2026-11-03T09:32:47.231Z"
+}
