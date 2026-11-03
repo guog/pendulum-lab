@@ -317,6 +317,38 @@
       </div>
       <section
         class="physics-benchmarks"
+        aria-labelledby="disturbance-title"
+      >
+        <div class="panel-heading"><h2 id="disturbance-title">共同快照扰动实验</h2></div>
+        <p>
+          先导出并校验首次稳定快照；两种扰动独立分叉，不改变无扰动耐久记录。结果为内存研究证据，不承诺崩溃恢复。
+        </p>
+        <button
+          id="run-disturbances"
+          type="button"
+          disabled
+        >
+          运行两种扰动
+        </button>
+        <button
+          id="resume-disturbances"
+          type="button"
+          disabled
+        >
+          继续扰动实验
+        </button>
+        <p id="disturbance-current">水平外力：阻塞；关节外力矩：阻塞（无已确认合格快照）。</p>
+        <button
+          id="save-disturbances"
+          type="button"
+          disabled
+        >
+          保存扰动证据
+        </button>
+        <pre id="disturbance-result">阻塞：等待已确认的合格快照。</pre>
+      </section>
+      <section
+        class="physics-benchmarks"
         aria-labelledby="bench-title"
       >
         <div class="panel-heading">

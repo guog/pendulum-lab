@@ -11,6 +11,22 @@ let session = createSession(createConfig('standard', 'release'))
 let timer: ReturnType<typeof setTimeout> | undefined
 let runningWallMs = 0
 let startedAt: number | undefined
+let disturbanceRunning = false
+let disturbancePaused = false
+let resumeDisturbances: (() => void) | undefined
+const disturbanceStatus = () =>
+  context.postMessage({
+    type: 'disturbance-status',
+    running: disturbanceRunning,
+    paused: disturbancePaused,
+  })
+async function disturbanceCheckpoint() {
+  await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  while (disturbancePaused)
+    await new Promise<void>((resolve) => {
+      resumeDisturbances = resolve
+    })
+}
 
 function suspendPump() {
   clearTimeout(timer)
@@ -69,6 +85,10 @@ context.onmessage = async ({ data: { request_id, command } }) => {
         timer = setTimeout(pump, 16)
         break
       case 'pause':
+        if (disturbanceRunning) {
+          disturbancePaused = true
+          disturbanceStatus()
+        }
         suspendPump()
         session.pause(command.reason)
         break
@@ -80,6 +100,31 @@ context.onmessage = async ({ data: { request_id, command } }) => {
         suspendPump()
         session.reset()
         runningWallMs = 0
+        break
+      case 'run-disturbances': {
+        if (disturbanceRunning) throw new Error('扰动实验已运行')
+        disturbanceRunning = true
+        disturbancePaused = false
+        disturbanceStatus()
+        try {
+          const results = [
+            await session.forkDisturbance('horizontal', disturbanceCheckpoint),
+            await session.forkDisturbance('torque', disturbanceCheckpoint),
+          ]
+          context.postMessage({ type: 'disturbances', results, request_id })
+        } finally {
+          disturbanceRunning = false
+          disturbancePaused = false
+          disturbanceStatus()
+        }
+        return
+      }
+      case 'resume-disturbances':
+        if (!disturbanceRunning || !disturbancePaused) throw new Error('扰动实验未暂停')
+        disturbancePaused = false
+        resumeDisturbances?.()
+        resumeDisturbances = undefined
+        disturbanceStatus()
         break
       case 'confirm-export':
         session.confirmExport(command.experiment_id, command.event_count)
