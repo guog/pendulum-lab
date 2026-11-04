@@ -1,0 +1,96 @@
+{
+  "tested_commit": "6d826d45d2a408724cc44bc18ed9ff0b7c22606b",
+  "build_identity": {
+    "source_revision": "6d826d45d2a408724cc44bc18ed9ff0b7c22606b",
+    "source_sha256": "5eee72e271ebe77c5b0ccb748da9a295d36fffc5231a09936ad1fdaa4ffca27d",
+    "source_dirty": false
+  },
+  "results": [
+    {
+      "scenario": "temp-before-close",
+      "status": "passed",
+      "experiment_id": "68c3185a-311f-4d52-ab25-c5a3c7a49722",
+      "acknowledged_sim_time_s": 0.5,
+      "recovered_sim_time_s": 0.5,
+      "frozen_sim_time_s": null,
+      "sealed_sim_time_s": null,
+      "samples": 51,
+      "chrome_error": null
+    },
+    {
+      "scenario": "manifest-before-close",
+      "status": "passed",
+      "experiment_id": "1342462c-8193-4661-bf82-c8b968d56483",
+      "acknowledged_sim_time_s": 0.5,
+      "recovered_sim_time_s": 1,
+      "frozen_sim_time_s": null,
+      "sealed_sim_time_s": null,
+      "samples": 101,
+      "chrome_error": null
+    },
+    {
+      "scenario": "committed-before-readback",
+      "status": "passed",
+      "experiment_id": "dc972d7c-8985-4aa2-9a35-f1091f0ddbdd",
+      "acknowledged_sim_time_s": 0.5,
+      "recovered_sim_time_s": 1,
+      "frozen_sim_time_s": null,
+      "sealed_sim_time_s": null,
+      "samples": 101,
+      "chrome_error": null
+    },
+    {
+      "scenario": "permission-revocation",
+      "status": "passed",
+      "experiment_id": "4e3ed458-f1fa-45c8-9ef8-3a1f533a7c08",
+      "acknowledged_sim_time_s": 5,
+      "recovered_sim_time_s": 5,
+      "frozen_sim_time_s": 5.5,
+      "sealed_sim_time_s": null,
+      "samples": 501,
+      "chrome_error": "NotAllowedError: Failed to execute 'getDirectoryHandle' on 'FileSystemDirectoryHandle': The request is not allowed by the user agent or the platform in the current context."
+    },
+    {
+      "scenario": "capacity",
+      "status": "passed",
+      "experiment_id": "35efd977-58e2-4a4e-a419-c7227f3b8f83",
+      "acknowledged_sim_time_s": 2.5,
+      "recovered_sim_time_s": null,
+      "frozen_sim_time_s": 3,
+      "sealed_sim_time_s": 3,
+      "samples": 301,
+      "chrome_error": "InvalidStateError"
+    },
+    {
+      "scenario": "readonly",
+      "status": "passed",
+      "experiment_id": "dcf99650-d791-415c-958a-7d90279c4dab",
+      "acknowledged_sim_time_s": 0.5,
+      "recovered_sim_time_s": null,
+      "frozen_sim_time_s": 1,
+      "sealed_sim_time_s": 1,
+      "samples": 1001,
+      "chrome_error": "NoModificationAllowedError: An attempt was made to write to a file or directory which could not be modified due to the state of the underlying filesystem."
+    }
+  ],
+  "additional_checks": [
+    {
+      "status": "passed",
+      "id": "a8d3f13e-288f-44d3-981a-78aa2112ac35",
+      "build": {
+        "source_revision": "6d826d45d2a408724cc44bc18ed9ff0b7c22606b",
+        "source_sha256": "5eee72e271ebe77c5b0ccb748da9a295d36fffc5231a09936ad1fdaa4ffca27d",
+        "source_dirty": false
+      },
+      "frozen_sim_time_s": 22,
+      "confirmed_sim_time_s": 21.5,
+      "alert": "NotAllowedError: The request is not allowed by the user agent or the platform in the current context.",
+      "record": "不可验证：没有完整清单前缀。保留文件待排查，可导出诊断。",
+      "rendered_diagnostics": "{\n  \"name\": \"NotAllowedError\",\n  \"message\": \"NotAllowedError: Failed to execute 'getDirectoryHandle' on 'FileSystemDirectoryHandle': The request is not allowed by the user agent or the platform in the current context.\",\n  \"sim_time_s\": 22,\n  \"committed_sim_time_s\": 21.5,\n  \"last_valid_state\": {\n    \"cart_x_m\": 0,\n    \"cart_v_m_s\": 0,\n    \"theta_unwrapped_rad\": 3.141592653589793,\n    \"theta_dot_rad_s\": 0\n  }\n}",
+      "download_has_diagnostics": true,
+      "download_has_live_fault": true,
+      "download_record": null,
+      "explanation": "History reply enables recovery export, then list refresh fails and progress restores raw storage_fault in diagnostic DOM. Waiting for DOM experiment_id is invalid; actual download retains complete unavailable diagnostics and live fault."
+    }
+  ]
+}

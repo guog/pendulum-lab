@@ -1,0 +1,141 @@
+{
+  "startup": {
+    "status": "passed",
+    "source": {
+      "source_revision": "bea7393af2ba79bf028886154372918b337e12e5",
+      "source_sha256": "be9ddee35b0134dfdf66822a0171edee244d55a0910393ca7cae67b0421ba043",
+      "source_dirty": false
+    },
+    "coverage": "native-start-save-failure",
+    "frozen": {
+      "error": {
+        "text": "NoModificationAllowedError: An attempt was made to write to a file or directory which could not be modified due to the state of the underlying filesystem."
+      },
+      "export": {
+        "disabled": true,
+        "text": "\u5bfc\u51fa\u6062\u590d\u8bb0\u5f55\u4e0e\u8bca\u65ad",
+        "value": ""
+      },
+      "history": {
+        "disabled": false,
+        "text": "c5cb38ba-47eb-4c86-8984-62b89c3fb59d",
+        "value": "c5cb38ba-47eb-4c86-8984-62b89c3fb59d"
+      },
+      "load": {
+        "disabled": false,
+        "text": "\u6838\u9a8c\u5e76\u67e5\u770b",
+        "value": ""
+      },
+      "progress": {
+        "text": "\u72b6\u6001 paused \u00b7 \u4eff\u771f 0.000 s \u00b7 \u5df2\u786e\u8ba4 0.000 s \u00b7 \u6837\u672c 1 \u00b7 \u4e8b\u4ef6 3 \u00b7 \u672a\u5c01\u5b58"
+      },
+      "resume": {
+        "disabled": true,
+        "text": "\u7ee7\u7eed\u76ee\u5f55\u5b9e\u9a8c",
+        "value": ""
+      },
+      "retry": {
+        "disabled": false,
+        "text": "\u91cd\u8bd5\u4fdd\u5b58",
+        "value": ""
+      },
+      "stop": {
+        "disabled": true,
+        "text": "\u7ec8\u6b62\u5e76\u5c01\u5b58",
+        "value": ""
+      }
+    }
+  },
+  "normal": {
+    "status": "passed",
+    "source": {
+      "source_revision": "bea7393af2ba79bf028886154372918b337e12e5",
+      "source_sha256": "be9ddee35b0134dfdf66822a0171edee244d55a0910393ca7cae67b0421ba043",
+      "source_dirty": false
+    },
+    "url": "http://localhost:5198/",
+    "coverage": ["authorized-directory-session", "visibility", "history-signal-colors"],
+    "native_picker": "not_exercised_by_this_script",
+    "start_before_ack": "passed",
+    "resume_before_ack": "passed",
+    "native_tab_background": "passed",
+    "history_signal_colors": [
+      {
+        "expected": [49, 95, 158],
+        "matches": 5880
+      },
+      {
+        "expected": [8, 119, 107],
+        "matches": 5880
+      },
+      {
+        "expected": [153, 96, 24],
+        "matches": 5880
+      },
+      {
+        "expected": [130, 85, 161],
+        "matches": 5880
+      }
+    ],
+    "final_progress": "\u72b6\u6001 stopped \u00b7 \u4eff\u771f 0.208 s \u00b7 \u5df2\u786e\u8ba4 0.208 s \u00b7 \u6837\u672c 22 \u00b7 \u4e8b\u4ef6 7 \u00b7 \u5df2\u5c01\u5b58\uff08\u5b8c\u6574\u6027\u786e\u8ba4\uff09",
+    "events": [
+      {
+        "schema_version": 1,
+        "event_index": 0,
+        "sim_time_s": 0,
+        "event_type": "start",
+        "payload": {}
+      },
+      {
+        "schema_version": 1,
+        "event_index": 1,
+        "sim_time_s": 0,
+        "event_type": "pause",
+        "payload": {
+          "reason": "background"
+        }
+      },
+      {
+        "schema_version": 1,
+        "event_index": 2,
+        "sim_time_s": 0,
+        "event_type": "resume",
+        "payload": {}
+      },
+      {
+        "schema_version": 1,
+        "event_index": 3,
+        "sim_time_s": 0,
+        "event_type": "pause",
+        "payload": {
+          "reason": "background"
+        }
+      },
+      {
+        "schema_version": 1,
+        "event_index": 4,
+        "sim_time_s": 0,
+        "event_type": "resume",
+        "payload": {}
+      },
+      {
+        "schema_version": 1,
+        "event_index": 5,
+        "sim_time_s": 0.20800000000000002,
+        "event_type": "pause",
+        "payload": {
+          "reason": "background"
+        }
+      },
+      {
+        "schema_version": 1,
+        "event_index": 6,
+        "sim_time_s": 0.20800000000000002,
+        "event_type": "stop",
+        "payload": {
+          "reason": "user"
+        }
+      }
+    ]
+  }
+}

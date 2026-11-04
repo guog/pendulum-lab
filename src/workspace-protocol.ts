@@ -14,5 +14,9 @@ export type WorkspaceReply =
   | { type: 'opened'; id: string; writable: boolean; experiments: string[] }
   | { type: 'list'; experiments: string[] }
   | ({ type: 'progress' } & ReturnType<Run['progress']>)
-  | { type: 'history'; record: Awaited<ReturnType<Workspace['load']>> }
+  | {
+      type: 'history'
+      recovery: Awaited<ReturnType<Workspace['recover']>>
+      live_fault?: ReturnType<Run['read']>
+    }
   | { type: 'error'; message: string; hasRun: boolean }

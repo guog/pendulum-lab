@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "basis": "Independent Node-free Python hashlib and literal sample counts; no app reader imported",
+  "checks": [
+    {
+      "state": "before",
+      "id": "c5cb38ba-47eb-4c86-8984-62b89c3fb59d",
+      "files_checked": 5,
+      "samples": 0,
+      "sealed": false,
+      "confirmed_sim_time_s": 0
+    },
+    {
+      "state": "sealed",
+      "id": "c5cb38ba-47eb-4c86-8984-62b89c3fb59d",
+      "files_checked": 9,
+      "samples": 1,
+      "sealed": true,
+      "confirmed_sim_time_s": 0
+    }
+  ]
+}

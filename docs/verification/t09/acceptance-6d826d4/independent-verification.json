@@ -1,0 +1,96 @@
+{
+  "status": "passed",
+  "basis": "Node fs and crypto; literal expected sample counts; no application loader or sample-column constants imported",
+  "checks": [
+    {
+      "scenario": "temp-before-close",
+      "status": "passed",
+      "experiment_id": "68c3185a-311f-4d52-ab25-c5a3c7a49722",
+      "samples": 51,
+      "sample_period_s": 0.01,
+      "confirmed_sim_time_s": 0.5,
+      "files_checked": 9,
+      "events": 1,
+      "build": {
+        "source_revision": "6d826d45d2a408724cc44bc18ed9ff0b7c22606b",
+        "source_sha256": "5eee72e271ebe77c5b0ccb748da9a295d36fffc5231a09936ad1fdaa4ffca27d",
+        "source_dirty": false
+      }
+    },
+    {
+      "scenario": "manifest-before-close",
+      "status": "passed",
+      "experiment_id": "1342462c-8193-4661-bf82-c8b968d56483",
+      "samples": 101,
+      "sample_period_s": 0.01,
+      "confirmed_sim_time_s": 1,
+      "files_checked": 11,
+      "events": 1,
+      "build": {
+        "source_revision": "6d826d45d2a408724cc44bc18ed9ff0b7c22606b",
+        "source_sha256": "5eee72e271ebe77c5b0ccb748da9a295d36fffc5231a09936ad1fdaa4ffca27d",
+        "source_dirty": false
+      }
+    },
+    {
+      "scenario": "committed-before-readback",
+      "status": "passed",
+      "experiment_id": "dc972d7c-8985-4aa2-9a35-f1091f0ddbdd",
+      "samples": 101,
+      "sample_period_s": 0.01,
+      "confirmed_sim_time_s": 1,
+      "files_checked": 11,
+      "events": 1,
+      "build": {
+        "source_revision": "6d826d45d2a408724cc44bc18ed9ff0b7c22606b",
+        "source_sha256": "5eee72e271ebe77c5b0ccb748da9a295d36fffc5231a09936ad1fdaa4ffca27d",
+        "source_dirty": false
+      }
+    },
+    {
+      "scenario": "permission-revocation",
+      "status": "passed",
+      "experiment_id": "4e3ed458-f1fa-45c8-9ef8-3a1f533a7c08",
+      "samples": 501,
+      "sample_period_s": 0.01,
+      "confirmed_sim_time_s": 5,
+      "files_checked": 27,
+      "events": 1,
+      "build": {
+        "source_revision": "6d826d45d2a408724cc44bc18ed9ff0b7c22606b",
+        "source_sha256": "5eee72e271ebe77c5b0ccb748da9a295d36fffc5231a09936ad1fdaa4ffca27d",
+        "source_dirty": false
+      }
+    },
+    {
+      "scenario": "capacity",
+      "status": "passed",
+      "experiment_id": "35efd977-58e2-4a4e-a419-c7227f3b8f83",
+      "samples": 301,
+      "sample_period_s": 0.01,
+      "confirmed_sim_time_s": 3,
+      "files_checked": 21,
+      "events": 4,
+      "build": {
+        "source_revision": "6d826d45d2a408724cc44bc18ed9ff0b7c22606b",
+        "source_sha256": "5eee72e271ebe77c5b0ccb748da9a295d36fffc5231a09936ad1fdaa4ffca27d",
+        "source_dirty": false
+      }
+    },
+    {
+      "scenario": "readonly",
+      "status": "passed",
+      "experiment_id": "dcf99650-d791-415c-958a-7d90279c4dab",
+      "samples": 1001,
+      "sample_period_s": 0.001,
+      "confirmed_sim_time_s": 1,
+      "files_checked": 13,
+      "events": 4,
+      "build": {
+        "source_revision": "6d826d45d2a408724cc44bc18ed9ff0b7c22606b",
+        "source_sha256": "5eee72e271ebe77c5b0ccb748da9a295d36fffc5231a09936ad1fdaa4ffca27d",
+        "source_dirty": false
+      }
+    }
+  ]
+}
