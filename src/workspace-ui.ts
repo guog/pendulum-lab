@@ -18,6 +18,7 @@ export function initializeWorkspace() {
   <p id="workspace-progress" role="status">未运行。每0.5秒仿真时间提交；等待磁盘时暂停推进。</p>
   <p id="workspace-error" role="alert"></p>
   <label>已保存实验 <select id="workspace-history"></select></label> <button id="workspace-load" disabled>核验并查看</button>
+  <button id="workspace-export" disabled>导出恢复记录与诊断</button><pre id="workspace-diagnostics"></pre>
   <div id="workspace-record"></div>`
   document.querySelector('.page-footer')!.before(host)
   const get = (id: string) => host.querySelector<HTMLElement>('#workspace-' + id)!
@@ -27,14 +28,28 @@ export function initializeWorkspace() {
   let writable = false,
     active = false,
     running = false,
-    pending = false
+    pending = false,
+    frozen = false
+  let liveRunId: string | null = null
+  let selectCurrentRun = false
+  let recoveryExport: Extract<WorkspaceReply, { type: 'history' }> | null = null
+  function selectRunWhenListed() {
+    if (
+      selectCurrentRun &&
+      liveRunId &&
+      [...select('history').options].some((option) => option.value === liveRunId)
+    ) {
+      select('history').value = liveRunId
+      selectCurrentRun = false
+    }
+  }
   function controls() {
     for (const id of ['open', 'read']) button(id).disabled = active || pending
     button('start').disabled = !writable || active || pending || document.hidden
     button('pause').disabled = !running || pending
-    button('resume').disabled = !active || running || pending || document.hidden
-    button('stop').disabled = !active || pending
-    button('load').disabled = active || pending || !select('history').value
+    button('resume').disabled = !active || running || frozen || pending || document.hidden
+    button('stop').disabled = !active || frozen || pending
+    button('load').disabled = (active && !frozen) || pending || !select('history').value
     for (const id of ['benchmark', 'preset', 'sampling']) select(id).disabled = active || pending
   }
   function send(command: WorkspaceCommand) {
@@ -65,27 +80,67 @@ export function initializeWorkspace() {
     if (config.benchmark === 'equilibrium') config.timing.duration_s = 60
     config.timing.sample_period_s = Number(select('sampling').value)
     active = true
+    frozen = false
+    liveRunId = null
+    selectCurrentRun = true
+    recoveryExport = null
+    get('record').replaceChildren()
+    get('diagnostics').textContent = ''
+    button('export').disabled = true
     send({ type: 'start', config })
   }
   button('pause').onclick = () => send({ type: 'pause', reason: 'manual' })
   for (const type of ['resume', 'stop', 'retry'] as const)
     button(type).onclick = () => send({ type })
   button('load').onclick = () => send({ type: 'load', id: select('history').value })
+  button('export').onclick = () => {
+    if (!recoveryExport) return
+    const text =
+      JSON.stringify(
+        { schema_version: 1, kind: 'workspace-recovery', ...recoveryExport },
+        null,
+        2,
+      ) + '\n'
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `recovery-${recoveryExport.recovery.diagnostics.experiment_id}.json`
+    link.click()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+  select('history').onchange = () => {
+    selectCurrentRun = false
+    recoveryExport = null
+    button('export').disabled = true
+    controls()
+  }
   worker.onmessage = ({ data }: MessageEvent<WorkspaceReply>) => {
     pending = false
     if (data.type === 'opened') {
       writable = data.writable
-      active = running = false
+      active = running = frozen = false
+      liveRunId = null
+      selectCurrentRun = false
+      recoveryExport = null
+      button('export').disabled = true
+      get('record').replaceChildren()
+      get('diagnostics').textContent = ''
       get('identity').textContent = `工作区 ${data.id} · ${writable ? '可写' : '只读'}`
     }
     if (data.type === 'list' || data.type === 'opened') {
       const previous = select('history').value
       select('history').replaceChildren(...data.experiments.map((id: string) => new Option(id, id)))
       if (data.experiments.includes(previous)) select('history').value = previous
+      selectRunWhenListed()
     }
     if (data.type === 'progress') {
+      liveRunId = data.experiment_id
+      selectRunWhenListed()
       active = !data.sealed
       running = data.status === 'running'
+      frozen = !!data.fault
+      if (data.storage_fault)
+        get('diagnostics').textContent = JSON.stringify(data.storage_fault, null, 2)
       pending = data.saving
       get('progress').textContent =
         `状态 ${data.status} · 仿真 ${data.sim_time_s.toFixed(3)} s · 已确认 ${data.committed_sim_time_s.toFixed(3)} s · 样本 ${data.sample_count} · 事件 ${data.event_count} · ${data.sealed ? '已封存（完整性确认）' : data.saving ? '等待磁盘；物理推进已暂停' : '未封存'}`
@@ -96,15 +151,31 @@ export function initializeWorkspace() {
       running = false
       if (!data.hasRun) active = false
       // Keep the run protected until retry/stop succeeds; never silently fall back to memory.
-      button('retry').disabled = false
+      button('retry').disabled = !frozen
     }
     if (data.type === 'history') {
-      const output: SessionOutput = data.record.output
+      recoveryExport = data
+      button('export').disabled = false
+      get('diagnostics').textContent = JSON.stringify(
+        { ...data.recovery.diagnostics, live_fault: data.live_fault },
+        null,
+        2,
+      )
+      const record = data.recovery.record
+      if (!record) {
+        get('record').textContent = '不可验证：没有完整清单前缀。保留文件待排查，可导出诊断。'
+        controls()
+        return
+      }
+      const output: SessionOutput = record.output
       const target = get('record')
       target.replaceChildren()
       const summary = document.createElement('p')
-      summary.textContent = `${output.experiment_id} · ${data.record.integrity} · 已确认至 ${data.record.manifest.committed_sim_time_s.toFixed(3)} s · ${output.samples.length}条原始样本 · ${data.record.manifest.sealed ? '完整性已核验；封存不等同控制成功' : '上次实验未封存，仅显示已确认前缀；未确认尾部范围未知，不补造数据'}`
+      summary.textContent = `${output.experiment_id} · ${record.integrity} · 已确认至 ${record.manifest.committed_sim_time_s.toFixed(3)} s · ${output.samples.length}条原始样本 · ${data.recovery.diagnostics.status === 'sealed' ? '完整性已核验；封存不等同控制成功' : '上次实验未封存，仅显示已确认前缀；未确认尾部范围未知，不补造数据'}`
       target.append(summary)
+      const diagnosis = document.createElement('p')
+      diagnosis.textContent = `恢复状态 ${data.recovery.diagnostics.status} · 实验内待排查孤儿 ${data.recovery.diagnostics.orphan_files.length} 个 · 工作区临时残留 ${data.recovery.diagnostics.workspace_orphan_files.length} 个（归属未知） · 只查看历史，不能续跑中断实验。`
+      target.append(diagnosis)
       for (const field of [
         'cart_x_m',
         'cart_v_m_s',
@@ -123,7 +194,7 @@ export function initializeWorkspace() {
       }
       for (const [name, value] of [
         ['原配置', output.config],
-        ['独立结果', data.record.result],
+        ['独立结果', record.result],
         ['原始轨迹', output.samples],
         ['全部事件', output.events],
       ]) {

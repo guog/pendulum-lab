@@ -456,3 +456,238 @@ test('history requires configuration identity to match the selected experiment',
     else await assert.rejects(workspace.load(run.id), /配置.*实验标识/, `id=${id}`)
   }
 })
+
+test('recovery preserves the last acknowledged prefix when the replaceable manifest is torn', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.advance(0.5)
+  const confirmed = (await workspace.load(run.id)).output
+  files.data.set(`experiments/${run.id}/manifest.json`, '{"torn":')
+  const recovered = await (await openWorkspace(files)).recover(run.id)
+  assert.deepEqual(recovered.record!.output, confirmed)
+  assert.equal(recovered.diagnostics.status, 'interrupted')
+  assert.equal(recovered.diagnostics.confirmed_sim_time_s, 0.5)
+  assert.equal(recovered.diagnostics.unconfirmed_tail!.end_sim_time_s, null)
+  assert.equal(recovered.record!.result.formal_acceptance, 'not_eligible')
+})
+
+test('permission loss freezes every command except explicit save retry and exposes the last valid state', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  const write = files.write.bind(files)
+  files.write = async () => {
+    throw new DOMException('revoked', 'NotAllowedError')
+  }
+  await assert.rejects(run.advance(0.5), /revoked/)
+  const frozen = run.read().output
+  assert.equal(run.progress().storage_fault!.name, 'NotAllowedError')
+  assert.equal(run.progress().storage_fault!.sim_time_s, 0.5)
+  assert.deepEqual(run.progress().storage_fault!.last_valid_state, frozen.state)
+  for (const command of [
+    () => run.start(),
+    () => run.pause(),
+    () => run.stop(),
+    () => run.advance(0.1),
+  ])
+    await assert.rejects(command, /存储/)
+  assert.throws(() => run.resume(), /存储/)
+  assert.deepEqual(run.read().output, frozen)
+  files.write = write
+  await run.retry()
+  assert.equal(run.progress().status, 'paused')
+  assert.equal(run.progress().committed_sim_time_s, 0.5)
+  await run.stop()
+  assert.ok(
+    (await workspace.load(run.id)).output.events.some((e) => e.event_type === 'storage_error'),
+  )
+})
+
+test('recovery diagnoses a torn mirror and orphan files without adopting samples or rewriting disk', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.advance(0.7)
+  files.data.set(`experiments/${run.id}/samples/unpublished.csv`, 'invented')
+  files.data.set(`experiments/${run.id}/manifest.json`, '{')
+  const before = [...files.data]
+  const recovery = await workspace.recover(run.id)
+  assert.equal(recovery.record!.output.samples.length, 51)
+  assert.equal(recovery.diagnostics.confirmed_sim_time_s, 0.5)
+  assert.ok(recovery.diagnostics.failures.some((f) => f.path === 'manifest.json'))
+  assert.ok(recovery.diagnostics.orphan_files.includes('samples/unpublished.csv'))
+  assert.equal(recovery.diagnostics.unconfirmed_tail!.end_sim_time_s, null)
+  assert.deepEqual([...files.data], before)
+})
+
+test('every interrupted write/readback cut retains the acknowledged prefix and never rewrites confirmed files', async () => {
+  // Discover boundary operations through the injected filesystem, then interrupt each side.
+  const probe = new Files(),
+    probeWorkspace = await openWorkspace(probe)
+  const probeRun = await probeWorkspace.create(createConfig('standard', 'equilibrium'))
+  await probeRun.start()
+  await probeRun.advance(0.5)
+  const operations: string[] = []
+  const probeWrite = probe.write.bind(probe),
+    probeRead = probe.read.bind(probe)
+  probe.write = async (path, text) => {
+    operations.push('write:' + path.split(probeRun.id)[1])
+    await probeWrite(path, text)
+  }
+  probe.read = async (path) => {
+    operations.push('read:' + path.split(probeRun.id)[1])
+    return probeRead(path)
+  }
+  await probeRun.advance(0.5)
+  for (let cut = 0; cut < operations.length; cut++) {
+    for (const side of ['before', 'after'] as const) {
+      const files = new Files(),
+        workspace = await openWorkspace(files)
+      const run = await workspace.create(createConfig('standard', 'equilibrium'))
+      await run.start()
+      await run.advance(0.5)
+      const immutable = [...files.data].filter(
+        ([path]) => !path.startsWith('tmp/') && !path.endsWith('/manifest.json'),
+      )
+      const read = files.read.bind(files),
+        write = files.write.bind(files)
+      let count = 0
+      async function boundary<T>(operation: () => Promise<T>) {
+        const hit = count++ === cut
+        if (hit && side === 'before') throw new DOMException('cut', 'AbortError')
+        const result = await operation()
+        if (hit && side === 'after') throw new DOMException('cut', 'AbortError')
+        return result
+      }
+      files.read = (path) => boundary(() => read(path))
+      files.write = (path, text) => boundary(() => write(path, text))
+      await assert.rejects(run.advance(0.5), /cut/, `${operations[cut]}:${side}`)
+      files.read = read
+      files.write = write
+      const recovery = await (await openWorkspace(files)).recover(run.id)
+      assert.ok(recovery.record, `${operations[cut]}:${side}`)
+      assert.ok(recovery.diagnostics.confirmed_sim_time_s! >= 0.5)
+      assert.equal(run.progress().committed_sim_time_s, 0.5)
+      assert.equal(run.progress().status, 'paused')
+      assert.equal(recovery.diagnostics.unconfirmed_tail!.end_sim_time_s, null)
+      assert.deepEqual(
+        recovery.record.output.samples.slice(0, 51),
+        run.read().output.samples.slice(0, 51),
+      )
+      for (const [path, text] of immutable) assert.equal(files.data.get(path), text, path)
+    }
+  }
+})
+
+test('a corrupt new commit falls back to verified history and leaves unrelated experiments intact', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const healthy = await workspace.create(createConfig('standard', 'equilibrium'))
+  await healthy.start()
+  await healthy.advance(0.1)
+  await healthy.stop()
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.advance(0.5)
+  const old = await workspace.load(run.id)
+  await run.advance(0.5)
+  const newest = await workspace.load(run.id)
+  const latestSample = newest.manifest.batches.at(-1)!.files[0]!
+  files.data.set(`experiments/${run.id}/${latestSample.path}`, 'damaged')
+  const before = [...files.data]
+  const recovery = await workspace.recover(run.id)
+  assert.deepEqual(recovery.record!.output, old.output)
+  assert.equal(recovery.diagnostics.status, 'interrupted')
+  assert.ok(recovery.diagnostics.failures.some((f) => f.error.includes('完整性')))
+  assert.equal(recovery.diagnostics.unconfirmed_tail!.end_sim_time_s, null)
+  assert.equal((await workspace.recover(healthy.id)).diagnostics.status, 'sealed')
+  assert.deepEqual([...files.data], before)
+})
+
+test('a directory without a valid published prefix exports diagnostics and never adopts loose files', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const id = '11111111-1111-4111-8111-111111111111'
+  files.data.set(`experiments/${id}/samples/chunk-000001.csv`, 'unpublished')
+  files.data.set(`experiments/${id}/config.json`, '{}')
+  const before = [...files.data]
+  const recovery = await workspace.recover(id)
+  assert.equal(recovery.record, null)
+  assert.equal(recovery.diagnostics.status, 'unverifiable')
+  assert.equal(recovery.diagnostics.confirmed_sim_time_s, null)
+  assert.deepEqual(recovery.diagnostics.orphan_files.sort(), [
+    'config.json',
+    'samples/chunk-000001.csv',
+  ])
+  assert.deepEqual([...files.data], before)
+})
+
+test('invalid experiment identity is rejected before any filesystem read', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  files.read = async () => {
+    throw new Error('unexpected filesystem read')
+  }
+  await assert.rejects(workspace.load('../../private'), /非法实验标识/)
+})
+
+test('renamed old commit records cannot supersede a newer verified prefix', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.advance(0.5)
+  const prefix = `experiments/${run.id}/`
+  files.data.set(
+    prefix + 'confirmed/manifest-999999.json',
+    files.data.get(prefix + 'confirmed/manifest-000001.json')!,
+  )
+  const recovery = await workspace.recover(run.id)
+  assert.equal(recovery.diagnostics.confirmed_sim_time_s, 0.5)
+  assert.ok(recovery.diagnostics.failures.some((f) => f.path === 'confirmed/manifest-999999.json'))
+})
+
+test('global temporary files remain pending investigation with unknown experiment ownership', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.stop()
+  files.data.set('tmp/pending.json.crswap', 'partial temporary content')
+  const before = [...files.data]
+  const recovery = await workspace.recover(run.id)
+  assert.deepEqual(recovery.diagnostics.workspace_orphan_files.sort(), [
+    'tmp/pending.json',
+    'tmp/pending.json.crswap',
+  ])
+  assert.deepEqual([...files.data], before)
+  assert.equal(recovery.diagnostics.status, 'sealed')
+})
+
+test('an unreadable orphan directory cannot block verified history or diagnostic export', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.advance(0.1)
+  await run.stop()
+  const expected = await workspace.load(run.id)
+  const list = files.list.bind(files)
+  files.data.set(`experiments/${run.id}/diagnostics`, 'not a directory')
+  files.list = async (path) => {
+    if (path.endsWith('/diagnostics'))
+      throw new DOMException('not a directory', 'TypeMismatchError')
+    return list(path)
+  }
+  const before = [...files.data]
+  const recovery = await workspace.recover(run.id)
+  assert.deepEqual(recovery.record!.output, expected.output)
+  assert.equal(recovery.diagnostics.status, 'sealed')
+  assert.ok(recovery.diagnostics.scan_failures.some((f) => f.path === 'diagnostics'))
+  assert.ok(recovery.diagnostics.orphan_files.includes('diagnostics'))
+  assert.deepEqual([...files.data], before)
+})

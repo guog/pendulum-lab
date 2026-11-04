@@ -42,6 +42,14 @@ type Manifest = {
   snapshot: Entry
   result: Entry
 }
+function manifestEntries(manifest: Manifest): Entry[] {
+  return [
+    manifest.config,
+    manifest.snapshot,
+    manifest.result,
+    ...manifest.batches.flatMap((batch) => batch.files),
+  ]
+}
 // JSON property order does not change a stored value's meaning.
 function sameJSON(left: unknown, right: unknown): boolean {
   if (left === right) return true
@@ -182,10 +190,9 @@ export async function openWorkspace(files: WorkspaceFiles) {
     if (!names.includes('experiments')) return []
     return (await files.list('experiments')).filter((id) => /^[a-f0-9-]{36}$/.test(id))
   }
-  async function load(id: string) {
+  async function loadManifest(id: string, raw: string) {
     if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('非法实验标识')
     const prefix = `experiments/${id}/`
-    const raw = await files.read(prefix + 'manifest.json')
     if (bytes(raw) > maximumManifestBytes) throw new Error('清单过大')
     const m: Manifest = JSON.parse(raw)
     if (m.sample_schema_version !== 1) throw new Error('不支持的采样版本')
@@ -372,11 +379,128 @@ export async function openWorkspace(files: WorkspaceFiles) {
       integrity: m.sealed ? 'sealed-verified' : 'interrupted-confirmed-prefix',
     }
   }
+  async function load(id: string) {
+    if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('非法实验标识')
+    return loadManifest(id, await files.read(`experiments/${id}/manifest.json`))
+  }
+  async function recover(id: string) {
+    if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('非法实验标识')
+    const prefix = `experiments/${id}/`
+    const paths: string[] = []
+    const failures: { path: string; error: string }[] = []
+    const scanFailures: { path: string; error: string }[] = []
+    async function walk(path: string) {
+      let names: string[]
+      try {
+        names = await files.list(path ? prefix + path : prefix.slice(0, -1))
+      } catch (error) {
+        scanFailures.push({ path: path || '.', error: String(error) })
+        if (path) paths.push(path)
+        return
+      }
+      for (const name of names) {
+        if (!/^[a-zA-Z0-9_.-]+$/.test(name) || name === '.' || name === '..') continue
+        const next = path ? path + '/' + name : name
+        // The file API deliberately exposes names only; known record directories are bounded.
+        if (
+          ['samples', 'events', 'snapshots', 'results', 'confirmed', 'diagnostics'].includes(next)
+        )
+          await walk(next)
+        else paths.push(next)
+      }
+    }
+    await walk('')
+    const candidates = paths
+      .filter((path) => /^confirmed\/manifest-\d{6,}(?:-sealed)?\.json$/.test(path))
+      .sort((a, b) => {
+        const revision = (path: string) => Number(path.match(/manifest-(\d+)/)![1])
+        return (
+          revision(b) - revision(a) || Number(b.includes('-sealed')) - Number(a.includes('-sealed'))
+        )
+      })
+    candidates.push('manifest.json')
+    let record: Awaited<ReturnType<typeof load>> | null = null
+    let source: string | null = null
+    for (const path of candidates) {
+      try {
+        const candidate = await loadManifest(id, await files.read(prefix + path))
+        const m = candidate.manifest
+        if (
+          path.startsWith('confirmed/') &&
+          path !==
+            `confirmed/manifest-${String(m.revision).padStart(6, '0')}${m.sealed ? '-sealed' : ''}.json`
+        )
+          throw new Error('清单文件名与修订或封存状态不一致')
+        record = candidate
+        source = path
+        break
+      } catch (error) {
+        failures.push({ path, error: String(error) })
+      }
+    }
+    if (record && source !== 'manifest.json') {
+      try {
+        const mirror = JSON.parse(await files.read(prefix + 'manifest.json'))
+        if (!sameJSON(mirror, record.manifest)) throw new Error('便利清单与恢复权威清单不一致')
+      } catch (error) {
+        failures.push({ path: 'manifest.json', error: String(error) })
+      }
+    }
+    const referenced = new Set<string>(['manifest.json'])
+    if (record) {
+      const m = record.manifest
+      for (const entry of manifestEntries(m)) referenced.add(entry.path)
+    }
+    // Older commit records are history, not orphan data. Their referenced files remain protected.
+    for (const path of candidates.filter((p) => p.startsWith('confirmed/'))) {
+      referenced.add(path)
+      try {
+        const old = JSON.parse(await files.read(prefix + path)) as Manifest
+        if (old.schema_version !== 1 || old.experiment_id !== id) continue
+        for (const entry of manifestEntries(old))
+          if (entry && safePath(entry.path)) referenced.add(entry.path)
+      } catch {
+        /* A damaged commit is reported above if needed for recovery. */
+      }
+    }
+    const workspaceOrphans: string[] = []
+    try {
+      if ((await files.list('')).includes('tmp'))
+        for (const name of await files.list('tmp')) workspaceOrphans.push(`tmp/${name}`)
+    } catch (error) {
+      scanFailures.push({ path: 'workspace:tmp', error: String(error) })
+    }
+    const diagnostics = {
+      schema_version: 1,
+      experiment_id: id,
+      status: !record
+        ? 'unverifiable'
+        : record.manifest.sealed && !failures.length
+          ? 'sealed'
+          : 'interrupted',
+      confirmed_sim_time_s: record?.manifest.committed_sim_time_s ?? null,
+      confirmed_revision: record?.manifest.revision ?? null,
+      source,
+      failures,
+      scan_failures: scanFailures,
+      orphan_files: paths.filter((path) => !referenced.has(path)),
+      workspace_orphan_files: workspaceOrphans,
+      unconfirmed_tail:
+        record && (!record.manifest.sealed || failures.length)
+          ? { after_sim_time_s: record.manifest.committed_sim_time_s, end_sim_time_s: null }
+          : null,
+      formal_acceptance: 'not_eligible',
+      limitation:
+        '只查看已核验历史；未知尾部终点不推测，不补样本，不续跑。浏览器强退证据不证明断电耐久。',
+    }
+    return { record, diagnostics }
+  }
   return {
     id: identity.workspace_id as string,
     writable,
     experiments,
     load,
+    recover,
     async create(input: ExperimentConfig) {
       const config: ExperimentConfig = {
         ...structuredClone(input),
@@ -396,6 +520,16 @@ export async function openWorkspace(files: WorkspaceFiles) {
       let manifest: Manifest | undefined,
         saving = false,
         fault: string | null = null
+      let storageFault: {
+        name: string
+        message: string
+        sim_time_s: number
+        committed_sim_time_s: number
+        last_valid_state: SessionOutput['state']
+      } | null = null
+      function requireReady() {
+        if (saving || fault || manifest?.sealed) throw new Error('存储未就绪或实验已封存')
+      }
       let lastTime = 0,
         sampleCount = 0,
         eventCount = 0,
@@ -458,21 +592,33 @@ export async function openWorkspace(files: WorkspaceFiles) {
             result: entries[3]!,
           }
           if (bytes(json(next)) > maximumManifestBytes) throw new Error('清单过大')
+          // Immutable commit records are the recovery authority. A torn convenience manifest
+          // can never destroy an earlier acknowledged revision. No existing record is rewritten.
+          if (sealed) await loadManifest(id, json(next))
+          await publish(files, prefix + `confirmed/manifest-${suffix}.json`, json(next))
           await publish(files, prefix + 'manifest.json', json(next))
-          // Each referenced new file has been closed and verified; cross-check all history before sealing.
           if (sealed) {
-            await load(id)
             next.sealed = true
+            await loadManifest(id, json(next))
+            await publish(files, prefix + `confirmed/manifest-${suffix}-sealed.json`, json(next))
             await publish(files, prefix + 'manifest.json', json(next))
-            await load(id)
           }
           manifest = next
           lastTime = output.sim_time_s
           sampleCount = samples.length
           eventCount = events.length
           fault = null
+          storageFault = null
         } catch (error) {
           fault = String(error)
+          const output = session.read()
+          storageFault = {
+            name: error instanceof Error || error instanceof DOMException ? error.name : 'Error',
+            message: fault,
+            sim_time_s: output.sim_time_s,
+            committed_sim_time_s: lastTime,
+            last_valid_state: output.state,
+          }
           session.storageError(fault)
           throw error
         } finally {
@@ -485,9 +631,11 @@ export async function openWorkspace(files: WorkspaceFiles) {
         progress() {
           return {
             ...session.progress(),
+            experiment_id: id,
             committed_sim_time_s: lastTime,
             saving,
             fault,
+            storage_fault: structuredClone(storageFault),
             sealed: manifest?.sealed ?? false,
           }
         },
@@ -497,11 +645,12 @@ export async function openWorkspace(files: WorkspaceFiles) {
             committed_sim_time_s: lastTime,
             saving,
             fault,
+            storage_fault: structuredClone(storageFault),
             sealed: manifest?.sealed ?? false,
           }
         },
         async start() {
-          if (saving || fault) throw new Error('存储未就绪')
+          requireReady()
           session.start()
           await commit()
         },
@@ -510,7 +659,7 @@ export async function openWorkspace(files: WorkspaceFiles) {
           const steps = Math.round(seconds / dt)
           if (!Number.isSafeInteger(steps) || seconds < 0 || Math.abs(steps * dt - seconds) > 1e-12)
             throw new Error('非法推进时长')
-          if (saving || fault) throw new Error('存储未就绪')
+          requireReady()
           let remaining = steps
           while (remaining > 0 && session.progress().status === 'running') {
             const now = session.progress().sim_time_s
@@ -526,16 +675,16 @@ export async function openWorkspace(files: WorkspaceFiles) {
           }
         },
         async pause(reason: 'manual' | 'background' = 'manual') {
-          if (saving) throw new Error('正在提交，请等待')
+          requireReady()
           session.pause(reason)
           await commit()
         },
         resume() {
-          if (saving || fault) throw new Error('存储未就绪')
+          requireReady()
           session.resume()
         },
         async stop() {
-          if (saving) throw new Error('正在提交，请等待')
+          requireReady()
           session.stop()
           await commit(true)
         },

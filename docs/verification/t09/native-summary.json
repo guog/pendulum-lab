@@ -1,0 +1,95 @@
+[
+  {
+    "phase": "temp-before-close",
+    "status": "passed",
+    "id": "84ea1526-f7c5-4b7c-91f4-bb6b87e6a6a9",
+    "before": 0.5,
+    "recovery": {
+      "schema_version": 1,
+      "experiment_id": "84ea1526-f7c5-4b7c-91f4-bb6b87e6a6a9",
+      "status": "interrupted",
+      "confirmed_sim_time_s": 0.5,
+      "confirmed_revision": 3,
+      "source": "confirmed/manifest-000003.json",
+      "failures": [],
+      "orphan_files": [],
+      "unconfirmed_tail": {
+        "after_sim_time_s": 0.5,
+        "end_sim_time_s": null
+      },
+      "formal_acceptance": "not_eligible",
+      "limitation": "只查看已核验历史；未知尾部终点不推测，不补样本，不续跑。浏览器强退证据不证明断电耐久。"
+    },
+    "samples": 51
+  },
+  {
+    "phase": "manifest-before-close",
+    "status": "passed",
+    "id": "89e92937-0d2d-4c40-afb0-60543137b8ca",
+    "before": 0.5,
+    "recovery": {
+      "schema_version": 1,
+      "experiment_id": "89e92937-0d2d-4c40-afb0-60543137b8ca",
+      "status": "interrupted",
+      "confirmed_sim_time_s": 1,
+      "confirmed_revision": 4,
+      "source": "confirmed/manifest-000004.json",
+      "failures": [
+        {
+          "path": "manifest.json",
+          "error": "Error: 便利清单与恢复权威清单不一致"
+        }
+      ],
+      "orphan_files": ["manifest.json.crswap"],
+      "unconfirmed_tail": {
+        "after_sim_time_s": 1,
+        "end_sim_time_s": null
+      },
+      "formal_acceptance": "not_eligible",
+      "limitation": "只查看已核验历史；未知尾部终点不推测，不补样本，不续跑。浏览器强退证据不证明断电耐久。"
+    },
+    "samples": 101
+  },
+  {
+    "phase": "committed-before-readback",
+    "status": "passed",
+    "id": "d568b703-6e2c-4fe4-8d15-de875d1f39f3",
+    "before": 0.5,
+    "recovery": {
+      "schema_version": 1,
+      "experiment_id": "d568b703-6e2c-4fe4-8d15-de875d1f39f3",
+      "status": "interrupted",
+      "confirmed_sim_time_s": 1,
+      "confirmed_revision": 4,
+      "source": "confirmed/manifest-000004.json",
+      "failures": [
+        {
+          "path": "manifest.json",
+          "error": "Error: 便利清单与恢复权威清单不一致"
+        }
+      ],
+      "orphan_files": [],
+      "unconfirmed_tail": {
+        "after_sim_time_s": 1,
+        "end_sim_time_s": null
+      },
+      "formal_acceptance": "not_eligible",
+      "limitation": "只查看已核验历史；未知尾部终点不推测，不补样本，不续跑。浏览器强退证据不证明断电耐久。"
+    },
+    "samples": 101
+  },
+  {
+    "scenario": "capacity-after-fault",
+    "id": "9ed99cc7-0c0b-430e-a7b3-8397bc56eb4b",
+    "status": "interrupted",
+    "confirmed_sim_time_s": 2.5,
+    "samples": 251
+  },
+  {
+    "scenario": "capacity-after-retry",
+    "id": "9ed99cc7-0c0b-430e-a7b3-8397bc56eb4b",
+    "status": "sealed",
+    "confirmed_sim_time_s": 3,
+    "samples": 301
+  }
+]

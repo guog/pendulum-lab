@@ -33,7 +33,7 @@ function schedule() {
         await advancing
         report()
         if (run.progress().sealed)
-          context.postMessage({ type: 'history', record: await workspace!.load(run.id) })
+          context.postMessage({ type: 'history', recovery: await workspace!.recover(run.id) })
         else schedule()
       }),
     16,
@@ -75,14 +75,18 @@ context.onmessage = ({ data }) => {
       case 'stop':
         await run?.stop()
         report()
-        context.postMessage({ type: 'history', record: await workspace!.load(run!.id) })
+        context.postMessage({ type: 'history', recovery: await workspace!.recover(run!.id) })
         break
       case 'retry':
         await run?.retry()
         report()
         break
       case 'load':
-        context.postMessage({ type: 'history', record: await workspace!.load(data.id) })
+        context.postMessage({
+          type: 'history',
+          recovery: await workspace!.recover(data.id),
+          live_fault: run?.id === data.id && run.progress().fault ? run.read() : undefined,
+        })
         break
     }
     if (workspace) context.postMessage({ type: 'list', experiments: await workspace.experiments() })
