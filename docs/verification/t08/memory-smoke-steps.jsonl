@@ -1,0 +1,178 @@
+{"phase":"start","args":["--executable-path","/Applications/Google Chrome.app/Contents/MacOS/Google Chrome","open","http://localhost:4173/"],"time":"2026-11-04T02:20:33.197Z"}
+{"phase":"finish","args":["--executable-path","/Applications/Google Chrome.app/Contents/MacOS/Google Chrome","open","http://localhost:4173/"],"status":0,"stdout":"✓ 一阶倒立摆实验台 · Pendulum Lab\n  http://localhost:4173/\n","stderr":"","elapsed_ms":791}
+{"phase":"start","args":["set","viewport","1440","1000"],"time":"2026-11-04T02:20:33.988Z"}
+{"phase":"finish","args":["set","viewport","1440","1000"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":53}
+{"phase":"start","args":["wait","--text","准备就绪"],"time":"2026-11-04T02:20:34.042Z"}
+{"phase":"finish","args":["wait","--text","准备就绪"],"status":0,"stdout":"准备就绪\n","stderr":"","elapsed_ms":50}
+{"phase":"start","args":["get","title"],"time":"2026-11-04T02:20:34.092Z"}
+{"phase":"finish","args":["get","title"],"status":0,"stdout":"一阶倒立摆实验台 · Pendulum Lab\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["focus","#preset"],"time":"2026-11-04T02:20:34.137Z"}
+{"phase":"finish","args":["focus","#preset"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["screenshot","/tmp/pendulum-13-memory-smoke-final/desktop-ready.png"],"time":"2026-11-04T02:20:34.183Z"}
+{"phase":"finish","args":["screenshot","/tmp/pendulum-13-memory-smoke-final/desktop-ready.png"],"status":0,"stdout":"✓ Screenshot saved to /tmp/pendulum-13-memory-smoke-final/desktop-ready.png\n","stderr":"","elapsed_ms":109}
+{"phase":"start","args":["scrollintoview","#start"],"time":"2026-11-04T02:20:34.292Z"}
+{"phase":"finish","args":["scrollintoview","#start"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["find","role","button","click","--name","开始基准","--exact"],"time":"2026-11-04T02:20:34.336Z"}
+{"phase":"finish","args":["find","role","button","click","--name","开始基准","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":64}
+{"phase":"start","args":["wait","--text","运行中"],"time":"2026-11-04T02:20:34.400Z"}
+{"phase":"finish","args":["wait","--text","运行中"],"status":0,"stdout":"运行中\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["scrollintoview","#pause"],"time":"2026-11-04T02:20:34.447Z"}
+{"phase":"finish","args":["scrollintoview","#pause"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":42}
+{"phase":"start","args":["find","role","button","click","--name","暂停","--exact"],"time":"2026-11-04T02:20:34.490Z"}
+{"phase":"finish","args":["find","role","button","click","--name","暂停","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":60}
+{"phase":"start","args":["wait","--text","已暂停"],"time":"2026-11-04T02:20:34.550Z"}
+{"phase":"finish","args":["wait","--text","已暂停"],"status":0,"stdout":"已暂停\n","stderr":"","elapsed_ms":50}
+{"phase":"start","args":["get","text","#time"],"time":"2026-11-04T02:20:34.600Z"}
+{"phase":"finish","args":["get","text","#time"],"status":0,"stdout":"0.096\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["wait","200"],"time":"2026-11-04T02:20:34.645Z"}
+{"phase":"finish","args":["wait","200"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":248}
+{"phase":"start","args":["get","text","#time"],"time":"2026-11-04T02:20:34.893Z"}
+{"phase":"finish","args":["get","text","#time"],"status":0,"stdout":"0.096\n","stderr":"","elapsed_ms":49}
+{"phase":"start","args":["scrollintoview","#pause"],"time":"2026-11-04T02:20:34.942Z"}
+{"phase":"finish","args":["scrollintoview","#pause"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["find","role","button","click","--name","继续","--exact"],"time":"2026-11-04T02:20:34.988Z"}
+{"phase":"finish","args":["find","role","button","click","--name","继续","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":63}
+{"phase":"start","args":["wait","--text","运行中"],"time":"2026-11-04T02:20:35.051Z"}
+{"phase":"finish","args":["wait","--text","运行中"],"status":0,"stdout":"运行中\n","stderr":"","elapsed_ms":49}
+{"phase":"start","args":["tab","list","--json"],"time":"2026-11-04T02:20:35.101Z"}
+{"phase":"finish","args":["tab","list","--json"],"status":0,"stdout":"{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":9467515241851479685},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"tabs\":[{\"active\":true,\"label\":null,\"tabId\":\"t1\",\"targetId\":\"E64AF3BA603D9F08E2479671E621AB59\",\"title\":\"localhost:4173\",\"type\":\"page\",\"url\":\"http://localhost:4173/\"}]},\"error\":null}\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["tab","new","about:blank"],"time":"2026-11-04T02:20:35.146Z"}
+{"phase":"finish","args":["tab","new","about:blank"],"status":0,"stdout":"about:blank\n","stderr":"","elapsed_ms":87}
+{"phase":"start","args":["tab","t1"],"time":"2026-11-04T02:20:35.233Z"}
+{"phase":"finish","args":["tab","t1"],"status":0,"stdout":"✓ 一阶倒立摆实验台 · Pendulum Lab\n  http://localhost:4173/\n","stderr":"","elapsed_ms":76}
+{"phase":"start","args":["wait","--text","已暂停"],"time":"2026-11-04T02:20:35.309Z"}
+{"phase":"finish","args":["wait","--text","已暂停"],"status":0,"stdout":"已暂停\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["get","text","#time"],"time":"2026-11-04T02:20:35.354Z"}
+{"phase":"finish","args":["get","text","#time"],"status":0,"stdout":"0.208\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["wait","200"],"time":"2026-11-04T02:20:35.397Z"}
+{"phase":"finish","args":["wait","200"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":248}
+{"phase":"start","args":["get","text","#time"],"time":"2026-11-04T02:20:35.645Z"}
+{"phase":"finish","args":["get","text","#time"],"status":0,"stdout":"0.208\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["scrollintoview","#pause"],"time":"2026-11-04T02:20:35.690Z"}
+{"phase":"finish","args":["scrollintoview","#pause"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["find","role","button","click","--name","继续","--exact"],"time":"2026-11-04T02:20:35.735Z"}
+{"phase":"finish","args":["find","role","button","click","--name","继续","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":59}
+{"phase":"start","args":["scrollintoview","#stop"],"time":"2026-11-04T02:20:35.794Z"}
+{"phase":"finish","args":["scrollintoview","#stop"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["find","role","button","click","--name","终止","--exact"],"time":"2026-11-04T02:20:35.841Z"}
+{"phase":"finish","args":["find","role","button","click","--name","终止","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":58}
+{"phase":"start","args":["wait","--text","已终止"],"time":"2026-11-04T02:20:35.899Z"}
+{"phase":"finish","args":["wait","--text","已终止"],"status":0,"stdout":"已终止\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["screenshot","--full","/tmp/pendulum-13-memory-smoke-final/desktop-stopped.png"],"time":"2026-11-04T02:20:35.943Z"}
+{"phase":"finish","args":["screenshot","--full","/tmp/pendulum-13-memory-smoke-final/desktop-stopped.png"],"status":0,"stdout":"✓ Screenshot saved to /tmp/pendulum-13-memory-smoke-final/desktop-stopped.png\n","stderr":"","elapsed_ms":214}
+{"phase":"start","args":["eval","document.querySelector('details.download-options').open","--json"],"time":"2026-11-04T02:20:36.157Z"}
+{"phase":"finish","args":["eval","document.querySelector('details.download-options').open","--json"],"status":0,"stdout":"{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":9467515241851479685},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"http://localhost:4173/\",\"result\":false},\"error\":null}\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["scrollintoview","details.download-options"],"time":"2026-11-04T02:20:36.201Z"}
+{"phase":"finish","args":["scrollintoview","details.download-options"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["find","text","下载副本与文件校验","click","--exact"],"time":"2026-11-04T02:20:36.245Z"}
+{"phase":"finish","args":["find","text","下载副本与文件校验","click","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":69}
+{"phase":"start","args":["scrollintoview","#prepare-download"],"time":"2026-11-04T02:20:36.314Z"}
+{"phase":"finish","args":["scrollintoview","#prepare-download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["find","role","button","click","--name","生成下载副本","--exact"],"time":"2026-11-04T02:20:36.358Z"}
+{"phase":"finish","args":["find","role","button","click","--name","生成下载副本","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":61}
+{"phase":"start","args":["wait","#download"],"time":"2026-11-04T02:20:36.419Z"}
+{"phase":"finish","args":["wait","#download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["get","text","#record-state"],"time":"2026-11-04T02:20:36.465Z"}
+{"phase":"finish","args":["get","text","#record-state"],"status":0,"stdout":"当前记录尚未确认导出\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["scrollintoview","#download"],"time":"2026-11-04T02:20:36.509Z"}
+{"phase":"finish","args":["scrollintoview","#download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["download","#download","/tmp/pendulum-13-memory-smoke-final/release-evidence.json"],"time":"2026-11-04T02:20:36.552Z"}
+{"phase":"finish","args":["download","#download","/tmp/pendulum-13-memory-smoke-final/release-evidence.json"],"status":0,"stdout":"✓ Download saved to /private/tmp/pendulum-13-memory-smoke-final/release-evidence.json\n","stderr":"","elapsed_ms":165}
+{"phase":"start","args":["get","text","#record-state"],"time":"2026-11-04T02:20:36.740Z"}
+{"phase":"finish","args":["get","text","#record-state"],"status":0,"stdout":"当前记录尚未确认导出\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["upload","#verify-file","/tmp/pendulum-13-memory-smoke-final/wrong-release-evidence.json"],"time":"2026-11-04T02:20:36.785Z"}
+{"phase":"finish","args":["upload","#verify-file","/tmp/pendulum-13-memory-smoke-final/wrong-release-evidence.json"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":53}
+{"phase":"start","args":["wait","--text","文件与当前证据包不一致"],"time":"2026-11-04T02:20:36.838Z"}
+{"phase":"finish","args":["wait","--text","文件与当前证据包不一致"],"status":0,"stdout":"文件与当前证据包不一致\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["get","text","#record-state"],"time":"2026-11-04T02:20:36.883Z"}
+{"phase":"finish","args":["get","text","#record-state"],"status":0,"stdout":"当前记录尚未确认导出\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["upload","#verify-file","/tmp/pendulum-13-memory-smoke-final/release-evidence.json"],"time":"2026-11-04T02:20:36.927Z"}
+{"phase":"finish","args":["upload","#verify-file","/tmp/pendulum-13-memory-smoke-final/release-evidence.json"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":48}
+{"phase":"start","args":["wait","--text","当前证据已导出并校验"],"time":"2026-11-04T02:20:36.975Z"}
+{"phase":"finish","args":["wait","--text","当前证据已导出并校验"],"status":0,"stdout":"当前证据已导出并校验\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["scrollintoview","#reset"],"time":"2026-11-04T02:20:37.020Z"}
+{"phase":"finish","args":["scrollintoview","#reset"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["find","role","button","click","--name","重置","--exact"],"time":"2026-11-04T02:20:37.066Z"}
+{"phase":"finish","args":["find","role","button","click","--name","重置","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":60}
+{"phase":"start","args":["wait","--text","准备就绪"],"time":"2026-11-04T02:20:37.126Z"}
+{"phase":"finish","args":["wait","--text","准备就绪"],"status":0,"stdout":"准备就绪\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["get","text","#time"],"time":"2026-11-04T02:20:37.170Z"}
+{"phase":"finish","args":["get","text","#time"],"status":0,"stdout":"0.000\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["get","text","#sample-count"],"time":"2026-11-04T02:20:37.213Z"}
+{"phase":"finish","args":["get","text","#sample-count"],"status":0,"stdout":"0\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["select","#preset","simple"],"time":"2026-11-04T02:20:37.258Z"}
+{"phase":"finish","args":["select","#preset","simple"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["select","#benchmark","equilibrium"],"time":"2026-11-04T02:20:37.303Z"}
+{"phase":"finish","args":["select","#benchmark","equilibrium"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["wait","--text","静止下垂"],"time":"2026-11-04T02:20:37.349Z"}
+{"phase":"finish","args":["wait","--text","静止下垂"],"status":0,"stdout":"静止下垂\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["scrollintoview","#start"],"time":"2026-11-04T02:20:37.393Z"}
+{"phase":"finish","args":["scrollintoview","#start"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":42}
+{"phase":"start","args":["find","role","button","click","--name","开始基准","--exact"],"time":"2026-11-04T02:20:37.435Z"}
+{"phase":"finish","args":["find","role","button","click","--name","开始基准","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":65}
+{"phase":"start","args":["wait","--text","基准已结束"],"time":"2026-11-04T02:20:37.500Z"}
+{"phase":"finish","args":["wait","--text","基准已结束"],"status":0,"stdout":"基准已结束\n","stderr":"","elapsed_ms":16052}
+{"phase":"start","args":["get","text","#time"],"time":"2026-11-04T02:20:53.553Z"}
+{"phase":"finish","args":["get","text","#time"],"status":0,"stdout":"10.000\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["get","text","#sample-count"],"time":"2026-11-04T02:20:53.597Z"}
+{"phase":"finish","args":["get","text","#sample-count"],"status":0,"stdout":"1001\n","stderr":"","elapsed_ms":65}
+{"phase":"start","args":["eval","document.querySelector('details.download-options').open","--json"],"time":"2026-11-04T02:20:53.662Z"}
+{"phase":"finish","args":["eval","document.querySelector('details.download-options').open","--json"],"status":0,"stdout":"{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":9467515241851479685},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"http://localhost:4173/\",\"result\":true},\"error\":null}\n","stderr":"","elapsed_ms":47}
+{"phase":"start","args":["scrollintoview","#prepare-download"],"time":"2026-11-04T02:20:53.709Z"}
+{"phase":"finish","args":["scrollintoview","#prepare-download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["find","role","button","click","--name","生成下载副本","--exact"],"time":"2026-11-04T02:20:53.753Z"}
+{"phase":"finish","args":["find","role","button","click","--name","生成下载副本","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":59}
+{"phase":"start","args":["wait","#download"],"time":"2026-11-04T02:20:53.812Z"}
+{"phase":"finish","args":["wait","#download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["get","text","#record-state"],"time":"2026-11-04T02:20:53.857Z"}
+{"phase":"finish","args":["get","text","#record-state"],"status":0,"stdout":"当前记录尚未确认导出\n","stderr":"","elapsed_ms":47}
+{"phase":"start","args":["scrollintoview","#download"],"time":"2026-11-04T02:20:53.904Z"}
+{"phase":"finish","args":["scrollintoview","#download"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":42}
+{"phase":"start","args":["download","#download","/tmp/pendulum-13-memory-smoke-final/equilibrium-evidence.json"],"time":"2026-11-04T02:20:53.946Z"}
+{"phase":"finish","args":["download","#download","/tmp/pendulum-13-memory-smoke-final/equilibrium-evidence.json"],"status":0,"stdout":"✓ Download saved to /private/tmp/pendulum-13-memory-smoke-final/equilibrium-evidence.json\n","stderr":"","elapsed_ms":55}
+{"phase":"start","args":["get","text","#record-state"],"time":"2026-11-04T02:20:54.027Z"}
+{"phase":"finish","args":["get","text","#record-state"],"status":0,"stdout":"当前记录尚未确认导出\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["upload","#verify-file","/tmp/pendulum-13-memory-smoke-final/wrong-equilibrium-evidence.json"],"time":"2026-11-04T02:20:54.073Z"}
+{"phase":"finish","args":["upload","#verify-file","/tmp/pendulum-13-memory-smoke-final/wrong-equilibrium-evidence.json"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":48}
+{"phase":"start","args":["wait","--text","文件与当前证据包不一致"],"time":"2026-11-04T02:20:54.121Z"}
+{"phase":"finish","args":["wait","--text","文件与当前证据包不一致"],"status":0,"stdout":"文件与当前证据包不一致\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["get","text","#record-state"],"time":"2026-11-04T02:20:54.164Z"}
+{"phase":"finish","args":["get","text","#record-state"],"status":0,"stdout":"当前记录尚未确认导出\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["upload","#verify-file","/tmp/pendulum-13-memory-smoke-final/equilibrium-evidence.json"],"time":"2026-11-04T02:20:54.208Z"}
+{"phase":"finish","args":["upload","#verify-file","/tmp/pendulum-13-memory-smoke-final/equilibrium-evidence.json"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["wait","--text","当前证据已导出并校验"],"time":"2026-11-04T02:20:54.253Z"}
+{"phase":"finish","args":["wait","--text","当前证据已导出并校验"],"status":0,"stdout":"当前证据已导出并校验\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["a11y","--json"],"time":"2026-11-04T02:20:54.301Z"}
+{"phase":"finish","args":["a11y","--json"],"status":0,"stdout":"{\"success\":true,\"data\":{\"axeVersion\":\"4.12.1\",\"counts\":{\"inapplicable\":45,\"incomplete\":1,\"passes\":44,\"violations\":0},\"incomplete\":[{\"help\":\"Elements must meet minimum color contrast ratio thresholds\",\"helpUrl\":\"https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI\",\"id\":\"color-contrast\",\"impact\":\"serious\",\"nodeCount\":7,\"nodes\":[{\"failureSummary\":\"Fix any of the following:\\n  Element's background color could not be determined because element contains an image node\",\"html\":\"<text x=\\\"50\\\" y=\\\"189.5\\\" text-anchor=\\\"middle\\\" fill=\\\"#52645f\\\" font-size=\\\"10\\\">-1.5 m</text>\",\"target\":[\"text[x=\\\"50\\\"]\"]},{\"failureSummary\":\"Fix any of the following:\\n  Element's background color could not be determined because element contains an image node\",\"html\":\"<text x=\\\"213.33333333333331\\\" y=\\\"189.5\\\" text-anchor=\\\"middle\\\" fill=\\\"#52645f\\\" font-size=\\\"10\\\">-1 m</text>\",\"target\":[\"text[x=\\\"213.33333333333331\\\"]\"]},{\"failureSummary\":\"Fix any of the following:\\n  Element's background color could not be determined because element contains an image node\",\"html\":\"<text x=\\\"376.66666666666663\\\" y=\\\"189.5\\\" text-anchor=\\\"middle\\\" fill=\\\"#52645f\\\" font-size=\\\"10\\\">-0.5 m</text>\",\"target\":[\"text[x=\\\"376.66666666666663\\\"]\"]},{\"failureSummary\":\"Fix any of the following:\\n  Element's background color could not be determined because element contains an image node\",\"html\":\"<text x=\\\"540\\\" y=\\\"189.5\\\" text-anchor=\\\"middle\\\" fill=\\\"#52645f\\\" font-size=\\\"10\\\">0 m</text>\",\"target\":[\"text[x=\\\"540\\\"]\"]},{\"failureSummary\":\"Fix any of the following:\\n  Element's background color could not be determined because element contains an image node\",\"html\":\"<text x=\\\"703.3333333333334\\\" y=\\\"189.5\\\" text-anchor=\\\"middle\\\" fill=\\\"#52645f\\\" font-size=\\\"10\\\">0.5 m</text>\",\"target\":[\"text[x=\\\"703.3333333333334\\\"]\"]},{\"failureSummary\":\"Fix any of the following:\\n  Element's background color could not be determined because element contains an image node\",\"html\":\"<text x=\\\"866.6666666666667\\\" y=\\\"189.5\\\" text-anchor=\\\"middle\\\" fill=\\\"#52645f\\\" font-size=\\\"10\\\">1 m</text>\",\"target\":[\"text[x=\\\"866.6666666666667\\\"]\"]},{\"failureSummary\":\"Fix any of the following:\\n  Element's background color could not be determined because element contains an image node\",\"html\":\"<text x=\\\"1030\\\" y=\\\"189.5\\\" text-anchor=\\\"middle\\\" fill=\\\"#52645f\\\" font-size=\\\"10\\\">1.5 m</text>\",\"target\":[\"text[x=\\\"1030\\\"]\"]}],\"tags\":[\"cat.color\",\"wcag2aa\",\"wcag143\",\"TTv5\",\"TT13.c\",\"EN-301-549\",\"EN-9.1.4.3\",\"ACT\",\"RGAAv4\",\"RGAA-3.2.1\"]}],\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":9467515241851479685},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"url\":\"http://localhost:4173/\",\"violations\":[]},\"error\":null}\n","stderr":"","elapsed_ms":396}
+{"phase":"start","args":["screenshot","--full","/tmp/pendulum-13-memory-smoke-final/desktop-completed.png"],"time":"2026-11-04T02:20:54.697Z"}
+{"phase":"finish","args":["screenshot","--full","/tmp/pendulum-13-memory-smoke-final/desktop-completed.png"],"status":0,"stdout":"✓ Screenshot saved to /tmp/pendulum-13-memory-smoke-final/desktop-completed.png\n","stderr":"","elapsed_ms":173}
+{"phase":"start","args":["set","viewport","1100","900"],"time":"2026-11-04T02:20:54.870Z"}
+{"phase":"finish","args":["set","viewport","1100","900"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":53}
+{"phase":"start","args":["screenshot","--full","/tmp/pendulum-13-memory-smoke-final/desktop-1100.png"],"time":"2026-11-04T02:20:54.923Z"}
+{"phase":"finish","args":["screenshot","--full","/tmp/pendulum-13-memory-smoke-final/desktop-1100.png"],"status":0,"stdout":"✓ Screenshot saved to /tmp/pendulum-13-memory-smoke-final/desktop-1100.png\n","stderr":"","elapsed_ms":157}
+{"phase":"start","args":["eval","JSON.stringify({width:innerWidth,scroll:document.documentElement.scrollWidth})","--json"],"time":"2026-11-04T02:20:55.081Z"}
+{"phase":"finish","args":["eval","JSON.stringify({width:innerWidth,scroll:document.documentElement.scrollWidth})","--json"],"status":0,"stdout":"{\"success\":true,\"data\":{\"lifecycle\":{\"effectiveLaunch\":{\"browserLaunched\":true,\"engine\":\"chrome\",\"launchHash\":9467515241851479685},\"launched\":false,\"relaunchedBrowser\":false,\"restartedBackground\":false,\"restoreStatus\":\"not_configured\",\"reused\":true,\"saveStatus\":\"not_attempted\"},\"origin\":\"http://localhost:4173/\",\"result\":\"{\\\"width\\\":1100,\\\"scroll\\\":1100}\"},\"error\":null}\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["scrollintoview","#reset"],"time":"2026-11-04T02:20:55.126Z"}
+{"phase":"finish","args":["scrollintoview","#reset"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["find","role","button","click","--name","重置","--exact"],"time":"2026-11-04T02:20:55.170Z"}
+{"phase":"finish","args":["find","role","button","click","--name","重置","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":63}
+{"phase":"start","args":["wait","--text","准备就绪"],"time":"2026-11-04T02:20:55.233Z"}
+{"phase":"finish","args":["wait","--text","准备就绪"],"status":0,"stdout":"准备就绪\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["eval","document.querySelector('#start').click(); Object.defineProperty(document, 'hidden', {configurable:true, get:()=>true}); document.dispatchEvent(new Event('visibilitychange'))"],"time":"2026-11-04T02:20:55.277Z"}
+{"phase":"finish","args":["eval","document.querySelector('#start').click(); Object.defineProperty(document, 'hidden', {configurable:true, get:()=>true}); document.dispatchEvent(new Event('visibilitychange'))"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":46}
+{"phase":"start","args":["wait","--text","已暂停"],"time":"2026-11-04T02:20:55.323Z"}
+{"phase":"finish","args":["wait","--text","已暂停"],"status":0,"stdout":"已暂停\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["get","text","#time"],"time":"2026-11-04T02:20:55.366Z"}
+{"phase":"finish","args":["get","text","#time"],"status":0,"stdout":"0.000\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["wait","200"],"time":"2026-11-04T02:20:55.411Z"}
+{"phase":"finish","args":["wait","200"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":245}
+{"phase":"start","args":["get","text","#time"],"time":"2026-11-04T02:20:55.657Z"}
+{"phase":"finish","args":["get","text","#time"],"status":0,"stdout":"0.000\n","stderr":"","elapsed_ms":51}
+{"phase":"start","args":["eval","delete document.hidden; document.dispatchEvent(new Event('visibilitychange'))"],"time":"2026-11-04T02:20:55.708Z"}
+{"phase":"finish","args":["eval","delete document.hidden; document.dispatchEvent(new Event('visibilitychange'))"],"status":0,"stdout":"true\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["get","text","#status"],"time":"2026-11-04T02:20:55.753Z"}
+{"phase":"finish","args":["get","text","#status"],"status":0,"stdout":"已暂停\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["get","text","#time"],"time":"2026-11-04T02:20:55.798Z"}
+{"phase":"finish","args":["get","text","#time"],"status":0,"stdout":"0.000\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["close"],"time":"2026-11-04T02:20:55.843Z"}
+{"phase":"finish","args":["close"],"status":0,"stdout":"✓ Browser closed\n","stderr":"","elapsed_ms":165}

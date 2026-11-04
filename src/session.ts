@@ -650,7 +650,7 @@ function createSessionInternal(
         } else if (tick % sampleSteps === 0) sample()
       }
     },
-    pause(reason: 'manual' | 'background' = 'manual') {
+    pause(reason: 'manual' | 'background' | 'storage' = 'manual') {
       if (status !== 'running') return
       status = 'paused'
       event('pause', { reason })
@@ -700,9 +700,32 @@ function createSessionInternal(
       experiment_id = crypto.randomUUID()
       created_at_utc = new Date().toISOString()
     },
+    storageError(message: string) {
+      event('storage_error', { message })
+      this.pause('storage')
+    },
+    progress() {
+      return {
+        status,
+        sim_time_s: time(),
+        sample_count: samples.length,
+        event_count: events.length,
+      }
+    },
     read() {
       return structuredClone({
         config,
+        integration_snapshot: {
+          physics_tick: tick,
+          control_phase_steps: tick % controlSteps,
+          sample_phase_steps: tick % sampleSteps,
+          forces,
+          initial_energy: initialEnergy,
+          dissipated_J: dissipated,
+          actuator_work_J: actuatorWork,
+          external_force_work_J: forceWork,
+          external_torque_work_J: torqueWork,
+        },
         disturbance: fork
           ? {
               status: forkResult,

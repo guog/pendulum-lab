@@ -6,6 +6,11 @@ import {
 } from './actuator-benchmarks.ts'
 import reference from './actuation-reference.json' with { type: 'json' }
 
+export const actuationAssessmentFormat = {
+  version: 'actuation-assessment-2',
+  requirement: 'P0-PHY-02/05',
+} as const
+
 export function assessActuation(output: SessionOutput) {
   const { config, samples, state, events } = output
   const id = config.benchmark
@@ -15,8 +20,7 @@ export function assessActuation(output: SessionOutput) {
     status: 'not_executed' | 'invalid' | 'blocked' | 'passed' | 'failed',
     reason: string,
   ) => ({
-    version: 'actuation-assessment-2',
-    requirement: 'P0-PHY-02/05',
+    ...actuationAssessmentFormat,
     status,
     reason,
     metrics,

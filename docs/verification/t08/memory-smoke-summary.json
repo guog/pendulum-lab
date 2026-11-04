@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "scenario": "T01 real Chrome + macOS + localhost",
+  "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "chrome_version": "Google Chrome 156.0.8078.80",
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "build_identity": {
+    "source_revision": "9a48276e3543657e4d6031db94ee43e1bdaa500a",
+    "source_sha256": "59be7a49555eaf0637dcc6adefa3b89bd798ab784a8958533910126b65aafa53",
+    "source_dirty": true
+  },
+  "release_experiment_id": "ab91d0fe-eb9d-468d-b88a-123fdd7c6fc5",
+  "equilibrium_experiment_id": "06903ce9-06cf-414f-ac7b-4281ddd2f881",
+  "equilibrium_samples": 1001,
+  "controlled_start_before_ack_visibility_regression": "passed",
+  "artifacts": "/tmp/pendulum-13-memory-smoke-final"
+}

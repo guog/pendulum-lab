@@ -1,0 +1,200 @@
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 check
+> npm run format:check && npm run lint:docs && npm run typecheck && npm test && npm run build
+
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 lint:docs
+> markdownlint-cli2
+
+markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)
+Finding: *.md docs/agents/**/*.md .github/**/*.md !.agents/** !docs/origin/** !node_modules/**
+Linting: 13 files
+Summary: 0 issues in 0 files
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 typecheck
+> tsc --noEmit
+
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 test
+> node --test scripts/*.test.mjs tests/*.test.ts
+
+✔ accepts AI disclosure (3.0955ms)
+✔ accepts human disclosure (0.401083ms)
+✔ accepts automation disclosure (0.389625ms)
+✔ rejects missing declaration (0.295875ms)
+✔ rejects agent missing (0.275166ms)
+✔ rejects conflicting declarations (0.295ms)
+✔ rejects duplicate declarations (0.23825ms)
+✔ rejects fenced example (0.718542ms)
+✔ rejects nonfinal example (0.330334ms)
+✔ rejects unnamed automation (16.36175ms)
+✔ rejects misleading human declaration (0.284209ms)
+✔ rejects cross-paragraph backtick fence (0.366833ms)
+✔ rejects cross-paragraph tilde fence (1.867209ms)
+✔ rejects cross-paragraph HTML comment (3.101833ms)
+✔ accepts footer after closed code fences and comments (0.481083ms)
+✔ accepts visible footer after inline comment marker (0.487208ms)
+✔ accepts visible footer after indented code comment marker (0.455041ms)
+✔ accepts visible footer after multiline code span (0.362209ms)
+✔ rejects quoted disclosure (0.403917ms)
+✔ rejects indented disclosure (0.177459ms)
+✔ rejects hidden closed comment (0.249583ms)
+✔ PR preflight: current passing run (408.230916ms)
+✔ PR preflight: failed latest run (229.160375ms)
+✔ PR preflight: run predates edit (172.200042ms)
+✔ PR preflight rejects a new run started during verification (336.692166ms)
+✔ manifest verification detects tampering and missing data (1.186875ms)
+✔ state wait checks selected preset and case and enabled start (0.137291ms)
+✔ 观察窗口终点先结束外扰及请求力，再记录唯一终点样本和完整分类做功 (38.515792ms)
+✔ 正反向跨入速度上限时按解析切换时刻分段，无自致超速或虚假做功 (6.920667ms)
+✔ 限速切换前后触边都保留真实部分步轨迹与做功，同刻边界阻止后续命令 (4.892167ms)
+✔ 切断驱动后外力仍造成真实超速，不能以限速切换截断状态或恢复资格 (0.323167ms)
+✔ 恒功率驱动跨入速度上限时分段做功，驱动力与绝对功率约束仍同时有效 (3.723708ms)
+✔ 零速受限请求推动水平杆，执行器与水平外力分别做功并满足独立匀加速解 (17.71575ms)
+✔ 正反向驱动和制动每步限制绝对机械功率，达到速度上限只允许制动 (3.863375ms)
+✔ 外力造成超速保留连续状态、记录违规起止持续时间并永久取消正式资格 (2.262917ms)
+✔ 初始或同刻触边优先于输入，终止样本保留入射力与部分步分类做功 (0.670042ms)
+✔ 外扰脉冲左闭右开，同刻先结束再开始，采样使用新输入且暂停不消费命令 (1.958208ms)
+✔ 非法命令时刻、未知字段与非有限输入拒绝，已创建会话的输入和重置记录相互隔离 (0.824375ms)
+✔ 关节力矩与混合做功符合独立DOP853动量参考，两个工况的分类账本分别核验 (11.893166ms)
+✔ 全部冻结受力场景分别导出独立结论，提前终止或修改输入不会获得通过 (183.9625ms)
+✔ 无效基准保留完整窗口误差不可评估和冻结阈值，不将异常诊断冒充物理通过 (2692.858875ms)
+✔ 异步导出冻结整批原始记录与结果，后续继续推进不改写导出快照 (95.753542ms)
+✔ 终止只使已经开始的当前基准无效，尚未创建的项目保持未执行 (174.719458ms)
+✔ 基准暂停证据区分人工与后台原因，默认公开暂停为人工操作 (59.288208ms)
+✔ 冻结基准通过同一实验会话保持两个精确平衡点，输出完整输入及独立误差 (2770.925417ms)
+✔ 10秒逐点收敛及30秒逐物理步能量漂移使用冻结容差，数值失败保留原输入和最后有效状态 (3932.798959ms)
+✔ 三种已批准阻力分别及共同耗散，保存tanh平滑与能量账本 (1688.022292ms)
+✔ 自然运动、多圈及配重基准用独立动量参考核对四状态和全部质量的能量 (1682.24775ms)
+✔ 真实构建清单识别未暂存及已暂存的源码删除，恢复后身份回到干净版本 (3202.772541ms)
+✔ 没有已确认的合格快照时不能分叉扰动实验 (6.283542ms)
+✔ 两种扰动从同一真实快照分叉并各自记录输入 (609.066042ms)
+✔ 脉冲在精确的左闭右开区间内生效并保留恢复相位 (247.258042ms)
+✔ 标准工况使用各自幅值，控制异常不得报告成功 (139.509292ms)
+✔ 耐久失败后，真实快照仍可用于独立扰动 (101.918916ms)
+✔ 力矩扰动在截止时不足连续五秒则失败，保留完整窗口 (166.17575ms)
+✔ 扰动推进可在检查点暂停并恢复，不在等待期间继续计算 (696.418792ms)
+✔ 合成扰动仅用于诊断，全程稳定被识别但不能获得物理验证资格 (132.066ms)
+✔ 恢复恰好在截止、提前一步和延后一步分别得到正确分类 (314.727167ms)
+✔ 采样间两次短暂越界都留事件，第二次越界重新开始五秒恢复 (105.738542ms)
+✔ 扰动截止时超速或触边优先于成功，违规与未恢复区分 (204.713125ms)
+✔ 真实分叉只保留源控制输出与相位，并从源采样时钟的下个边界继续 (169.72ms)
+✔ 合成分叉不能从真实会话伪造，且不接受快照前或无效轨迹 (50.785042ms)
+✔ 扰动后台暂停及继续作为同一仿真时刻的关键事件保留 (596.28725ms)
+✔ 合成扰动发生数值异常时标记异常并保留最后有效状态 (50.361083ms)
+✔ 脉冲期间超速、触边或数值异常记录实际终止而非计划终点 (53.684834ms)
+✔ 扰动子实验账本从快照时刻归零且保留源快照累计量 (140.430292ms)
+✔ 手动终止扰动时保留部分样本、终止事件并标记无效 (109.573125ms)
+✔ 首次稳定后继续20秒并独立导出耐久结果及原快照 (385.560958ms)
+✔ 首次稳定后控制异常使耐久失败且不抹除共同快照 (113.519084ms)
+✔ 耐久规则在截止时刻优先判定越界，短暂越界不可恢复为通过 (0.485542ms)
+✔ 手动及后台暂停期间耐久仿真时间不推进 (147.354292ms)
+✔ 标准工况取得独立的20秒耐久结果 (107.607917ms)
+✔ 合成会话中单步越界立即使耐久失败，导出保留失败证据且快照没有扰动资格 (69.8685ms)
+✔ 合成会话在耐久截止时刻触边时先终止，再判耐久失败 (149.174667ms)
+✔ 合成会话在耐久截止时刻控制超时优先于通过 (112.996042ms)
+✔ 合成会话即使耐久规则通过也不会冒称物理稳定或赋予快照资格 (154.591792ms)
+✔ 真实步内触边早于合成步末输入，未发生的合成状态不会写入事件 (0.641625ms)
+✔ 合成状态分量有限但能量溢出时保留最后有效状态并终止耐久 (62.476083ms)
+✔ 零重力无阻力基准按物理时间匀速运动，并完整记录10ms采样点 (7.006458ms)
+✔ 水平释放的有质量杆遵循重力动力学，而非匀速或预设动画 (0.35225ms)
+✔ 暂停不推进物理时间，继续保留状态，重置生成全新实验 (6.251959ms)
+✔ 拒绝非法物理配置，并隔离外部对已创建配置的修改 (0.616791ms)
+✔ 导出同一次实验的完整配置、原始CSV、事件、结果及可独立校验的清单 (15.132875ms)
+✔ 物理与采样周期相互独立，达到基准时长后精确结束且不静默取整输入 (2.835666ms)
+✔ 黏性阻力按解析匀速衰减基准耗散动能，能量账本可核验 (1.697583ms)
+✔ 步内触边定位真实终止时刻，保留终点且不碰撞反弹 (0.420917ms)
+✔ 数值发散冻结在最后有效状态，导出不包含非法物理样本 (8.105875ms)
+✔ 一次推进与分批推进产生相同的10秒原始轨迹，完整结束含1001个采样点 (175.34325ms)
+✔ 触边事件独立携带四状态与违规条件，含初始触边 (0.392958ms)
+✔ 导出请求逐次记事件且不添加重复样本，不冒称写盘已成功 (57.206375ms)
+✔ 步内触边后返回仍在首次触边终止，左右边界及两种物理步长一致 (1.245291ms)
+✔ 合法整步时长不受浮点除法误差影响，非整步及超容量输入仍拒绝 (41.33575ms)
+✔ 自动起摆从精确静止下垂开始，控制输入主动启动并记录 (20.134458ms)
+✔ 首次稳定需要逐步连续五秒并产生同一时刻的完整快照 (282.782125ms)
+✔ 用户中止的起摆没有合格快照，导出区分中止与控制失败 (24.867875ms)
+✔ 重置清除控制器状态并重现相同的受控轨迹 (33.7345ms)
+✔ 控制器状态序列化后可恢复相同的后续输出 (0.511125ms)
+✔ 越界事件记录四状态并在首次进入合格区间前保留初始违规 (22.642666ms)
+✔ 改变简单工况的物理参数时不能得到正式候选快照 (128.458917ms)
+✔ 控制预算超时时，已发生的安全区间在终止时关闭 (7.217167ms)
+✔ 读回确认同一证据后快照可用，旧版本或其他实验的确认被拒绝 (184.628042ms)
+✔ 首次稳定之前确认的部分记录不能确认之后生成的快照 (179.428542ms)
+✔ 标准工况自动起摆保持冻结物理参数与60秒时限 (0.38675ms)
+✔ 标准工况使用自身冻结配置判定资格并导出真实结果 (131.106167ms)
+✔ 标准工况篡改物理参数不能获得合格快照 (231.042125ms)
+✔ explicitly selected empty directory initializes; unrelated directory stays untouched (5.780125ms)
+✔ 60s default and high frequency loads seal and reopen all prescribed records (12064.309833ms)
+✔ slow disk stops physics before the ceiling, preserving all 1ms samples (34.605334ms)
+✔ write failure never acknowledges data; retry preserves a diagnostic and the tail (4.706167ms)
+✔ read-only opens history, denied read refuses, tampered content cannot be called complete (3.069042ms)
+✔ invalid sampling rejects before creating an experiment; unsealed reopen reports confirmed prefix (6.890167ms)
+✔ rehashed malformed CSV is rejected as data, even when byte digests agree (2.603166ms)
+✔ directory result assesses the complete experiment rather than the final chunk (12.6965ms)
+✔ pause between batch boundaries does not skip the next half-second commit (2.877167ms)
+✔ workspace identity with missing required fields is refused without rewriting (0.273ms)
+ℹ tests 115
+ℹ suites 0
+ℹ pass 115
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12877.394083
+npm warn Unknown env config "electron-builder-binaries-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "electron-mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown env config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "disturl". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown user config "electron_builder_binaries_mirror". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> pendulum-lab@0.0.0 build
+> tsc --noEmit && vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 20 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/build-info.json                         0.17 kB │ gzip:  0.15 kB
+dist/index.html                             15.80 kB │ gzip:  4.18 kB
+dist/assets/experiment.worker-QDZpj1Wv.js   54.01 kB
+dist/assets/workspace.worker-cCw5l6Ru.js    62.01 kB
+dist/assets/benchmarks.worker-DKWN5Btq.js  222.09 kB
+dist/assets/index-DDSYTEWC.css               8.00 kB │ gzip:  2.44 kB
+dist/assets/index-BKNtiFhw.js               60.85 kB │ gzip: 22.23 kB
+
+✓ built in 212ms

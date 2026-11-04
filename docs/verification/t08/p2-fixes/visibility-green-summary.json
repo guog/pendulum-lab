@@ -1,0 +1,71 @@
+{
+  "status": "passed",
+  "source": {
+    "source_revision": "9057403b4ce0d3e35c2c01c05c483ced4f1dac09",
+    "source_sha256": "cda42ea8543fbf4b028914a47d7ca42016bbe50b9ffa25e57ccf19c7d64c59ee",
+    "source_dirty": true
+  },
+  "start_before_ack": "passed",
+  "resume_before_ack": "passed",
+  "native_tab_background": "passed",
+  "final_progress": "状态 stopped · 仿真 0.208 s · 已确认 0.208 s · 样本 22 · 事件 7 · 已封存（完整性确认）",
+  "events": [
+    {
+      "schema_version": 1,
+      "event_index": 0,
+      "sim_time_s": 0,
+      "event_type": "start",
+      "payload": {}
+    },
+    {
+      "schema_version": 1,
+      "event_index": 1,
+      "sim_time_s": 0,
+      "event_type": "pause",
+      "payload": {
+        "reason": "background"
+      }
+    },
+    {
+      "schema_version": 1,
+      "event_index": 2,
+      "sim_time_s": 0,
+      "event_type": "resume",
+      "payload": {}
+    },
+    {
+      "schema_version": 1,
+      "event_index": 3,
+      "sim_time_s": 0,
+      "event_type": "pause",
+      "payload": {
+        "reason": "background"
+      }
+    },
+    {
+      "schema_version": 1,
+      "event_index": 4,
+      "sim_time_s": 0,
+      "event_type": "resume",
+      "payload": {}
+    },
+    {
+      "schema_version": 1,
+      "event_index": 5,
+      "sim_time_s": 0.20800000000000002,
+      "event_type": "pause",
+      "payload": {
+        "reason": "background"
+      }
+    },
+    {
+      "schema_version": 1,
+      "event_index": 6,
+      "sim_time_s": 0.20800000000000002,
+      "event_type": "stop",
+      "payload": {
+        "reason": "user"
+      }
+    }
+  ]
+}
