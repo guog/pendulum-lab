@@ -11,6 +11,7 @@ export interface WorkspaceFiles {
 }
 const json = (value: unknown) => JSON.stringify(value, null, 2) + '\n'
 const bytes = (text: string) => new TextEncoder().encode(text).byteLength
+const maximumManifestBytes = 16 * 1024 * 1024
 const safePath = (path: string) =>
   /^[a-zA-Z0-9_./-]+$/.test(path) && !path.split('/').some((p) => !p || p === '.' || p === '..')
 type Entry = { path: string; byte_length: number; sha256: string }
@@ -103,7 +104,7 @@ export async function openWorkspace(files: WorkspaceFiles) {
     if (!/^[a-f0-9-]{36}$/.test(id)) throw new Error('非法实验标识')
     const prefix = `experiments/${id}/`
     const raw = await files.read(prefix + 'manifest.json')
-    if (bytes(raw) > 16 * 1024 * 1024) throw new Error('清单过大')
+    if (bytes(raw) > maximumManifestBytes) throw new Error('清单过大')
     const m: Manifest = JSON.parse(raw)
     if (
       m.schema_version !== 1 ||
@@ -111,7 +112,6 @@ export async function openWorkspace(files: WorkspaceFiles) {
       !Number.isSafeInteger(m.revision) ||
       m.revision < 1 ||
       !Array.isArray(m.batches) ||
-      m.batches.length > 1202 ||
       !Number.isFinite(m.committed_sim_time_s) ||
       m.committed_sim_time_s < 0 ||
       typeof m.sealed !== 'boolean'
@@ -331,6 +331,7 @@ export async function openWorkspace(files: WorkspaceFiles) {
             snapshot: entries[2]!,
             result: entries[3]!,
           }
+          if (bytes(json(next)) > maximumManifestBytes) throw new Error('清单过大')
           await publish(files, prefix + 'manifest.json', json(next))
           // Each referenced new file has been closed and verified; cross-check all history before sealing.
           if (sealed) {

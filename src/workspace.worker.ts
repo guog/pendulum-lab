@@ -64,7 +64,7 @@ context.onmessage = ({ data }) => {
         schedule()
         break
       case 'pause':
-        await run?.pause(data.reason)
+        if (run?.progress().status === 'running') await run.pause(data.reason)
         report()
         break
       case 'resume':

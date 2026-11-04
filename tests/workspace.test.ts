@@ -205,3 +205,27 @@ test('workspace identity with missing required fields is refused without rewriti
   await assert.rejects(openWorkspace(files), /无效工作区/)
   assert.equal(files.data.get('workspace.json'), malformed)
 })
+
+test('a valid 600s experiment remains readable across 1202 batches after a pause and seals', async () => {
+  const files = new Files()
+  const workspace = await openWorkspace(files)
+  const config = createConfig('standard', 'equilibrium')
+  config.timing.duration_s = 600
+  config.timing.sample_period_s = 0.1
+  const run = await workspace.create(config)
+  await run.start()
+  await run.advance(0.2)
+  await run.pause()
+  run.resume()
+  await run.advance(598.8)
+  assert.equal((await workspace.load(run.id)).output.sim_time_s, 599)
+  await run.advance(0.5)
+  assert.equal((await workspace.load(run.id)).output.sim_time_s, 599.5)
+  await run.advance(0.5)
+  const reopened = await (await openWorkspace(files)).load(run.id)
+  assert.equal(reopened.integrity, 'sealed-verified')
+  assert.equal(reopened.output.status, 'completed')
+  assert.equal(reopened.output.samples.length, 6001)
+  assert.equal(reopened.output.samples.at(-1)!.sim_time_s, 600)
+  assert.deepEqual(reopened.output, run.read().output)
+})

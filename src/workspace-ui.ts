@@ -147,7 +147,7 @@ export function initializeWorkspace() {
     controls()
   }
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden && running) send({ type: 'pause', reason: 'background' })
+    if (document.hidden && active) send({ type: 'pause', reason: 'background' })
     controls()
   })
   window.addEventListener('beforeunload', (event) => {
