@@ -1,5 +1,7 @@
 # T09 保存故障冻结与中断恢复（Issue #14）
 
+PR #31 后续修复了启动保存失败时恢复入口不可用的P2，公开工作区回归与真实Chrome红绿证据见 [启动故障修复](start-failure-fix/README.md)。
+
 最新结论：已在干净提交 `6d826d45d2a408724cc44bc18ed9ff0b7c22606b` 补齐全部三处强退、容量不足、Chrome 目录权限实际撤回和只读目录场景，见 [当前提交补验报告](acceptance-6d826d4/README.md)。下文保留首轮历史记录；其中的撤权阻塞和构建重测缺口已由该补验更新。
 
 基线为最新 origin/main `5074fce45de89efe220fddd18adb8ca66aeef78a`，任务分支 `codex/feat-14-interrupted-experiment-recovery`。#13 已关闭，原生依赖未关闭数为 0。本页下文的实现与阶段报告是首轮交付时的历史状态，当时浏览器权限撤回阻塞；当前验收状态以顶部补验报告为准。
