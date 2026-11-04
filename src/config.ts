@@ -12,7 +12,7 @@ export type ExperimentConfig = {
   benchmark: BenchmarkId
   benchmark_description: string
   environment: { user_agent: string; language: string | null; logical_processors: number | null }
-  execution_mode: 'memory-research'
+  execution_mode: 'memory-research' | 'authorized-directory'
   control_mode: 'free' | 'prescribed' | 'automatic'
   build_identity: BuildIdentity | null
   versions: {
@@ -127,7 +127,7 @@ export function validateConfig(config: ExperimentConfig) {
   if (
     config.schema_version !== 1 ||
     !['free', 'prescribed', 'automatic'].includes(config.control_mode) ||
-    config.execution_mode !== 'memory-research'
+    !['memory-research', 'authorized-directory'].includes(config.execution_mode)
   )
     throw new Error('不支持的实验格式或模式')
   if (config.benchmark === 'swing-up' && config.control_mode !== 'automatic')

@@ -1,0 +1,24 @@
+{"phase":"start","args":["--executable-path","/Applications/Google Chrome.app/Contents/MacOS/Google Chrome","open","http://localhost:4173/"],"time":"2026-11-04T02:19:47.175Z"}
+{"phase":"finish","args":["--executable-path","/Applications/Google Chrome.app/Contents/MacOS/Google Chrome","open","http://localhost:4173/"],"status":0,"stdout":"✓ 一阶倒立摆实验台 · Pendulum Lab\n  http://localhost:4173/\n","stderr":"","elapsed_ms":833}
+{"phase":"start","args":["set","viewport","1440","1000"],"time":"2026-11-04T02:19:48.008Z"}
+{"phase":"finish","args":["set","viewport","1440","1000"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":57}
+{"phase":"start","args":["wait","--text","准备就绪"],"time":"2026-11-04T02:19:48.065Z"}
+{"phase":"finish","args":["wait","--text","准备就绪"],"status":0,"stdout":"准备就绪\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["get","title"],"time":"2026-11-04T02:19:48.110Z"}
+{"phase":"finish","args":["get","title"],"status":0,"stdout":"一阶倒立摆实验台 · Pendulum Lab\n","stderr":"","elapsed_ms":44}
+{"phase":"start","args":["focus","#preset"],"time":"2026-11-04T02:19:48.154Z"}
+{"phase":"finish","args":["focus","#preset"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["screenshot","/tmp/pendulum-13-memory-smoke/desktop-ready.png"],"time":"2026-11-04T02:19:48.199Z"}
+{"phase":"finish","args":["screenshot","/tmp/pendulum-13-memory-smoke/desktop-ready.png"],"status":0,"stdout":"✓ Screenshot saved to /tmp/pendulum-13-memory-smoke/desktop-ready.png\n","stderr":"","elapsed_ms":105}
+{"phase":"start","args":["scrollintoview","#start"],"time":"2026-11-04T02:19:48.304Z"}
+{"phase":"finish","args":["scrollintoview","#start"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":43}
+{"phase":"start","args":["find","role","button","click","--name","开始基准","--exact"],"time":"2026-11-04T02:19:48.347Z"}
+{"phase":"finish","args":["find","role","button","click","--name","开始基准","--exact"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":74}
+{"phase":"start","args":["wait","--text","运行中"],"time":"2026-11-04T02:19:48.421Z"}
+{"phase":"finish","args":["wait","--text","运行中"],"status":0,"stdout":"运行中\n","stderr":"","elapsed_ms":47}
+{"phase":"start","args":["scrollintoview","#pause"],"time":"2026-11-04T02:19:48.468Z"}
+{"phase":"finish","args":["scrollintoview","#pause"],"status":0,"stdout":"✓ Done\n","stderr":"","elapsed_ms":45}
+{"phase":"start","args":["find","role","button","click","--name","暂停","--exact"],"time":"2026-11-04T02:19:48.513Z"}
+{"phase":"finish","args":["find","role","button","click","--name","暂停","--exact"],"status":1,"stdout":"","stderr":"✗ Element '@e2' is disabled, so the click would not reach it\n","elapsed_ms":55}
+{"phase":"start","args":["close"],"time":"2026-11-04T02:19:48.569Z"}
+{"phase":"finish","args":["close"],"status":0,"stdout":"✓ Browser closed\n","stderr":"","elapsed_ms":178}

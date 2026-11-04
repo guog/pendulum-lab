@@ -16,36 +16,37 @@ export async function sha256(text: string): Promise<string> {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
+export const sampleColumns: (keyof Sample)[] = [
+  'sample_index',
+  'sim_time_s',
+  'cart_x_m',
+  'cart_v_m_s',
+  'theta_unwrapped_rad',
+  'theta_wrapped_rad',
+  'theta_dot_rad_s',
+  'force_requested_N',
+  'force_actual_N',
+  'force_external_N',
+  'torque_external_Nm',
+  'control_mode',
+  'controller_phase',
+  'kinetic_energy_J',
+  'potential_energy_J',
+  'actuator_power_W',
+  'actuator_work_J',
+  'force_external_work_J',
+  'torque_external_work_J',
+  'external_work_J',
+  'dissipated_energy_J',
+  'energy_residual_J',
+  'overspeed',
+  'saturation_reasons',
+  'saturated',
+]
+
 export async function buildEvidence(output: SessionOutput): Promise<EvidenceBundle> {
   const { experiment_id } = output
   const stringify = (value: unknown) => JSON.stringify(value, null, 2) + '\n'
-  const columns: (keyof Sample)[] = [
-    'sample_index',
-    'sim_time_s',
-    'cart_x_m',
-    'cart_v_m_s',
-    'theta_unwrapped_rad',
-    'theta_wrapped_rad',
-    'theta_dot_rad_s',
-    'force_requested_N',
-    'force_actual_N',
-    'force_external_N',
-    'torque_external_Nm',
-    'control_mode',
-    'controller_phase',
-    'kinetic_energy_J',
-    'potential_energy_J',
-    'actuator_power_W',
-    'actuator_work_J',
-    'force_external_work_J',
-    'torque_external_work_J',
-    'external_work_J',
-    'dissipated_energy_J',
-    'energy_residual_J',
-    'overspeed',
-    'saturation_reasons',
-    'saturated',
-  ]
   const configDigest = await sha256(stringify(output.config))
   const files: Record<string, string> = {
     'config.json': stringify({
@@ -57,9 +58,9 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
     }),
     'samples/chunk-000001.csv':
       [
-        columns.join(','),
+        sampleColumns.join(','),
         ...output.samples.map((sample) =>
-          columns
+          sampleColumns
             .map((key) =>
               Array.isArray(sample[key]) ? sample[key].join('|') : String(sample[key]),
             )
@@ -91,26 +92,7 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
         }
       : {}),
     ...(output.controller ? { 'controller.json': stringify(output.controller) } : {}),
-    'result.json': stringify({
-      schema_version: 1,
-      experiment_id,
-      status: output.status,
-      trajectory_source: output.trajectory_source,
-      execution_mode: 'memory-research',
-      formal_acceptance: 'not_eligible',
-      actuation_assessment: assessActuation(output),
-      qualification_reasons: output.qualification_reasons,
-      condition_intervals: output.condition_intervals,
-      first_stable: output.controller ? output.first_stable : 'not_executed',
-      endurance: output.endurance,
-      horizontal_disturbance: 'not_executed',
-      torque_disturbance: 'not_executed',
-      sim_time_s: output.sim_time_s,
-      last_state: output.state,
-      sample_count: output.samples.length,
-      rules_version: output.config.versions.rules,
-      limitation: '内存记录需用户显式导出，不承诺崩溃恢复或正式控制验收。',
-    }),
+    'result.json': stringify(buildResult(output)),
   }
   const entries = await Promise.all(
     Object.entries(files).map(async ([path, content]) => ({
@@ -139,5 +121,28 @@ export async function buildEvidence(output: SessionOutput): Promise<EvidenceBund
     experiment_id,
     prepared_at_utc: new Date().toISOString(),
     files,
+  }
+}
+
+export function buildResult(output: SessionOutput) {
+  return {
+    schema_version: 1,
+    experiment_id: output.experiment_id,
+    status: output.status,
+    trajectory_source: output.trajectory_source,
+    execution_mode: 'memory-research',
+    formal_acceptance: 'not_eligible',
+    actuation_assessment: assessActuation(output),
+    qualification_reasons: output.qualification_reasons,
+    condition_intervals: output.condition_intervals,
+    first_stable: output.controller ? output.first_stable : 'not_executed',
+    endurance: output.endurance,
+    horizontal_disturbance: 'not_executed',
+    torque_disturbance: 'not_executed',
+    sim_time_s: output.sim_time_s,
+    last_state: output.state,
+    sample_count: output.samples.length,
+    rules_version: output.config.versions.rules,
+    limitation: '内存记录需用户显式导出，不承诺崩溃恢复或正式控制验收。',
   }
 }

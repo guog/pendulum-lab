@@ -1,3 +1,4 @@
+import { initializeWorkspace } from './workspace-ui.ts'
 import { actuationCases, type ActuationCaseId } from './actuator-benchmarks.ts'
 import { assessActuation } from './actuation-assessment.ts'
 import './styles.css'
@@ -662,3 +663,5 @@ window.addEventListener('beforeunload', (event) => {
     event.preventDefault()
 })
 window.addEventListener('resize', scheduleRender)
+
+initializeWorkspace()
