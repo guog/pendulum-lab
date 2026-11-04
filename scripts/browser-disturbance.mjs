@@ -207,6 +207,44 @@ try {
   assert.equal(new Set(both.results.map((result) => result.experiment_id)).size, 4)
   for (const result of both.results) assert.equal(result.disturbance.validity, 'physical')
   browser('screenshot', '--full', join(artifacts, 'both-presets.png'))
+  // Exercise a single test, manual pause/resume, and termination while paused.
+  browser('click', '#run-horizontal')
+  browser('wait', '--fn', "!document.querySelector('#pause-disturbances').disabled")
+  browser('click', '#pause-disturbances')
+  browser('wait', '--fn', "!document.querySelector('#resume-disturbances').disabled")
+  const manualPaused = text('#disturbance-current')
+  browser('wait', '300')
+  assert.equal(text('#disturbance-current'), manualPaused)
+  browser('click', '#resume-disturbances')
+  browser('wait', '--fn', "!document.querySelector('#pause-disturbances').disabled")
+  browser('click', '#pause-disturbances')
+  browser('wait', '--fn', "!document.querySelector('#resume-disturbances').disabled")
+  browser('click', '#stop-disturbances')
+  browser('wait', '--text', '用户终止')
+  browser('wait', '--fn', "!document.querySelector('#run-torque').disabled")
+  browser('click', '#run-torque')
+  browser(
+    'wait',
+    '--fn',
+    "(document.querySelector('#disturbance-result').textContent.match(/工况 · /g) || []).length === 6",
+  )
+  browser('click', '#prepare-disturbance-download')
+  browser('wait', '#download-disturbances')
+  const singlePath = join(artifacts, 'disturbances-single.json')
+  browser('scrollintoview', '#download-disturbances')
+  browser('download', '#download-disturbances', singlePath)
+  const singles = JSON.parse(readFileSync(singlePath, 'utf8')).results
+  assert.equal(singles.length, 6)
+  assert.equal(singles[4].kind, 'horizontal')
+  assert.equal(singles[4].disturbance.status, 'invalid')
+  assert.ok(
+    singles[4].events.some(
+      (event) => event.event_type === 'pause' && event.payload.reason === 'manual',
+    ),
+  )
+  assert.ok(singles[4].events.some((event) => event.event_type === 'stop'))
+  assert.equal(singles[5].kind, 'torque')
+  assert.ok(singles[5].events.some((event) => event.event_type === 'disturbance_result'))
   writeFileSync(
     join(artifacts, 'summary.json'),
     JSON.stringify(

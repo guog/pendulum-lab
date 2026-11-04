@@ -80,7 +80,7 @@ function createSessionInternal(
       ? createController(config.physics, fork?.snapshot.controller)
       : null
   const controlSteps = Math.round(config.timing.control_period_s / config.timing.physics_step_s)
-  const initialEnergy = energy(config.initial_state, config.physics)
+  const initialEnergy = energy(fork?.snapshot.state ?? config.initial_state, config.physics)
   let created_at_utc = new Date().toISOString()
   let state = structuredClone(fork?.snapshot.state ?? config.initial_state)
   const samples: Sample[] = []
@@ -88,10 +88,10 @@ function createSessionInternal(
   const dt = config.timing.physics_step_s
   const sampleSteps = Math.round(config.timing.sample_period_s / dt)
   const durationSteps = Math.round(config.timing.duration_s / dt)
-  let dissipated = fork?.snapshot.energy.dissipated_J ?? 0
-  let actuatorWork = fork?.snapshot.energy.actuator_work_J ?? 0
-  let forceWork = fork?.snapshot.energy.external_force_work_J ?? 0
-  let torqueWork = fork?.snapshot.energy.external_torque_work_J ?? 0
+  let dissipated = 0
+  let actuatorWork = 0
+  let forceWork = 0
+  let torqueWork = 0
   let forces: Forces = { ...(fork?.snapshot.forces ?? zeroForces) }
   let stableStart: number | null = null
   let previousFailures = new Set<string>()
@@ -237,7 +237,8 @@ function createSessionInternal(
   let forkUnstable = false
   let forkOutside = false
   let recoveryStart: number | null = null
-  let forkResult: 'running' | 'suppressed' | 'recovered' | 'failed' | 'violation' | 'error' =
+  let forkResult:
+    'running' | 'suppressed' | 'recovered' | 'failed' | 'violation' | 'error' | 'invalid' =
     'running'
   let disturbanceActualEnd: number | null = null
   const event = (event_type: string, payload: Record<string, unknown> = {}) => {
@@ -399,7 +400,11 @@ function createSessionInternal(
     trajectory: SyntheticStep[] | null,
     checkpoint?: (progress: {
       sim_time_s: number
-    }) => Promise<{ reason: 'manual' | 'background' } | void>,
+    }) => Promise<
+      | { reason: 'manual' | 'background' }
+      | { action: 'stop'; reason?: 'manual' | 'background' }
+      | void
+    >,
   ): Promise<DisturbanceOutput> {
     if (!['horizontal', 'torque'].includes(kind)) throw new Error('未知扰动')
     if (!stableSnapshot || !exportConfirmed) throw new Error('缺少已确认的快照')
@@ -415,6 +420,11 @@ function createSessionInternal(
         const progress = child.read()
         if (progress.status !== 'running') break
         const pause = await checkpoint({ sim_time_s: progress.sim_time_s })
+        if (pause && 'action' in pause) {
+          if (pause.reason) child.pause(pause.reason)
+          child.stop()
+          break
+        }
         if (pause) {
           child.pause(pause.reason)
           child.resume()
@@ -430,7 +440,11 @@ function createSessionInternal(
       kind: 'horizontal' | 'torque',
       checkpoint?: (progress: {
         sim_time_s: number
-      }) => Promise<{ reason: 'manual' | 'background' } | void>,
+      }) => Promise<
+        | { reason: 'manual' | 'background' }
+        | { action: 'stop'; reason?: 'manual' | 'background' }
+        | void
+      >,
     ): Promise<DisturbanceOutput> {
       if (syntheticSteps !== null) throw new Error('缺少已确认的合格快照')
       return runFork(kind, null, checkpoint)
@@ -649,6 +663,8 @@ function createSessionInternal(
     stop() {
       if (status !== 'running' && status !== 'paused') return
       status = 'stopped'
+      if (fork) forkResult = 'invalid'
+      endDisturbance('user_stopped')
       failEndurance('user_stopped')
       finishConditions()
       event('stop', { reason: 'user' })

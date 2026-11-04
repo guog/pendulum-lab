@@ -352,3 +352,39 @@ test('脉冲期间超速、触边或数值异常记录实际终止而非计划�
     assert.ok(ends[0]!.sim_time_s < child.disturbance!.pulse_end_s)
   }
 })
+
+test('扰动子实验账本从快照时刻归零且保留源快照累计量', async () => {
+  const source = createSession(createConfig('simple', 'swing-up'))
+  source.start()
+  source.advance(50)
+  const bundle = await source.exportEvidence()
+  source.confirmExport(bundle.experiment_id, source.read().events.length)
+  const snapshot = source.read().first_stable.snapshot!
+  const child = await source.forkDisturbance('horizontal')
+  assert.notEqual(snapshot.energy.actuator_work_J, 0)
+  assert.equal(child.samples[0]!.actuator_work_J, 0)
+  assert.equal(child.samples[0]!.dissipated_energy_J, 0)
+  assert.equal(child.samples[0]!.energy_residual_J, 0)
+  assert.deepEqual(child.snapshot.energy, snapshot.energy)
+})
+
+test('手动终止扰动时保留部分样本、终止事件并标记无效', async () => {
+  const source = createSession(createConfig('simple', 'swing-up'))
+  source.start()
+  source.advance(50)
+  const bundle = await source.exportEvidence()
+  source.confirmExport(bundle.experiment_id, source.read().events.length)
+  let calls = 0
+  const result = await source.forkDisturbance('horizontal', async () => {
+    calls++
+    return calls === 4 ? { action: 'stop' } : undefined
+  })
+  assert.equal(result.disturbance?.status, 'invalid')
+  assert.ok(result.events.some((event) => event.event_type === 'stop'))
+  assert.ok(
+    result.events.some(
+      (event) => event.event_type === 'disturbance_end' && event.payload.reason === 'user_stopped',
+    ),
+  )
+  assert.ok(result.samples.length > 1)
+})

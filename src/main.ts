@@ -15,6 +15,10 @@ function element<T extends Element>(id: string, type: new (...args: never[]) => 
   return found
 }
 const runDisturbances = element('run-disturbances', HTMLButtonElement)
+const runHorizontal = element('run-horizontal', HTMLButtonElement)
+const runTorque = element('run-torque', HTMLButtonElement)
+const pauseDisturbances = element('pause-disturbances', HTMLButtonElement)
+const stopDisturbances = element('stop-disturbances', HTMLButtonElement)
 const saveDisturbances = element('save-disturbances', HTMLButtonElement)
 const prepareDisturbanceDownload = element('prepare-disturbance-download', HTMLButtonElement)
 const downloadDisturbances = element('download-disturbances', HTMLAnchorElement)
@@ -153,6 +157,10 @@ function updateControls() {
     !current ||
     current.status === 'running' ||
     current.first_stable.disturbance_eligibility !== 'eligible'
+  runHorizontal.disabled = runDisturbances.disabled
+  runTorque.disabled = runDisturbances.disabled
+  pauseDisturbances.disabled = !disturbanceRunning || disturbancePaused || document.hidden
+  stopDisturbances.disabled = !disturbanceRunning || document.hidden
   saveDisturbances.disabled = busy || !disturbanceResults
   prepareDisturbanceDownload.disabled = busy || !disturbanceResults
   verifyDisturbances.disabled = busy || !preparedDisturbances
@@ -473,6 +481,7 @@ function renderDisturbances() {
     violation: '违规',
     error: '异常',
     running: '证据不完整',
+    invalid: '用户终止',
   }
   write(
     'disturbance-result',
@@ -491,9 +500,11 @@ function renderDisturbances() {
   )
 }
 resumeDisturbances.onclick = () => void call({ type: 'resume-disturbances' }).catch(showError)
-runDisturbances.onclick = () =>
+pauseDisturbances.onclick = () => void call({ type: 'pause-disturbances' }).catch(showError)
+stopDisturbances.onclick = () => void call({ type: 'stop-disturbances' }).catch(showError)
+function runSelectedDisturbances(kind: 'horizontal' | 'torque' | 'both') {
   void action(async () => {
-    const reply = await call({ type: 'run-disturbances' })
+    const reply = await call({ type: 'run-disturbances', kind })
     if (reply.type !== 'disturbances') throw new Error('未收到扰动结果')
     disturbanceResults = [...(disturbanceResults ?? []), ...reply.results]
     disturbanceRevision++
@@ -501,6 +512,10 @@ runDisturbances.onclick = () =>
     disturbanceSaved = false
     renderDisturbances()
   })
+}
+runDisturbances.onclick = () => runSelectedDisturbances('both')
+runHorizontal.onclick = () => runSelectedDisturbances('horizontal')
+runTorque.onclick = () => runSelectedDisturbances('torque')
 saveDisturbances.onclick = () =>
   void action(async () => {
     if (!disturbanceResults) return

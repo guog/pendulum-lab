@@ -13,6 +13,7 @@ let runningWallMs = 0
 let startedAt: number | undefined
 let disturbanceRunning = false
 let disturbancePaused = false
+let disturbanceStopRequested = false
 let disturbancePauseRequested: 'manual' | 'background' | null = null
 let disturbanceTime: number | null = null
 let resumeDisturbances: (() => void) | undefined
@@ -26,6 +27,7 @@ const disturbanceStatus = () =>
 async function disturbanceCheckpoint(progress: { sim_time_s: number }) {
   disturbanceTime = progress.sim_time_s
   await new Promise<void>((resolve) => setTimeout(resolve, 0))
+  if (disturbanceStopRequested) return { action: 'stop' as const }
   const reason = disturbancePauseRequested
   if (reason) {
     disturbancePaused = true
@@ -34,6 +36,7 @@ async function disturbanceCheckpoint(progress: { sim_time_s: number }) {
       await new Promise<void>((resolve) => {
         resumeDisturbances = resolve
       })
+    if (disturbanceStopRequested) return { action: 'stop' as const, reason }
     return { reason }
   }
 }
@@ -112,14 +115,18 @@ context.onmessage = async ({ data: { request_id, command } }) => {
         if (disturbanceRunning) throw new Error('扰动实验已运行')
         disturbanceRunning = true
         disturbancePaused = false
+        disturbanceStopRequested = false
         disturbancePauseRequested = null
         disturbanceTime = null
         disturbanceStatus()
         try {
-          const results = [
-            await session.forkDisturbance('horizontal', disturbanceCheckpoint),
-            await session.forkDisturbance('torque', disturbanceCheckpoint),
-          ]
+          const kinds =
+            command.kind === 'both' ? (['horizontal', 'torque'] as const) : [command.kind]
+          const results = []
+          for (const kind of kinds) {
+            results.push(await session.forkDisturbance(kind, disturbanceCheckpoint))
+            if (disturbanceStopRequested) break
+          }
           context.postMessage({ type: 'disturbances', results, request_id })
         } finally {
           disturbanceRunning = false
@@ -129,6 +136,17 @@ context.onmessage = async ({ data: { request_id, command } }) => {
         }
         return
       }
+      case 'pause-disturbances':
+        if (!disturbanceRunning || disturbancePaused) throw new Error('扰动实验未运行')
+        disturbancePauseRequested = 'manual'
+        break
+      case 'stop-disturbances':
+        if (!disturbanceRunning) throw new Error('扰动实验未运行')
+        disturbanceStopRequested = true
+        disturbancePauseRequested = null
+        resumeDisturbances?.()
+        resumeDisturbances = undefined
+        break
       case 'resume-disturbances':
         if (!disturbanceRunning || !disturbancePaused) throw new Error('扰动实验未暂停')
         disturbancePaused = false

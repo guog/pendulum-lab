@@ -5,7 +5,8 @@ import type { SessionOutput, DisturbanceOutput } from './session.ts'
 export type Command =
   | { type: 'configure'; preset: PresetId; benchmark: BenchmarkId }
   | { type: 'start' | 'resume' | 'stop' | 'reset' | 'export' }
-  | { type: 'run-disturbances' | 'resume-disturbances' }
+  | { type: 'run-disturbances'; kind: 'horizontal' | 'torque' | 'both' }
+  | { type: 'resume-disturbances' | 'pause-disturbances' | 'stop-disturbances' }
   | { type: 'confirm-export'; experiment_id: string; event_count: number }
   | { type: 'pause'; reason: 'manual' | 'background' }
 
