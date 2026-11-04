@@ -374,3 +374,85 @@ test('malformed CSV cells are rejected instead of being silently converted', asy
     await assert.rejects(workspace.load(run.id), /采样|样本/, `${field}=${value}`)
   }
 })
+
+test('sealed directory records carry the approved format versions and experiment identity', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.advance(0.01)
+  await run.stop()
+  const record = await (await openWorkspace(files)).load(run.id)
+  const prefix = `experiments/${run.id}/`
+  const config = JSON.parse(await files.read(prefix + record.manifest.config.path))
+  const snapshot = JSON.parse(await files.read(prefix + record.manifest.snapshot.path))
+  assert.deepEqual(
+    {
+      sample_schema_version: record.manifest.sample_schema_version,
+      snapshot_schema_version: snapshot.schema_version,
+      config_experiment_id: config.experiment_id,
+    },
+    { sample_schema_version: 1, snapshot_schema_version: 1, config_experiment_id: run.id },
+  )
+  assert.equal(record.integrity, 'sealed-verified')
+  assert.deepEqual(record.output, run.read().output)
+})
+
+test('history refuses missing or unsupported sample format versions', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.stop()
+  const path = `experiments/${run.id}/manifest.json`
+  const manifest = JSON.parse(await files.read(path))
+  for (const version of [999, undefined, null, 0, '1', 1.5]) {
+    await files.write(path, JSON.stringify({ ...manifest, sample_schema_version: version }))
+    await assert.rejects(workspace.load(run.id), /采样版本/, `version=${version}`)
+  }
+  await files.write(path, JSON.stringify(manifest))
+  assert.equal((await workspace.load(run.id)).integrity, 'sealed-verified')
+})
+
+test('history refuses unsupported snapshot versions even with matching digests', async () => {
+  const { sha256 } = await import('../src/evidence.ts')
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.stop()
+  const prefix = `experiments/${run.id}/`
+  const manifest = JSON.parse(await files.read(prefix + 'manifest.json'))
+  const original = await files.read(prefix + manifest.snapshot.path)
+  const snapshot = JSON.parse(original)
+  for (const version of [999, undefined, null, 0, '1', 1.5, 1]) {
+    const text = JSON.stringify({ ...snapshot, schema_version: version })
+    await files.write(prefix + manifest.snapshot.path, text)
+    manifest.snapshot.sha256 = await sha256(text)
+    manifest.snapshot.byte_length = new TextEncoder().encode(text).byteLength
+    await files.write(prefix + 'manifest.json', JSON.stringify(manifest))
+    if (version === 1) assert.equal((await workspace.load(run.id)).integrity, 'sealed-verified')
+    else await assert.rejects(workspace.load(run.id), /快照版本/, `version=${version}`)
+  }
+})
+
+test('history requires configuration identity to match the selected experiment', async () => {
+  const { sha256 } = await import('../src/evidence.ts')
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.stop()
+  const prefix = `experiments/${run.id}/`
+  const manifest = JSON.parse(await files.read(prefix + 'manifest.json'))
+  const config = JSON.parse(await files.read(prefix + manifest.config.path))
+  for (const id of [crypto.randomUUID(), undefined, null, '', 1, run.id]) {
+    const text = JSON.stringify({ ...config, experiment_id: id })
+    await files.write(prefix + manifest.config.path, text)
+    manifest.config.sha256 = await sha256(text)
+    manifest.config.byte_length = new TextEncoder().encode(text).byteLength
+    await files.write(prefix + 'manifest.json', JSON.stringify(manifest))
+    if (id === run.id) assert.equal((await workspace.load(run.id)).integrity, 'sealed-verified')
+    else await assert.rejects(workspace.load(run.id), /配置.*实验标识/, `id=${id}`)
+  }
+})

@@ -1,0 +1,32 @@
+{
+  "adapter": "Node fs, not Chrome FSA",
+  "results": [
+    {
+      "name": "default-60s",
+      "sample_count": 6001,
+      "event_count": 2,
+      "snapshot_count": 122,
+      "sample_schema_version": 1,
+      "config_identity_matches": true,
+      "all_snapshots_versioned": true
+    },
+    {
+      "name": "high-frequency-60s",
+      "sample_count": 60001,
+      "event_count": 2,
+      "snapshot_count": 122,
+      "sample_schema_version": 1,
+      "config_identity_matches": true,
+      "all_snapshots_versioned": true
+    },
+    {
+      "name": "slow-disk",
+      "sample_count": 1204,
+      "event_count": 2,
+      "snapshot_count": 5,
+      "sample_schema_version": 1,
+      "config_identity_matches": true,
+      "all_snapshots_versioned": true
+    }
+  ]
+}

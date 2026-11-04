@@ -26,7 +26,13 @@
 
 ## 结果与配色后续收尾
 
-后续按 TDD 修复结果版本/元数据 P2 与历史配色 P3，并处理复审定位的 CSV 单元隐式类型转换 P2。最终以 `9a48276` 对暂存源码树 `1bf6983f86c3a6aad8e23d43ea7b0a303198c800` 完成双轴独立复审：Standards 0 项，Spec 0 项未解决。120 项完整检查及最终源码 Chrome 验证通过，详见 [最新记录](result-color-fixes/README.md)。
+后续按 TDD 修复结果版本/元数据 P2 与历史配色 P3，并处理复审定位的 CSV 单元隐式类型转换 P2。该轮以 `9a48276` 对暂存源码树 `1bf6983f86c3a6aad8e23d43ea7b0a303198c800` 完成双轴独立复审：Standards 0 项，Spec 0 项未解决。120 项完整检查及该轮源码 Chrome 验证通过，详见 [结果与配色记录](result-color-fixes/README.md)。
+
+## PR #28 版本契约后续修复
+
+对提交 `7e91d66` 的合并前复审发现 1 项 P2：目录清单/快照/配置遗漏已批准的版本与实验标识字段，未知采样版本仍可被标记完整，故该轮未合并。现沿用公共接口按 TDD 修复并保留四轮失败日志。
+
+以 `9a48276` 对暂存树 `56cfd8aea8f783a16bad4f790969a0936896db5d` 再次完整双轴审查：Standards 0 项，Spec 0 项确定发现；124 项完整检查与 Node 真实磁盘负载通过。该树后仅补文档结论，不变更已审源码/测试/证据。本轮未重跑 Chrome，旧档案兼容性限制详见 [版本契约记录](contract-fixes/README.md)。
 
 Assisted-by: LLM
 AI-Agent: OpenAI Codex

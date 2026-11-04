@@ -30,6 +30,7 @@ type Batch = {
 }
 type Manifest = {
   schema_version: 1
+  sample_schema_version: 1
   experiment_id: string
   revision: number
   config: Entry
@@ -187,6 +188,7 @@ export async function openWorkspace(files: WorkspaceFiles) {
     const raw = await files.read(prefix + 'manifest.json')
     if (bytes(raw) > maximumManifestBytes) throw new Error('清单过大')
     const m: Manifest = JSON.parse(raw)
+    if (m.sample_schema_version !== 1) throw new Error('不支持的采样版本')
     if (
       m.schema_version !== 1 ||
       m.experiment_id !== id ||
@@ -198,12 +200,22 @@ export async function openWorkspace(files: WorkspaceFiles) {
       typeof m.sealed !== 'boolean'
     )
       throw new Error('非法实验清单')
-    const config = JSON.parse(await checkedRead(files, m.config, prefix)) as ExperimentConfig
+    const configRecord = JSON.parse(
+      await checkedRead(files, m.config, prefix),
+    ) as ExperimentConfig & {
+      experiment_id?: unknown
+    }
+    if (configRecord.experiment_id !== id) throw new Error('配置的实验标识不一致')
+    const config = { ...configRecord }
+    delete config.experiment_id
     validateConfig(config)
-    const snapshot = JSON.parse(await checkedRead(files, m.snapshot, prefix)) as Omit<
+    const snapshotRecord = JSON.parse(await checkedRead(files, m.snapshot, prefix)) as Omit<
       SessionOutput,
       'samples' | 'events'
-    >
+    > & { schema_version?: unknown }
+    if (snapshotRecord.schema_version !== 1) throw new Error('不支持的快照版本')
+    const snapshot = { ...snapshotRecord }
+    delete snapshot.schema_version
     const result = JSON.parse(await checkedRead(files, m.result, prefix))
     if (!result || Array.isArray(result) || result.schema_version !== 1)
       throw new Error('不支持的结果格式')
@@ -375,7 +387,11 @@ export async function openWorkspace(files: WorkspaceFiles) {
       const session = createSession(config)
       const id = session.read().experiment_id,
         prefix = `experiments/${id}/`
-      const fullConfig = await publish(files, prefix + 'config.json', json(config))
+      const fullConfig = await publish(
+        files,
+        prefix + 'config.json',
+        json({ ...config, experiment_id: id }),
+      )
       const configEntry = { ...fullConfig, path: 'config.json' }
       let manifest: Manifest | undefined,
         saving = false,
@@ -403,7 +419,7 @@ export async function openWorkspace(files: WorkspaceFiles) {
             [`events/part-${suffix}.jsonl`]: delta.events.length
               ? bundle.files['events/part-000001.jsonl']!
               : '',
-            [`snapshots/snapshot-${suffix}.json`]: json(snapshot),
+            [`snapshots/snapshot-${suffix}.json`]: json({ schema_version: 1, ...snapshot }),
             [`results/result-${suffix}.json`]: json({
               ...buildResult(output),
               sample_count: samples.length,
@@ -429,6 +445,7 @@ export async function openWorkspace(files: WorkspaceFiles) {
           }
           const next: Manifest = {
             schema_version: 1,
+            sample_schema_version: 1,
             experiment_id: id,
             revision,
             config: configEntry,
