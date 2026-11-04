@@ -14,8 +14,9 @@ const artifacts = resolve(destination)
 mkdirSync(artifacts, { recursive: true })
 const drive = createBrowser(session, [], join(artifacts, 'browser-steps.jsonl'))
 const tabs = JSON.parse(drive('tab', 'list', '--json')).data.tabs
-const appTab = tabs.find((tab) => tab.url === 'http://localhost:5183/')?.tabId
-if (!appTab) throw new Error('命名会话缺少 localhost:5183 测试页面')
+const url = new URL(process.env.BROWSER_URL ?? 'http://localhost:5183/').href
+const appTab = tabs.find((tab) => tab.url === url)?.tabId
+if (!appTab) throw new Error(`命名会话缺少 ${url} 测试页面`)
 // Keep every DOM operation on the app tab even if another tab becomes active.
 const browser = (...args) => {
   if (args[0] !== 'tab') drive('tab', appTab)
@@ -39,7 +40,12 @@ const reveal = () =>
   browser('eval', 'delete document.hidden; document.dispatchEvent(new Event("visibilitychange"))')
 const summary = {
   status: 'failed',
-  source: JSON.parse(readFileSync('dist/build-info.json', 'utf8')),
+  source: JSON.parse(
+    readFileSync(process.env.BROWSER_BUILD_INFO ?? 'dist/build-info.json', 'utf8'),
+  ),
+  url,
+  coverage: ['authorized-directory-session', 'visibility', 'history-signal-colors'],
+  native_picker: 'not_exercised_by_this_script',
 }
 assert.deepEqual(summary.source, readBuildIdentity(process.cwd()))
 try {

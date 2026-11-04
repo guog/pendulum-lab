@@ -1,0 +1,92 @@
+{
+  "status": "passed",
+  "source": {
+    "source_revision": "6d9fcb6a36f765276f49bae95071216954bb25df",
+    "source_sha256": "b73daeef4d5ae8debbc9e86e68932f06a41ef10a19f6c4b6417e1308573426bd",
+    "source_dirty": true
+  },
+  "url": "http://localhost:5299/",
+  "coverage": ["authorized-directory-session", "visibility", "history-signal-colors"],
+  "native_picker": "not_exercised_by_this_script",
+  "start_before_ack": "passed",
+  "resume_before_ack": "passed",
+  "native_tab_background": "passed",
+  "history_signal_colors": [
+    {
+      "expected": [49, 95, 158],
+      "matches": 4280
+    },
+    {
+      "expected": [8, 119, 107],
+      "matches": 4280
+    },
+    {
+      "expected": [153, 96, 24],
+      "matches": 4280
+    },
+    {
+      "expected": [130, 85, 161],
+      "matches": 4280
+    }
+  ],
+  "final_progress": "状态 stopped · 仿真 0.272 s · 已确认 0.272 s · 样本 29 · 事件 7 · 已封存（完整性确认）",
+  "events": [
+    {
+      "schema_version": 1,
+      "event_index": 0,
+      "sim_time_s": 0,
+      "event_type": "start",
+      "payload": {}
+    },
+    {
+      "schema_version": 1,
+      "event_index": 1,
+      "sim_time_s": 0,
+      "event_type": "pause",
+      "payload": {
+        "reason": "background"
+      }
+    },
+    {
+      "schema_version": 1,
+      "event_index": 2,
+      "sim_time_s": 0,
+      "event_type": "resume",
+      "payload": {}
+    },
+    {
+      "schema_version": 1,
+      "event_index": 3,
+      "sim_time_s": 0,
+      "event_type": "pause",
+      "payload": {
+        "reason": "background"
+      }
+    },
+    {
+      "schema_version": 1,
+      "event_index": 4,
+      "sim_time_s": 0,
+      "event_type": "resume",
+      "payload": {}
+    },
+    {
+      "schema_version": 1,
+      "event_index": 5,
+      "sim_time_s": 0.272,
+      "event_type": "pause",
+      "payload": {
+        "reason": "background"
+      }
+    },
+    {
+      "schema_version": 1,
+      "event_index": 6,
+      "sim_time_s": 0.272,
+      "event_type": "stop",
+      "payload": {
+        "reason": "user"
+      }
+    }
+  ]
+}

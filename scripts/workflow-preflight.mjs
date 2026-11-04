@@ -1,6 +1,10 @@
 import { execFileSync, spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { isDeepStrictEqual } from 'node:util'
 import { validateProvenance } from './check-provenance.mjs'
+import { pullInputs } from './ci-inputs.mjs'
 
 const run = (command, args) => execFileSync(command, args, { encoding: 'utf8' }).trim()
 const git = (...args) => run('git', args)
@@ -39,6 +43,7 @@ function pr(repo, number, expectedHead) {
   if (pull.state !== 'open' || pull.draft || pull.head.sha !== expectedHead)
     throw new Error('PR is not open and ready at the expected head')
   validateProvenance(pull.body ?? '')
+  const inputs = pullInputs(repo, pull)
   const latestRun = () => {
     const pages = api(
       `repos/${repo}/actions/workflows/quality.yml/runs?event=pull_request&head_sha=${expectedHead}&per_page=100`,
@@ -58,8 +63,28 @@ function pr(repo, number, expectedHead) {
   const latest = latestRun()
   if (!latest || latest.status !== 'completed' || latest.conclusion !== 'success')
     throw new Error('Latest PR workflow run is missing, incomplete or unsuccessful')
-  if (Date.parse(latest.created_at) < Date.parse(pull.updated_at))
-    throw new Error('Latest PR workflow predates the last PR update; verify a fresh run')
+  if (!Number.isSafeInteger(latest.run_attempt) || latest.run_attempt < 1)
+    throw new Error('Invalid workflow attempt')
+  const directory = mkdtempSync(join(tmpdir(), 'pr-check-inputs-'))
+  try {
+    run('gh', [
+      'run',
+      'download',
+      String(latest.id),
+      '--repo',
+      repo,
+      '--name',
+      `pr-check-inputs-${latest.run_attempt}`,
+      '--dir',
+      directory,
+    ])
+    const recorded = JSON.parse(readFileSync(join(directory, 'inputs.json'), 'utf8'))
+    const expected = { ...inputs, run_id: latest.id, run_attempt: latest.run_attempt }
+    if (Object.entries(expected).some(([key, value]) => recorded[key] !== value))
+      throw new Error('PR check inputs changed; verify a fresh run')
+  } finally {
+    rmSync(directory, { recursive: true, force: true })
+  }
   const jobsPages = api(
     `repos/${repo}/actions/runs/${latest.id}/jobs?per_page=100`,
     '--paginate',
@@ -78,7 +103,7 @@ function pr(repo, number, expectedHead) {
   const current = api(`repos/${repo}/pulls/${number}`)
   if (
     current.head.sha !== expectedHead ||
-    current.updated_at !== pull.updated_at ||
+    !isDeepStrictEqual(pullInputs(repo, current), inputs) ||
     current.state !== 'open' ||
     current.draft
   )
