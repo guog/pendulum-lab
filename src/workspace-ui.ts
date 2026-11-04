@@ -33,7 +33,14 @@ export function initializeWorkspace() {
   let liveRunId: string | null = null
   let selectCurrentRun = false
   let recoveryExport: Extract<WorkspaceReply, { type: 'history' }> | null = null
-  function selectRunWhenListed() {
+  function updateHistorySelection() {
+    // Start may fail before the worker can refresh the directory listing.
+    if (
+      frozen &&
+      liveRunId &&
+      ![...select('history').options].some((option) => option.value === liveRunId)
+    )
+      select('history').add(new Option(liveRunId, liveRunId))
     if (
       selectCurrentRun &&
       liveRunId &&
@@ -131,14 +138,14 @@ export function initializeWorkspace() {
       const previous = select('history').value
       select('history').replaceChildren(...data.experiments.map((id: string) => new Option(id, id)))
       if (data.experiments.includes(previous)) select('history').value = previous
-      selectRunWhenListed()
+      updateHistorySelection()
     }
     if (data.type === 'progress') {
       liveRunId = data.experiment_id
-      selectRunWhenListed()
       active = !data.sealed
       running = data.status === 'running'
       frozen = !!data.fault
+      updateHistorySelection()
       if (data.storage_fault)
         get('diagnostics').textContent = JSON.stringify(data.storage_fault, null, 2)
       pending = data.saving

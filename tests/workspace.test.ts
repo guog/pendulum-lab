@@ -691,3 +691,34 @@ test('an unreadable orphan directory cannot block verified history or diagnostic
   assert.ok(recovery.diagnostics.orphan_files.includes('diagnostics'))
   assert.deepEqual([...files.data], before)
 })
+
+test('a failed start preserves a recoverable initial prefix and exportable frozen diagnostics', async () => {
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  const initial = await workspace.recover(run.id)
+  const write = files.write.bind(files)
+  files.write = async () => {
+    throw new DOMException('start save denied', 'NotAllowedError')
+  }
+  await assert.rejects(run.start(), /start save denied/)
+  const frozen = run.read()
+  assert.equal(frozen.output.status, 'paused')
+  assert.equal(frozen.output.sim_time_s, 0)
+  assert.equal(frozen.storage_fault!.name, 'NotAllowedError')
+  assert.deepEqual(frozen.storage_fault!.last_valid_state, frozen.output.state)
+  assert.ok(frozen.output.events.some((e) => e.event_type === 'storage_error'))
+  const recovery = await workspace.recover(run.id)
+  assert.deepEqual(recovery.record!.output, initial.record!.output)
+  assert.equal(recovery.diagnostics.confirmed_sim_time_s, 0)
+  assert.equal(recovery.diagnostics.status, 'interrupted')
+  assert.throws(() => run.resume(), /存储/)
+  await assert.rejects(run.stop(), /存储/)
+  files.write = write
+  await run.retry()
+  assert.equal(run.progress().status, 'paused')
+  await run.stop()
+  assert.ok(
+    (await workspace.load(run.id)).output.events.some((e) => e.event_type === 'storage_error'),
+  )
+})
