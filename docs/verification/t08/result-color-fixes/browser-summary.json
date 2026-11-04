@@ -1,0 +1,89 @@
+{
+  "status": "passed",
+  "source": {
+    "source_revision": "cbf92efa9bd901db9296e9445720202fbfb3458f",
+    "source_sha256": "d1aeca33cc9007e55fdbea140ec4b3276a110ff6b6595a7a5c733121b17a2768",
+    "source_dirty": true
+  },
+  "start_before_ack": "passed",
+  "resume_before_ack": "passed",
+  "native_tab_background": "passed",
+  "history_signal_colors": [
+    {
+      "expected": [49, 95, 158],
+      "matches": 4280
+    },
+    {
+      "expected": [8, 119, 107],
+      "matches": 4280
+    },
+    {
+      "expected": [153, 96, 24],
+      "matches": 4280
+    },
+    {
+      "expected": [130, 85, 161],
+      "matches": 4280
+    }
+  ],
+  "final_progress": "状态 stopped · 仿真 0.224 s · 已确认 0.224 s · 样本 24 · 事件 7 · 已封存（完整性确认）",
+  "events": [
+    {
+      "schema_version": 1,
+      "event_index": 0,
+      "sim_time_s": 0,
+      "event_type": "start",
+      "payload": {}
+    },
+    {
+      "schema_version": 1,
+      "event_index": 1,
+      "sim_time_s": 0,
+      "event_type": "pause",
+      "payload": {
+        "reason": "background"
+      }
+    },
+    {
+      "schema_version": 1,
+      "event_index": 2,
+      "sim_time_s": 0,
+      "event_type": "resume",
+      "payload": {}
+    },
+    {
+      "schema_version": 1,
+      "event_index": 3,
+      "sim_time_s": 0,
+      "event_type": "pause",
+      "payload": {
+        "reason": "background"
+      }
+    },
+    {
+      "schema_version": 1,
+      "event_index": 4,
+      "sim_time_s": 0,
+      "event_type": "resume",
+      "payload": {}
+    },
+    {
+      "schema_version": 1,
+      "event_index": 5,
+      "sim_time_s": 0.224,
+      "event_type": "pause",
+      "payload": {
+        "reason": "background"
+      }
+    },
+    {
+      "schema_version": 1,
+      "event_index": 6,
+      "sim_time_s": 0.224,
+      "event_type": "stop",
+      "payload": {
+        "reason": "user"
+      }
+    }
+  ]
+}

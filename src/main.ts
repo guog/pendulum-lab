@@ -4,7 +4,7 @@ import { assessActuation } from './actuation-assessment.ts'
 import './styles.css'
 import { sha256 } from './evidence.ts'
 import { saveEvidenceFile } from './save.ts'
-import { drawApparatus, drawChart } from './visualization.ts'
+import { drawApparatus, drawChart, signalColors } from './visualization.ts'
 import type { Command, Reply, Request } from './protocol.ts'
 import type { SessionOutput, DisturbanceOutput } from './session.ts'
 import type { BenchmarkId, PresetId } from './config.ts'
@@ -39,10 +39,20 @@ const errorBox = element('error', HTMLDivElement)
 const exportMessage = element('export-message', HTMLParagraphElement)
 const apparatus = element('apparatus', SVGSVGElement)
 const views = [
-  { field: 'cart_x_m', value: 'value-x', canvas: 'chart-x', color: '#315f9e' },
-  { field: 'cart_v_m_s', value: 'value-v', canvas: 'chart-v', color: '#08776b' },
-  { field: 'theta_unwrapped_rad', value: 'value-theta', canvas: 'chart-theta', color: '#996018' },
-  { field: 'theta_dot_rad_s', value: 'value-omega', canvas: 'chart-omega', color: '#8255a1' },
+  { field: 'cart_x_m', value: 'value-x', canvas: 'chart-x', color: signalColors.cart_x_m },
+  { field: 'cart_v_m_s', value: 'value-v', canvas: 'chart-v', color: signalColors.cart_v_m_s },
+  {
+    field: 'theta_unwrapped_rad',
+    value: 'value-theta',
+    canvas: 'chart-theta',
+    color: signalColors.theta_unwrapped_rad,
+  },
+  {
+    field: 'theta_dot_rad_s',
+    value: 'value-omega',
+    canvas: 'chart-omega',
+    color: signalColors.theta_dot_rad_s,
+  },
 ] as const
 const forceViews = [
   { field: 'force_requested_N', label: '请求力', unit: 'N', color: '#996018' },

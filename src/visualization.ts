@@ -1,5 +1,12 @@
 import type { SessionOutput, Sample } from './session.ts'
 
+export const signalColors = {
+  cart_x_m: '#315f9e',
+  cart_v_m_s: '#08776b',
+  theta_unwrapped_rad: '#996018',
+  theta_dot_rad_s: '#8255a1',
+} as const
+
 const ns = 'http://www.w3.org/2000/svg'
 function shape(name: string, attributes: Record<string, string | number>, text?: string) {
   const element = document.createElementNS(ns, name)

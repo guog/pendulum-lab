@@ -229,3 +229,148 @@ test('a valid 600s experiment remains readable across 1202 batches after a pause
   assert.equal(reopened.output.samples.at(-1)!.sim_time_s, 600)
   assert.deepEqual(reopened.output, run.read().output)
 })
+
+test('an unsupported result version is rejected even when its digest is valid', async () => {
+  const { sha256 } = await import('../src/evidence.ts')
+  const files = new Files()
+  const workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.advance(0.1)
+  await run.stop()
+  const prefix = `experiments/${run.id}/`
+  const manifest = JSON.parse(await files.read(prefix + 'manifest.json'))
+  const result = JSON.parse(await files.read(prefix + manifest.result.path))
+  result.schema_version = 999
+  const text = JSON.stringify(result)
+  await files.write(prefix + manifest.result.path, text)
+  manifest.result.sha256 = await sha256(text)
+  manifest.result.byte_length = new TextEncoder().encode(text).byteLength
+  await files.write(prefix + 'manifest.json', JSON.stringify(manifest))
+  await assert.rejects(workspace.load(run.id), /结果格式/)
+})
+
+test('result metadata must agree with the snapshot, configuration and recorded state', async () => {
+  const { sha256 } = await import('../src/evidence.ts')
+  const files = new Files()
+  const workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.advance(0.1)
+  await run.stop()
+  const prefix = `experiments/${run.id}/`
+  const manifest = JSON.parse(await files.read(prefix + 'manifest.json'))
+  const original = JSON.parse(await files.read(prefix + manifest.result.path))
+  for (const patch of [
+    { status: 'running' },
+    { rules_version: 'unsupported-future-version' },
+    { last_state: { ...original.last_state, cart_x_m: 1 } },
+    { last_state: { x: 123456789 } },
+    { trajectory_source: 'synthetic' },
+    { execution_mode: 'memory-research' },
+    { formal_acceptance: 'eligible' },
+    { qualification_reasons: ['invented'] },
+    { condition_intervals: [{}] },
+    { first_stable: { status: 'passed' } },
+    { endurance: { status: 'passed' } },
+    { horizontal_disturbance: 'passed' },
+    { torque_disturbance: 'passed' },
+  ]) {
+    const text = JSON.stringify({ ...original, ...patch })
+    await files.write(prefix + manifest.result.path, text)
+    manifest.result.sha256 = await sha256(text)
+    manifest.result.byte_length = new TextEncoder().encode(text).byteLength
+    await files.write(prefix + 'manifest.json', JSON.stringify(manifest))
+    await assert.rejects(workspace.load(run.id), /结果.*不一致/, JSON.stringify(patch))
+  }
+})
+
+test('result diagnostics have a supported assessment schema and retain historical values', async () => {
+  const { createActuationConfig } = await import('../src/actuator-benchmarks.ts')
+  const { sha256 } = await import('../src/evidence.ts')
+  for (const config of [
+    createConfig('standard', 'equilibrium'),
+    createActuationConfig('standard', 'force-limit'),
+  ]) {
+    const files = new Files(),
+      workspace = await openWorkspace(files)
+    const run = await workspace.create(config)
+    await run.start()
+    await run.advance(config.benchmark === 'force-limit' ? 0.02 : 0.1)
+    if (!run.progress().sealed) await run.stop()
+    const prefix = `experiments/${run.id}/`
+    const manifest = JSON.parse(await files.read(prefix + 'manifest.json'))
+    const original = JSON.parse(await files.read(prefix + manifest.result.path))
+    const assessment = original.actuation_assessment
+    const patches = assessment
+      ? [
+          { actuation_assessment: { ...assessment, version: 'unknown' } },
+          { actuation_assessment: { ...assessment, status: 'unknown' } },
+          { actuation_assessment: { ...assessment, status: ['passed'] } },
+          {
+            actuation_assessment: {
+              ...assessment,
+              metrics: [{ ...assessment.metrics[0], actual: 'NaN' }],
+            },
+          },
+          { limitation: {} },
+        ]
+      : [{ actuation_assessment: { version: 'unknown', status: 'passed' } }, { limitation: {} }]
+    for (const patch of patches) {
+      const text = JSON.stringify({ ...original, ...patch })
+      await files.write(prefix + manifest.result.path, text)
+      manifest.result.sha256 = await sha256(text)
+      manifest.result.byte_length = new TextEncoder().encode(text).byteLength
+      await files.write(prefix + 'manifest.json', JSON.stringify(manifest))
+      await assert.rejects(workspace.load(run.id), /结果格式/)
+    }
+    const reordered = {
+      ...original,
+      last_state: Object.fromEntries(Object.entries(original.last_state).reverse()),
+    }
+    const text = JSON.stringify(reordered)
+    await files.write(prefix + manifest.result.path, text)
+    manifest.result.sha256 = await sha256(text)
+    manifest.result.byte_length = new TextEncoder().encode(text).byteLength
+    await files.write(prefix + 'manifest.json', JSON.stringify(manifest))
+    assert.deepEqual((await workspace.load(run.id)).result, reordered)
+  }
+})
+
+test('malformed CSV cells are rejected instead of being silently converted', async () => {
+  const { sha256 } = await import('../src/evidence.ts')
+  const files = new Files(),
+    workspace = await openWorkspace(files)
+  const run = await workspace.create(createConfig('standard', 'equilibrium'))
+  await run.start()
+  await run.advance(0.1)
+  await run.stop()
+  const prefix = `experiments/${run.id}/`
+  const manifest = JSON.parse(await files.read(prefix + 'manifest.json'))
+  const entry = manifest.batches.find((batch: { sample_count: number }) => batch.sample_count > 0)
+    .files[0]
+  const original = await files.read(prefix + entry.path)
+  const columns = original.split('\n')[0]!.split(',')
+  for (const [field, value] of [
+    ['overspeed', 'INVALID'],
+    ['saturated', '0'],
+    ['cart_x_m', ''],
+    ['cart_x_m', ' '],
+    ['cart_x_m', 'NaN'],
+    ['cart_x_m', '1e999'],
+    ['control_mode', 'unknown'],
+    ['controller_phase', 'unknown'],
+    ['saturation_reasons', 'unknown'],
+  ]) {
+    const lines = original.split('\n'),
+      cells = lines[1]!.split(',')
+    cells[columns.indexOf(field!)] = value!
+    lines[1] = cells.join(',')
+    const text = lines.join('\n')
+    await files.write(prefix + entry.path, text)
+    entry.sha256 = await sha256(text)
+    entry.byte_length = new TextEncoder().encode(text).byteLength
+    await files.write(prefix + 'manifest.json', JSON.stringify(manifest))
+    await assert.rejects(workspace.load(run.id), /采样|样本/, `${field}=${value}`)
+  }
+})

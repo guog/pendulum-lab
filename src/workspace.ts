@@ -1,3 +1,5 @@
+import { actuationAssessmentFormat } from './actuation-assessment.ts'
+import { actuationCases } from './actuator-benchmarks.ts'
 import { createSession, type ExperimentConfig, type SessionOutput } from './session.ts'
 import { validateConfig } from './config.ts'
 import { buildEvidence, buildResult, sha256, sampleColumns } from './evidence.ts'
@@ -38,6 +40,85 @@ type Manifest = {
   batches: Batch[]
   snapshot: Entry
   result: Entry
+}
+// JSON property order does not change a stored value's meaning.
+function sameJSON(left: unknown, right: unknown): boolean {
+  if (left === right) return true
+  if (
+    !left ||
+    !right ||
+    typeof left !== 'object' ||
+    typeof right !== 'object' ||
+    Array.isArray(left) !== Array.isArray(right)
+  )
+    return false
+  const a = left as Record<string, unknown>,
+    b = right as Record<string, unknown>
+  const keys = Object.keys(a)
+  return (
+    keys.length === Object.keys(b).length &&
+    keys.every((key) => Object.hasOwn(b, key) && sameJSON(a[key], b[key]))
+  )
+}
+function validateResultDiagnostics(result: Record<string, unknown>, benchmark: string) {
+  const fail = () => {
+    throw new Error('不支持的结果格式')
+  }
+  if (typeof result.limitation !== 'string') fail()
+  const assessment = result.actuation_assessment
+  if (!Object.hasOwn(actuationCases, benchmark)) {
+    if (assessment !== null) fail()
+    return
+  }
+  if (!assessment || typeof assessment !== 'object' || Array.isArray(assessment)) return fail()
+  const a = assessment as Record<string, unknown>
+  if (
+    a.version !== actuationAssessmentFormat.version ||
+    a.requirement !== actuationAssessmentFormat.requirement ||
+    typeof a.status !== 'string' ||
+    !['not_executed', 'invalid', 'blocked', 'passed', 'failed'].includes(a.status) ||
+    typeof a.reason !== 'string' ||
+    !Array.isArray(a.metrics)
+  )
+    return fail()
+  for (const metric of a.metrics) {
+    if (
+      !metric ||
+      typeof metric !== 'object' ||
+      Array.isArray(metric) ||
+      ['name', 'unit', 'basis'].some((key) => typeof metric[key] !== 'string') ||
+      !Number.isFinite(metric.actual) ||
+      !Number.isFinite(metric.limit)
+    )
+      fail()
+  }
+}
+function sampleCell(field: string, value: string): string | string[] | number | boolean {
+  const invalid = () => {
+    throw new Error(`非法采样字段 ${field}`)
+  }
+  if (field === 'control_mode' || field === 'controller_phase') {
+    const allowed =
+      field === 'control_mode' ? ['free', 'prescribed', 'automatic'] : ['none', 'swing', 'balance']
+    if (!allowed.includes(value)) return invalid()
+    return value
+  }
+  if (field === 'saturation_reasons') {
+    const reasons = value ? value.split('|') : []
+    if (reasons.some((reason) => !['force', 'power', 'speed_direction'].includes(reason)))
+      return invalid()
+    return reasons
+  }
+  if (field === 'overspeed' || field === 'saturated') {
+    if (value !== 'true' && value !== 'false') return invalid()
+    return value === 'true'
+  }
+  if (
+    !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(value) ||
+    !Number.isFinite(Number(value))
+  )
+    return invalid()
+  return Number(value)
 }
 async function checkedRead(files: WorkspaceFiles, entry: Entry, prefix: string) {
   if (
@@ -124,6 +205,8 @@ export async function openWorkspace(files: WorkspaceFiles) {
       'samples' | 'events'
     >
     const result = JSON.parse(await checkedRead(files, m.result, prefix))
+    if (!result || Array.isArray(result) || result.schema_version !== 1)
+      throw new Error('不支持的结果格式')
     const samples: SessionOutput['samples'] = [],
       events: SessionOutput['events'] = []
     const seen = new Set([m.config.path, m.snapshot.path, m.result.path])
@@ -143,20 +226,7 @@ export async function openWorkspace(files: WorkspaceFiles) {
         throw new Error('非法采样格式')
       const rows = lines.map((line) =>
         Object.fromEntries(
-          line
-            .split(',')
-            .map((value, i) => [
-              columns[i]!,
-              ['control_mode', 'controller_phase'].includes(columns[i]!)
-                ? value
-                : columns[i] === 'saturation_reasons'
-                  ? value
-                    ? value.split('|')
-                    : []
-                  : ['overspeed', 'saturated'].includes(columns[i]!)
-                    ? value === 'true'
-                    : Number(value),
-            ]),
+          line.split(',').map((value, i) => [columns[i]!, sampleCell(columns[i]!, value)]),
         ),
       ) as SessionOutput['samples']
       const eventText = await checkedRead(files, batch.files[1]!, prefix)
@@ -244,6 +314,45 @@ export async function openWorkspace(files: WorkspaceFiles) {
       (m.sealed && !['completed', 'stopped', 'error'].includes(snapshot.status))
     )
       throw new Error('配置、快照、结果或记录不一致')
+    const stateFields = [
+      'cart_x_m',
+      'cart_v_m_s',
+      'theta_unwrapped_rad',
+      'theta_dot_rad_s',
+    ] as const
+    if (
+      !['ready', 'running', 'paused', 'stopped', 'completed', 'error'].includes(snapshot.status) ||
+      !['physics', 'synthetic'].includes(snapshot.trajectory_source) ||
+      config.execution_mode !== 'authorized-directory' ||
+      !snapshot.state ||
+      Object.keys(snapshot.state).length !== stateFields.length ||
+      stateFields.some((field) => !Number.isFinite(snapshot.state[field])) ||
+      (terminal &&
+        (!samples.length ||
+          stateFields.some((field) => samples.at(-1)![field] !== snapshot.state[field])))
+    )
+      throw new Error('结果与最终记录不一致')
+    validateResultDiagnostics(result, config.benchmark)
+    const expected = {
+      status: snapshot.status,
+      trajectory_source: snapshot.trajectory_source,
+      execution_mode: 'authorized-directory',
+      formal_acceptance: 'not_eligible',
+      qualification_reasons: snapshot.qualification_reasons,
+      condition_intervals: snapshot.condition_intervals,
+      first_stable: snapshot.controller ? snapshot.first_stable : 'not_executed',
+      endurance: snapshot.endurance,
+      horizontal_disturbance: 'not_executed',
+      torque_disturbance: 'not_executed',
+      last_state: snapshot.state,
+      rules_version: config.versions.rules,
+    }
+    if (
+      Object.entries(expected).some(
+        ([key, value]) => !Object.hasOwn(result, key) || !sameJSON(result[key], value),
+      )
+    )
+      throw new Error('结果与配置或快照不一致')
     return {
       manifest: m,
       output: { ...snapshot, samples, events },

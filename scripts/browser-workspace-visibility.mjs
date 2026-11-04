@@ -98,6 +98,28 @@ try {
   assert.equal(events.filter((e) => e.event_type === 'resume').length, 2)
   assert.equal(events.at(-1).event_type, 'stop')
   assert.equal(events[1].sim_time_s, 0)
+  const rendered = JSON.parse(
+    browser(
+      'eval',
+      `JSON.stringify([...document.querySelectorAll('#workspace-record canvas')].map((canvas, index) => {
+    const expected = [[49,95,158],[8,119,107],[153,96,24],[130,85,161]][index];
+    const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+    let matches = 0;
+    for (let i = 0; i < pixels.length; i += 4) {
+      if (pixels[i] === expected[0] && pixels[i+1] === expected[1] && pixels[i+2] === expected[2] && pixels[i+3] === 255) matches++;
+    }
+    return { expected, matches };
+  }))`,
+      '--json',
+    ),
+  ).data
+  const colors = typeof rendered.result === 'string' ? JSON.parse(rendered.result) : rendered.result
+  assert.equal(colors.length, 4)
+  assert.ok(
+    colors.every((item) => item.matches > 0),
+    `历史曲线配色不符: ${JSON.stringify(colors)}`,
+  )
+  summary.history_signal_colors = colors
   summary.status = 'passed'
   summary.final_progress = text('#workspace-progress')
   summary.events = events

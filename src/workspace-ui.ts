@@ -1,6 +1,6 @@
 import type { WorkspaceCommand, WorkspaceReply } from './workspace-protocol.ts'
 import { createConfig } from './session.ts'
-import { drawChart } from './visualization.ts'
+import { drawChart, signalColors } from './visualization.ts'
 import type { SessionOutput } from './session.ts'
 
 export function initializeWorkspace() {
@@ -119,7 +119,7 @@ export function initializeWorkspace() {
         chart.style.width = '100%'
         chart.style.height = '150px'
         target.append(label, chart)
-        drawChart(chart, output.samples, field, '#315f9e', output.sim_time_s || 1)
+        drawChart(chart, output.samples, field, signalColors[field], output.sim_time_s || 1)
       }
       for (const [name, value] of [
         ['原配置', output.config],

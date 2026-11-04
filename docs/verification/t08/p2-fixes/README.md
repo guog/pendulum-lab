@@ -43,7 +43,9 @@ BROWSER_SESSION=<测试会话> BROWSER_ARTIFACTS_DIR=<证据目录> \
 
 新增 P2 已在修复前 `9057403` 和本轮修复后分别复现，脚本及输出在 [unresolved-result-validation.tar.gz](unresolved-result-validation.tar.gz)。
 
-本分支尚不能宣称审查问题已全部清零。跨实例独占与完整崩溃恢复仍属后续任务，本次未扩展。
+本轮固定对象当时尚不能宣称审查问题已全部清零。跨实例独占与完整崩溃恢复仍属后续任务，本次未扩展。
+
+后续上述结果校验缺口、历史配色及 CSV 类型校验已修复，最新验证与审查结论见 [后续修复记录](../result-color-fixes/README.md)。本页保留为本轮历史。
 
 Assisted-by: LLM
 AI-Agent: OpenAI Codex
