@@ -1,0 +1,24 @@
+{
+  "repo": "guog/pendulum-lab",
+  "root_issue": 13,
+  "sources": [
+    {
+      "number": 13,
+      "title": "feat(qv1): 授权目录并持续保存可重新查看的实验",
+      "url": "https://github.com/guog/pendulum-lab/issues/13",
+      "body_sha256": "4c8e3aedcfab8fd94cf7cc7c68b109eedbb45f6628dbd39167179e478610f72c"
+    },
+    {
+      "number": 4,
+      "title": "spec: 一阶倒立摆快速验证需求基线 QV-1（已确认）与完整产品候选范围",
+      "url": "https://github.com/guog/pendulum-lab/issues/4",
+      "body_sha256": "22a10963aa2901664708f333c375e29da5d3efa572dbcf5f5f04e76d4ed76d51"
+    },
+    {
+      "number": 5,
+      "title": "spec: 原始 ADR-001～190 逐项需求追踪与阶段处置（QV-1已确认）",
+      "url": "https://github.com/guog/pendulum-lab/issues/5",
+      "body_sha256": "903b3d16de29e252a0a060752bca6730f92886ab70a354796fed44800db255d0"
+    }
+  ]
+}
