@@ -3,7 +3,7 @@ import { createController, controllerDefinition } from './controller.ts'
 import { actuator, zeroForces, type Forces } from './actuation.ts'
 import { integrate, energy, type State } from './dynamics.ts'
 import { createConfig, validateConfig, type ExperimentConfig } from './config.ts'
-import { buildEvidence } from './evidence.ts'
+import { buildEvidence, sha256 } from './evidence.ts'
 export { createConfig }
 export type { ExperimentConfig, State }
 
@@ -16,16 +16,37 @@ export type ExperimentEvent = {
   payload: Record<string, unknown>
 }
 
+type StableSnapshot = {
+  trajectory_source: 'physics' | 'synthetic'
+  sim_time_s: number
+  stable_since_s: number
+  config: ExperimentConfig
+  controller_definition: typeof controllerDefinition
+  state: State
+  controller: ReturnType<ReturnType<typeof createController>['read']>
+  forces: Forces
+  physics_tick: number
+  control_phase_steps: number
+  sample_phase_steps: number
+  energy: {
+    initial: ReturnType<typeof energy>
+    actuator_work_J: number
+    external_force_work_J: number
+    external_torque_work_J: number
+    dissipated_J: number
+  }
+}
+
 export type SyntheticStep = { tick: number; state: State }
 
 export function createSession(input: ExperimentConfig) {
   return createSessionInternal(input, null)
 }
 
-export function createSyntheticSession(input: ExperimentConfig, steps: SyntheticStep[]) {
+function validateSyntheticSteps(steps: SyntheticStep[], maximum = 10000) {
   if (
     !Array.isArray(steps) ||
-    steps.length > 10000 ||
+    steps.length > maximum ||
     steps.some(
       (step, index) =>
         !step ||
@@ -39,18 +60,29 @@ export function createSyntheticSession(input: ExperimentConfig, steps: Synthetic
     )
   )
     throw new Error('非法合成轨迹')
+}
+
+export function createSyntheticSession(input: ExperimentConfig, steps: SyntheticStep[]) {
+  validateSyntheticSteps(steps)
   return createSessionInternal(input, structuredClone(steps))
 }
 
-function createSessionInternal(input: ExperimentConfig, syntheticSteps: SyntheticStep[] | null) {
+function createSessionInternal(
+  input: ExperimentConfig,
+  syntheticSteps: SyntheticStep[] | null,
+  fork?: { snapshot: StableSnapshot; kind: 'horizontal' | 'torque' },
+) {
   validateConfig(input)
   const config = structuredClone(input)
   const syntheticByTick = new Map(syntheticSteps?.map((step) => [step.tick, step.state]) ?? [])
-  const controller = config.control_mode === 'automatic' ? createController(config.physics) : null
+  const controller =
+    config.control_mode === 'automatic'
+      ? createController(config.physics, fork?.snapshot.controller)
+      : null
   const controlSteps = Math.round(config.timing.control_period_s / config.timing.physics_step_s)
-  const initialEnergy = energy(config.initial_state, config.physics)
+  const initialEnergy = energy(fork?.snapshot.state ?? config.initial_state, config.physics)
   let created_at_utc = new Date().toISOString()
-  let state = structuredClone(config.initial_state)
+  let state = structuredClone(fork?.snapshot.state ?? config.initial_state)
   const samples: Sample[] = []
   const events: ExperimentEvent[] = []
   const dt = config.timing.physics_step_s
@@ -60,29 +92,10 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
   let actuatorWork = 0
   let forceWork = 0
   let torqueWork = 0
-  let forces: Forces = { ...zeroForces }
+  let forces: Forces = { ...(fork?.snapshot.forces ?? zeroForces) }
   let stableStart: number | null = null
   let previousFailures = new Set<string>()
-  type StableSnapshot = {
-    trajectory_source: 'physics' | 'synthetic'
-    sim_time_s: number
-    stable_since_s: number
-    config: ExperimentConfig
-    controller_definition: typeof controllerDefinition
-    state: State
-    controller: ReturnType<NonNullable<typeof controller>['read']>
-    forces: Forces
-    physics_tick: number
-    control_phase_steps: number
-    sample_phase_steps: number
-    energy: {
-      initial: ReturnType<typeof energy>
-      actuator_work_J: number
-      external_force_work_J: number
-      external_torque_work_J: number
-      dissipated_J: number
-    }
-  }
+
   let physicalStableSince: number | null = null
   let physicalFirstStable: number | null = null
   let physicallyStable = false
@@ -214,10 +227,20 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
     }
   }
   let terminalTime: number | null = null
-  let tick = 0
+  let tick = fork?.snapshot.physics_tick ?? 0
   const time = () => terminalTime ?? tick * dt
   let status: SessionStatus = 'ready'
   let experiment_id = crypto.randomUUID()
+  const forkStart = tick
+  const pulseEnd = forkStart + Math.round(0.1 / dt)
+  const forkDeadline = pulseEnd + Math.round(10 / dt)
+  let forkUnstable = false
+  let forkOutside = false
+  let recoveryStart: number | null = null
+  let forkResult:
+    'running' | 'suppressed' | 'recovered' | 'failed' | 'violation' | 'error' | 'invalid' =
+    'running'
+  let disturbanceActualEnd: number | null = null
   const event = (event_type: string, payload: Record<string, unknown> = {}) => {
     events.push({
       schema_version: 1,
@@ -225,6 +248,17 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
       sim_time_s: time(),
       event_type,
       payload,
+    })
+  }
+  const endDisturbance = (reason: string) => {
+    if (!fork || disturbanceActualEnd !== null) return
+    disturbanceActualEnd = time()
+    event('disturbance_end', {
+      scheduled_time_s: pulseEnd * dt,
+      actual_time_s: time(),
+      reason,
+      inputs_ending: { ...forces },
+      terminal_sample_forces: reason === 'scheduled' ? 'after_end' : 'before_termination',
     })
   }
   const boundaryEvent = () => {
@@ -361,11 +395,88 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
         overspeed: Math.abs(state.cart_v_m_s) > config.physics.speed_max_m_s,
       })
   }
+  async function runFork(
+    kind: 'horizontal' | 'torque',
+    trajectory: SyntheticStep[] | null,
+    checkpoint?: (progress: {
+      sim_time_s: number
+    }) => Promise<
+      | { reason: 'manual' | 'background' }
+      | { action: 'stop'; reason?: 'manual' | 'background' }
+      | void
+    >,
+  ): Promise<DisturbanceOutput> {
+    if (!['horizontal', 'torque'].includes(kind)) throw new Error('未知扰动')
+    if (!stableSnapshot || !exportConfirmed) throw new Error('缺少已确认的快照')
+    const snapshot = structuredClone(stableSnapshot)
+    const sourceId = experiment_id
+    const digest = await sha256(JSON.stringify(snapshot, null, 2) + '\n')
+    const child = createSessionInternal(config, trajectory, { snapshot, kind })
+    child.start()
+    if (checkpoint) {
+      const totalSteps = Math.round(10.1 / dt)
+      const chunkSteps = Math.round(0.016 / dt)
+      for (let step = 0; step < totalSteps; step += chunkSteps) {
+        const progress = child.read()
+        if (progress.status !== 'running') break
+        const pause = await checkpoint({ sim_time_s: progress.sim_time_s })
+        if (pause && 'action' in pause) {
+          if (pause.reason) child.pause(pause.reason)
+          child.stop()
+          break
+        }
+        if (pause) {
+          child.pause(pause.reason)
+          child.resume()
+        }
+        child.advance(Math.min(chunkSteps, totalSteps - step) * dt)
+      }
+    } else child.advance(10.1)
+    const result = child.read()
+    return { ...result, snapshot, snapshot_sha256: digest, source_experiment_id: sourceId, kind }
+  }
   return {
+    async forkDisturbance(
+      kind: 'horizontal' | 'torque',
+      checkpoint?: (progress: {
+        sim_time_s: number
+      }) => Promise<
+        | { reason: 'manual' | 'background' }
+        | { action: 'stop'; reason?: 'manual' | 'background' }
+        | void
+      >,
+    ): Promise<DisturbanceOutput> {
+      if (syntheticSteps !== null) throw new Error('缺少已确认的合格快照')
+      return runFork(kind, null, checkpoint)
+    },
+    async forkSyntheticDisturbance(
+      kind: 'horizontal' | 'torque',
+      steps: SyntheticStep[],
+    ): Promise<DisturbanceOutput> {
+      if (syntheticSteps === null) throw new Error('仅合成会话可执行合成诊断')
+      validateSyntheticSteps(steps, 20000)
+      if (!stableSnapshot || steps.some((step) => step.tick <= stableSnapshot!.physics_tick))
+        throw new Error('合成轨迹必须在快照之后')
+      return runFork(kind, structuredClone(steps))
+    },
     start() {
       if (status !== 'ready') throw new Error('请重置后开始新的实验')
       status = 'running'
       event('start')
+      if (fork) {
+        forces.force_external_N = fork.kind === 'horizontal' ? config.physics.force_max_N * 0.1 : 0
+        forces.torque_external_Nm = fork.kind === 'torque' ? 0.1 : 0
+        event('disturbance_start', {
+          kind: fork.kind,
+          scheduled_time_s: time(),
+          actual_time_s: time(),
+          end_time_s: pulseEnd * dt,
+          ...forces,
+        })
+        observe()
+        sample()
+        return
+      }
       if (Math.abs(state.cart_x_m) >= config.physics.track_length_m / 2) {
         status = 'stopped'
         observe()
@@ -402,12 +513,14 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
         ) {
           status = 'error'
           qualificationReasons.add('numerical_error')
+          if (fork) forkResult = 'error'
           finishConditions()
           failEndurance('numerical_error')
           event('numerical_error', {
             attempted_sim_time_s: time() + dt,
             reason: '非有限数值，保留最后有效状态',
           })
+          endDisturbance('numerical_error')
           sample()
           break
         }
@@ -418,12 +531,14 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
           if (!Object.values(injectedEnergy).every(Number.isFinite)) {
             status = 'error'
             qualificationReasons.add('numerical_error')
+            if (fork) forkResult = 'error'
             finishConditions()
             failEndurance('numerical_error')
             event('numerical_error', {
               attempted_sim_time_s: time() + dt,
               reason: '合成状态能量非有限，保留最后有效状态',
             })
+            endDisturbance('numerical_error')
             sample()
             break
           }
@@ -445,6 +560,8 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
           observe()
           if (injected) event('synthetic_state', { ...injected, tick: tick + 1 })
           boundaryEvent()
+          if (fork) forkResult = 'violation'
+          endDisturbance('boundary')
           failEndurance('boundary')
           sample()
           break
@@ -457,16 +574,55 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
         tick++
         if (injected) event('synthetic_state', { ...state, tick })
         const previousForces = { ...forces }
+        if (fork && tick === pulseEnd) {
+          endDisturbance('scheduled')
+          forces.force_external_N = 0
+          forces.torque_external_Nm = 0
+        }
         applyInputs()
         if (controller && tick % controlSteps === 0) updateController()
         observe(previousForces)
         if (qualificationReasons.has('controller_error')) {
+          if (fork) forkResult = 'error'
+          endDisturbance('controller_error')
           failEndurance('controller_error')
           finishConditions()
           sample()
           break
         }
-        checkStability()
+        if (fork) {
+          const failures = stabilityFailures(state)
+          if (failures.length) {
+            if (!forkOutside)
+              event('disturbance_stability_lost', { ...state, failed_thresholds: failures })
+            forkOutside = true
+            forkUnstable = true
+            recoveryStart = null
+          } else {
+            if (forkOutside) event('disturbance_stability_enter', { ...state })
+            forkOutside = false
+            if (forkUnstable && tick >= pulseEnd && recoveryStart === null) recoveryStart = tick
+          }
+          if (qualificationReasons.size) forkResult = 'violation'
+          else if (
+            forkUnstable &&
+            recoveryStart !== null &&
+            tick - recoveryStart >= Math.round(5 / dt)
+          )
+            forkResult = 'recovered'
+          else if (tick >= forkDeadline) forkResult = forkUnstable ? 'failed' : 'suppressed'
+          if (forkResult !== 'running') {
+            status = 'completed'
+            endDisturbance(forkResult === 'violation' ? 'violation' : 'completed')
+            event('disturbance_result', {
+              result: forkResult,
+              recovery_start_s: recoveryStart === null ? null : recoveryStart * dt,
+            })
+            finishConditions()
+            sample()
+            break
+          }
+        } else checkStability()
         if (enduranceStatus === 'running' && enduranceStart !== null && tick > enduranceStart) {
           const failures = stabilityFailures(state)
           enduranceStatus = enduranceAssessment!.observe(tick, state, qualificationReasons.size > 0)
@@ -485,7 +641,7 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
             break
           }
         }
-        if (tick >= durationSteps && stableSnapshot === null) {
+        if (!fork && tick >= durationSteps && stableSnapshot === null) {
           status = 'completed'
           if (controller && stabilityStatus === 'pending') stabilityStatus = 'failed'
           finishConditions()
@@ -507,6 +663,8 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
     stop() {
       if (status !== 'running' && status !== 'paused') return
       status = 'stopped'
+      if (fork) forkResult = 'invalid'
+      endDisturbance('user_stopped')
       failEndurance('user_stopped')
       finishConditions()
       event('stop', { reason: 'user' })
@@ -545,7 +703,17 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
     read() {
       return structuredClone({
         config,
-        trajectory_source: syntheticSteps === null ? 'physics' : 'synthetic',
+        disturbance: fork
+          ? {
+              status: forkResult,
+              validity: syntheticSteps === null ? ('physical' as const) : ('synthetic' as const),
+              pulse_start_s: forkStart * dt,
+              pulse_end_s: pulseEnd * dt,
+              pulse_actual_end_s: disturbanceActualEnd,
+              deadline_s: forkDeadline * dt,
+            }
+          : null,
+        trajectory_source: syntheticSteps === null ? ('physics' as const) : ('synthetic' as const),
         synthetic_trajectory: syntheticSteps,
         first_stable: {
           status:
@@ -606,7 +774,7 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
             ['completed', 'stopped', 'error'].includes(status)
               ? 'blocked'
               : enduranceStatus,
-          validity: syntheticSteps === null ? 'physical' : 'synthetic',
+          validity: syntheticSteps === null ? ('physical' as const) : ('synthetic' as const),
           start_s: enduranceStart === null ? null : enduranceStart * dt,
           end_s: enduranceEnd,
           rules_version: config.versions.rules,
@@ -654,6 +822,36 @@ function createSessionInternal(input: ExperimentConfig, syntheticSteps: Syntheti
 }
 
 export type SessionOutput = ReturnType<ReturnType<typeof createSession>['read']>
+export type DisturbanceOutput = {
+  trajectory_source: 'physics' | 'synthetic'
+  first_stable: { disturbance_eligibility: string }
+  controller: { state: ReturnType<ReturnType<typeof createController>['read']> } | null
+  snapshot: StableSnapshot
+  snapshot_sha256: string
+  source_experiment_id: string
+  kind: 'horizontal' | 'torque'
+  experiment_id: string
+  samples: Sample[]
+  events: ExperimentEvent[]
+  qualification_reasons: string[]
+  condition_intervals: {
+    condition: string
+    start_time_s: number
+    end_time_s: number | null
+    duration_s: number
+    active_at_end: boolean
+    causes: string[]
+  }[]
+  disturbance: {
+    status: string
+    validity: 'physical' | 'synthetic'
+    pulse_start_s: number
+    pulse_end_s: number
+    pulse_actual_end_s: number | null
+    deadline_s: number
+  } | null
+}
+
 export type Sample = State & {
   sample_index: number
   sim_time_s: number

@@ -5,7 +5,7 @@ import { sha256 } from './evidence.ts'
 import { saveEvidenceFile } from './save.ts'
 import { drawApparatus, drawChart } from './visualization.ts'
 import type { Command, Reply, Request } from './protocol.ts'
-import type { SessionOutput } from './session.ts'
+import type { SessionOutput, DisturbanceOutput } from './session.ts'
 import type { BenchmarkId, PresetId } from './config.ts'
 import { initializeBenchmarks } from './benchmark-ui.ts'
 
@@ -14,6 +14,16 @@ function element<T extends Element>(id: string, type: new (...args: never[]) => 
   if (!(found instanceof type)) throw new Error(`页面缺少 ${id}`)
   return found
 }
+const runDisturbances = element('run-disturbances', HTMLButtonElement)
+const runHorizontal = element('run-horizontal', HTMLButtonElement)
+const runTorque = element('run-torque', HTMLButtonElement)
+const pauseDisturbances = element('pause-disturbances', HTMLButtonElement)
+const stopDisturbances = element('stop-disturbances', HTMLButtonElement)
+const saveDisturbances = element('save-disturbances', HTMLButtonElement)
+const prepareDisturbanceDownload = element('prepare-disturbance-download', HTMLButtonElement)
+const downloadDisturbances = element('download-disturbances', HTMLAnchorElement)
+const verifyDisturbances = element('verify-disturbances', HTMLInputElement)
+const resumeDisturbances = element('resume-disturbances', HTMLButtonElement)
 const start = element('start', HTMLButtonElement)
 const pause = element('pause', HTMLButtonElement)
 const stop = element('stop', HTMLButtonElement)
@@ -74,6 +84,14 @@ const statusText = {
   completed: '基准已结束',
   error: '计算已冻结',
 }
+let disturbanceResults: DisturbanceOutput[] | undefined
+let disturbanceSaved = false
+let disturbancePaused = false
+let disturbanceRunning = false
+let disturbanceTime: number | null = null
+let disturbanceRevision = 0
+let preparedDisturbances:
+  { hash: string; url: string; revision: number; byteLength: number } | undefined
 let current: SessionOutput | undefined
 let wallMs = 0
 let busy = false
@@ -110,8 +128,43 @@ function clearPrepared() {
   verifyFile.disabled = true
   verifyFile.value = ''
 }
+function clearPreparedDisturbances() {
+  if (preparedDisturbances) URL.revokeObjectURL(preparedDisturbances.url)
+  preparedDisturbances = undefined
+  downloadDisturbances.hidden = true
+  downloadDisturbances.removeAttribute('href')
+  verifyDisturbances.value = ''
+}
+function disturbanceEvidence() {
+  if (!disturbanceResults) throw new Error('尚无扰动结果')
+  return (
+    JSON.stringify(
+      {
+        schema_version: 1,
+        limitation: '内存研究证据；不承诺崩溃恢复或正式工作区验收。',
+        results: disturbanceResults,
+      },
+      null,
+      2,
+    ) + '\n'
+  )
+}
 function updateControls() {
   const status = workerFailed ? undefined : current?.status
+  runDisturbances.disabled =
+    busy ||
+    workerFailed ||
+    !current ||
+    current.status === 'running' ||
+    current.first_stable.disturbance_eligibility !== 'eligible'
+  runHorizontal.disabled = runDisturbances.disabled
+  runTorque.disabled = runDisturbances.disabled
+  pauseDisturbances.disabled = !disturbanceRunning || disturbancePaused || document.hidden
+  stopDisturbances.disabled = !disturbanceRunning || document.hidden
+  saveDisturbances.disabled = busy || !disturbanceResults
+  prepareDisturbanceDownload.disabled = busy || !disturbanceResults
+  verifyDisturbances.disabled = busy || !preparedDisturbances
+  resumeDisturbances.disabled = !disturbancePaused || document.hidden
   start.disabled = busy || benchmarksActive || status !== 'ready'
   pause.disabled = busy || (status !== 'running' && status !== 'paused')
   pause.textContent = status === 'paused' ? '继续' : '暂停'
@@ -137,6 +190,14 @@ function render() {
   renderQueued = false
   if (!current) return
   const { config, state } = current
+  write(
+    'disturbance-current',
+    disturbancePaused
+      ? `扰动实验已暂停（${disturbanceTime?.toFixed(3) ?? '等待开始'} s）；回到页面后可继续。`
+      : current.first_stable.disturbance_eligibility === 'eligible'
+        ? `${config.preset === 'simple' ? '简单' : '标准'}工况：已有合格快照，可运行水平外力与关节力矩实验。`
+        : `${config.preset === 'simple' ? '简单' : '标准'}工况：水平外力阻塞；关节力矩阻塞（无已确认合格快照）。`,
+  )
   if (renderedConfigId !== current.experiment_id) {
     renderedConfigId = current.experiment_id
     write('benchmark-description', config.benchmark_description)
@@ -193,7 +254,7 @@ function render() {
   write(
     'end-reason',
     config.control_mode === 'automatic' && current.first_stable.snapshot
-      ? `首次稳定：${current.first_stable.disturbance_eligibility === 'eligible' ? '通过，快照证据已导出校验' : '已达成，候选快照待导出校验'} · ${last?.event_type === 'boundary' ? '触边终止 · ' : last?.event_type === 'controller_error' ? '控制器异常 · ' : last?.event_type === 'numerical_error' ? '数值异常 · ' : current.status === 'stopped' ? '用户终止 · ' : ''}扰动测试尚未执行`
+      ? `首次稳定：${current.first_stable.disturbance_eligibility === 'eligible' ? '通过，快照证据已导出校验' : '已达成，候选快照待导出校验'} · ${last?.event_type === 'boundary' ? '触边终止 · ' : last?.event_type === 'controller_error' ? '控制器异常 · ' : last?.event_type === 'numerical_error' ? '数值异常 · ' : current.status === 'stopped' ? '用户终止 · ' : ''}可在下方运行独立扰动测试`
       : config.control_mode === 'automatic'
         ? `${current.controller?.state.phase === 'balance' ? '稳摆' : '起摆'} · ${last?.event_type === 'boundary' ? '触边终止；首次稳定失败，扰动测试阻塞' : last?.event_type === 'numerical_error' ? '数值异常；首次稳定失败，扰动测试阻塞' : last?.event_type === 'controller_error' ? '控制器异常或超出预算；首次稳定失败，扰动测试阻塞' : current.first_stable.reason === 'user_stopped' ? '用户终止；首次稳定未完成，扰动测试阻塞' : current.first_stable.physical_status === 'passed' && !current.first_stable.snapshot ? '物理稳定曾达成，但配置或资格无效；扰动测试阻塞' : current.first_stable.physical_status === 'passed' ? (current.first_stable.disturbance_eligibility === 'eligible' ? '首次连续5秒稳定；快照证据已导出校验，扰动功能尚未执行' : '首次连续5秒稳定，候选快照待导出校验；扰动测试阻塞') : ['failed', 'invalid'].includes(current.first_stable.status) ? `首次稳定失败（${current.qualification_reasons.join('、') || '超过时限'}），扰动测试阻塞` : '等待首次稳定；无合格快照，扰动测试阻塞'}`
         : last?.event_type === 'boundary'
@@ -331,6 +392,17 @@ function scheduleRender() {
   }
 }
 worker.onmessage = ({ data }: MessageEvent<Reply>) => {
+  if (data.type === 'disturbance-status') {
+    disturbanceRunning = data.running
+    disturbancePaused = data.running && data.paused
+    disturbanceTime = data.sim_time_s
+    if (disturbancePaused)
+      write(
+        'disturbance-current',
+        `扰动实验已暂停（${disturbanceTime?.toFixed(3) ?? '等待开始'} s）；回到页面后可继续。`,
+      )
+    updateControls()
+  }
   if (data.type === 'snapshot') {
     if (
       current &&
@@ -394,9 +466,101 @@ function discardAllowed() {
   return (
     !current?.samples.length ||
     verifiedKey === key() ||
-    window.confirm('当前记录尚未确认导出。继续将清空这次内存记录，是否继续？')
+    window.confirm('当前源实验记录尚未确认导出。继续将清空这次内存记录，是否继续？')
   )
 }
+function renderDisturbances() {
+  if (!disturbanceResults?.length) {
+    write('disturbance-result', '阻塞：等待已确认的合格快照。')
+    return
+  }
+  const labels: Record<string, string> = {
+    suppressed: '抑扰成功',
+    recovered: '失稳恢复成功',
+    failed: '未恢复',
+    violation: '违规',
+    error: '异常',
+    running: '证据不完整',
+    invalid: '用户终止',
+  }
+  write(
+    'disturbance-result',
+    disturbanceResults
+      .map((result) => {
+        const conditions =
+          result.condition_intervals
+            .map(
+              (item) =>
+                `${item.condition} ${item.start_time_s.toFixed(3)}–${item.end_time_s?.toFixed(3) ?? '未结束'} s`,
+            )
+            .join('、') || '无约束或超速区间'
+        return `${result.snapshot.config.preset === 'simple' ? '简单' : '标准'}工况 · ${result.kind === 'horizontal' ? '水平外力' : '关节外力矩'} · ${result.experiment_id}\n状态：${labels[result.disturbance?.status ?? 'running']}；脉冲起点 ${result.disturbance?.pulse_start_s.toFixed(3)} s、计划终点 ${result.disturbance?.pulse_end_s.toFixed(3)} s、实际终点 ${result.disturbance?.pulse_actual_end_s?.toFixed(3) ?? '未记录'} s；恢复截止 ${result.disturbance?.deadline_s.toFixed(3)} s\n限制：${conditions}；资格原因：${result.qualification_reasons.join('、') || '无'}`
+      })
+      .join('\n\n') + `\n\n扰动证据${disturbanceSaved ? '已导出并校验' : '尚未导出校验'}`,
+  )
+}
+resumeDisturbances.onclick = () => void call({ type: 'resume-disturbances' }).catch(showError)
+pauseDisturbances.onclick = () => void call({ type: 'pause-disturbances' }).catch(showError)
+stopDisturbances.onclick = () => void call({ type: 'stop-disturbances' }).catch(showError)
+function runSelectedDisturbances(kind: 'horizontal' | 'torque' | 'both') {
+  void action(async () => {
+    const reply = await call({ type: 'run-disturbances', kind })
+    if (reply.type !== 'disturbances') throw new Error('未收到扰动结果')
+    disturbanceResults = [...(disturbanceResults ?? []), ...reply.results]
+    disturbanceRevision++
+    clearPreparedDisturbances()
+    disturbanceSaved = false
+    renderDisturbances()
+  })
+}
+runDisturbances.onclick = () => runSelectedDisturbances('both')
+runHorizontal.onclick = () => runSelectedDisturbances('horizontal')
+runTorque.onclick = () => runSelectedDisturbances('torque')
+saveDisturbances.onclick = () =>
+  void action(async () => {
+    if (!disturbanceResults) return
+    if (!window.showSaveFilePicker)
+      throw new Error('当前浏览器无法保存扰动证据，请使用支持保存对话框的桌面 Chrome。')
+    const text = disturbanceEvidence()
+    const name = await saveEvidenceFile(async () => text, 'pendulum-disturbances.json')
+    disturbanceSaved = true
+    renderDisturbances()
+    exportMessage.textContent = `扰动证据已写入并读回校验：${name}`
+  })
+prepareDisturbanceDownload.onclick = () =>
+  void action(async () => {
+    const text = disturbanceEvidence()
+    clearPreparedDisturbances()
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+    preparedDisturbances = {
+      hash: await sha256(text),
+      url,
+      revision: disturbanceRevision,
+      byteLength: new TextEncoder().encode(text).byteLength,
+    }
+    downloadDisturbances.href = url
+    downloadDisturbances.download = 'pendulum-disturbances.json'
+    downloadDisturbances.hidden = false
+    write('disturbance-save-message', '证据副本已生成；下载后选择实际文件进行校验。')
+  })
+downloadDisturbances.onclick = () => {
+  write('disturbance-save-message', '下载已发起；请选择实际文件进行校验。')
+}
+verifyDisturbances.onchange = () =>
+  void action(async () => {
+    const file = verifyDisturbances.files?.[0]
+    const prepared = preparedDisturbances
+    if (!file || !prepared) return
+    if (
+      file.size !== prepared.byteLength ||
+      (await sha256(await file.text())) !== prepared.hash ||
+      prepared.revision !== disturbanceRevision
+    )
+      throw new Error('文件与当前扰动证据不一致，请重新下载并校验。')
+    disturbanceSaved = true
+    renderDisturbances()
+    write('disturbance-save-message', `已读回校验：${file.name}`)
+  })
 start.onclick = () => void action(() => call({ type: 'start' }))
 pause.onclick = () =>
   void action(() =>
@@ -486,9 +650,15 @@ verifyFile.onchange = () =>
     exportMessage.textContent = `已读回校验：${file.name}`
   })
 document.addEventListener('visibilitychange', () => {
+  updateControls()
   if (document.hidden) void call({ type: 'pause', reason: 'background' }).catch(showError)
 })
 window.addEventListener('beforeunload', (event) => {
-  if (current?.samples.length && verifiedKey !== key()) event.preventDefault()
+  if (
+    (current?.samples.length && verifiedKey !== key()) ||
+    (disturbanceResults && !disturbanceSaved) ||
+    disturbanceRunning
+  )
+    event.preventDefault()
 })
 window.addEventListener('resize', scheduleRender)

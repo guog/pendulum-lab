@@ -317,6 +317,92 @@
       </div>
       <section
         class="physics-benchmarks"
+        aria-labelledby="disturbance-title"
+      >
+        <div class="panel-heading"><h2 id="disturbance-title">共同快照扰动实验</h2></div>
+        <p>
+          先导出并校验首次稳定快照；两种扰动独立分叉，不改变无扰动耐久记录。结果为内存研究证据，不承诺崩溃恢复。
+        </p>
+        <button
+          id="run-disturbances"
+          type="button"
+          disabled
+        >
+          运行两种扰动
+        </button>
+        <button
+          id="run-horizontal"
+          type="button"
+          disabled
+        >
+          仅运行水平外力
+        </button>
+        <button
+          id="run-torque"
+          type="button"
+          disabled
+        >
+          仅运行关节力矩
+        </button>
+        <button
+          id="pause-disturbances"
+          type="button"
+          disabled
+        >
+          暂停扰动实验
+        </button>
+        <button
+          id="stop-disturbances"
+          type="button"
+          disabled
+        >
+          终止扰动实验
+        </button>
+        <button
+          id="resume-disturbances"
+          type="button"
+          disabled
+        >
+          继续扰动实验
+        </button>
+        <p id="disturbance-current">水平外力：阻塞；关节外力矩：阻塞（无已确认合格快照）。</p>
+        <button
+          id="save-disturbances"
+          type="button"
+          disabled
+        >
+          保存扰动证据
+        </button>
+        <details>
+          <summary>下载扰动证据与文件校验</summary>
+          <button
+            id="prepare-disturbance-download"
+            type="button"
+            disabled
+          >
+            生成扰动证据副本
+          </button>
+          <a
+            id="download-disturbances"
+            hidden
+            >下载扰动 JSON 证据</a
+          >
+          <label for="verify-disturbances">校验已下载的扰动证据</label>
+          <input
+            id="verify-disturbances"
+            type="file"
+            accept=".json,application/json"
+            disabled
+          />
+        </details>
+        <p
+          id="disturbance-save-message"
+          role="status"
+        ></p>
+        <pre id="disturbance-result">阻塞：等待已确认的合格快照。</pre>
+      </section>
+      <section
+        class="physics-benchmarks"
         aria-labelledby="bench-title"
       >
         <div class="panel-heading">

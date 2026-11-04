@@ -1,6 +1,11 @@
-import { test } from 'node:test'
+import { test, beforeEach } from 'node:test'
 import assert from 'node:assert/strict'
 import { createConfig, createSession } from '../src/session.ts'
+
+beforeEach((t) => {
+  if (!('mock' in t)) throw new Error('测试计时不可用')
+  t.mock.method(performance, 'now', () => 0)
+})
 
 test('首次稳定后继续20秒并独立导出耐久结果及原快照', async () => {
   const session = createSession(createConfig('simple', 'swing-up'))
