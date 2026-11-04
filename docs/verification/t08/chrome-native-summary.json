@@ -1,0 +1,89 @@
+{
+  "status": "passed",
+  "source": {
+    "source_revision": "96080f3e333e957be9326751f349bc8ba7b16472",
+    "source_sha256": "59be7a49555eaf0637dcc6adefa3b89bd798ab784a8958533910126b65aafa53",
+    "source_dirty": false
+  },
+  "authorization": "Native macOS picker, initial grant by user; subsequent selections via explicitly authorized System Events; Chrome permission prompts accepted for test directories",
+  "cases": {
+    "normal_10ms_60s": {
+      "sample_count": 6001,
+      "status": "passed"
+    },
+    "high_1ms_60s": {
+      "sample_count": 60001,
+      "status": "passed"
+    },
+    "reselect_and_history": "passed",
+    "cancel_no_initialization": "passed",
+    "unrelated_directory_unchanged": "passed",
+    "readonly_history_and_start_disabled": "passed",
+    "readonly_byte_hash_unchanged": "passed",
+    "os_read_denial": "NotFoundError rejected, permission restored and all bytes unchanged",
+    "user_stop_100ms": {
+      "stop_s": 0.496,
+      "sample_count": 6,
+      "status": "passed"
+    },
+    "os_write_failure_retry": {
+      "stop_s": 5.5,
+      "sample_count": 551,
+      "event_count": 4,
+      "events": ["start", "storage_error", "pause", "stop"],
+      "status": "passed"
+    }
+  },
+  "observed_backpressure": [
+    {
+      "label": "default-10ms",
+      "observations": 149,
+      "observed_wall_ms": 163566,
+      "max_unconfirmed_sim_s": 0.5,
+      "saving_observations": 86
+    },
+    {
+      "label": "high-frequency-1ms",
+      "observations": 125,
+      "observed_wall_ms": 137136,
+      "max_unconfirmed_sim_s": 0.5,
+      "saving_observations": 69
+    }
+  ],
+  "independently_verified_experiments": [
+    {
+      "experiment_id": "0eb010ec-2c13-44fe-ab90-2001abdb3855",
+      "committed_sim_time_s": 60,
+      "sample_count": 6001,
+      "event_count": 2,
+      "sealed": true
+    },
+    {
+      "experiment_id": "573696e2-6b0c-4fb0-b712-d6751c634db7",
+      "committed_sim_time_s": 5.5,
+      "sample_count": 551,
+      "event_count": 4,
+      "sealed": true
+    },
+    {
+      "experiment_id": "74bd5d35-bc12-455b-be17-1a740c6d8cf0",
+      "committed_sim_time_s": 60,
+      "sample_count": 60001,
+      "event_count": 2,
+      "sealed": true
+    },
+    {
+      "experiment_id": "e78ea8e9-c83a-4805-b18f-f132c7f54bf0",
+      "committed_sim_time_s": 0.496,
+      "sample_count": 6,
+      "event_count": 2,
+      "sealed": true
+    }
+  ],
+  "limitations": [
+    "Single-instance assumption only; no cross-browser/origin exclusion proof",
+    "Filesystem permission revocation is not hardware disk-full or power-loss testing",
+    "High-frequency monitor started after initial seconds; all60001samples checked independently on disk",
+    "Native control transient guard failure and stale first monitoring attempt retained in raw logs; successful runs independently verified"
+  ]
+}
