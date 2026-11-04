@@ -16,6 +16,9 @@ function element<T extends Element>(id: string, type: new (...args: never[]) => 
 }
 const runDisturbances = element('run-disturbances', HTMLButtonElement)
 const saveDisturbances = element('save-disturbances', HTMLButtonElement)
+const prepareDisturbanceDownload = element('prepare-disturbance-download', HTMLButtonElement)
+const downloadDisturbances = element('download-disturbances', HTMLAnchorElement)
+const verifyDisturbances = element('verify-disturbances', HTMLInputElement)
 const resumeDisturbances = element('resume-disturbances', HTMLButtonElement)
 const start = element('start', HTMLButtonElement)
 const pause = element('pause', HTMLButtonElement)
@@ -81,6 +84,10 @@ let disturbanceResults: DisturbanceOutput[] | undefined
 let disturbanceSaved = false
 let disturbancePaused = false
 let disturbanceRunning = false
+let disturbanceTime: number | null = null
+let disturbanceRevision = 0
+let preparedDisturbances:
+  { hash: string; url: string; revision: number; byteLength: number } | undefined
 let current: SessionOutput | undefined
 let wallMs = 0
 let busy = false
@@ -117,6 +124,27 @@ function clearPrepared() {
   verifyFile.disabled = true
   verifyFile.value = ''
 }
+function clearPreparedDisturbances() {
+  if (preparedDisturbances) URL.revokeObjectURL(preparedDisturbances.url)
+  preparedDisturbances = undefined
+  downloadDisturbances.hidden = true
+  downloadDisturbances.removeAttribute('href')
+  verifyDisturbances.value = ''
+}
+function disturbanceEvidence() {
+  if (!disturbanceResults) throw new Error('尚无扰动结果')
+  return (
+    JSON.stringify(
+      {
+        schema_version: 1,
+        limitation: '内存研究证据；不承诺崩溃恢复或正式工作区验收。',
+        results: disturbanceResults,
+      },
+      null,
+      2,
+    ) + '\n'
+  )
+}
 function updateControls() {
   const status = workerFailed ? undefined : current?.status
   runDisturbances.disabled =
@@ -126,6 +154,8 @@ function updateControls() {
     current.status === 'running' ||
     current.first_stable.disturbance_eligibility !== 'eligible'
   saveDisturbances.disabled = busy || !disturbanceResults
+  prepareDisturbanceDownload.disabled = busy || !disturbanceResults
+  verifyDisturbances.disabled = busy || !preparedDisturbances
   resumeDisturbances.disabled = !disturbancePaused || document.hidden
   start.disabled = busy || benchmarksActive || status !== 'ready'
   pause.disabled = busy || (status !== 'running' && status !== 'paused')
@@ -155,7 +185,7 @@ function render() {
   write(
     'disturbance-current',
     disturbancePaused
-      ? '扰动实验已暂停；回到页面后可继续。'
+      ? `扰动实验已暂停（${disturbanceTime?.toFixed(3) ?? '等待开始'} s）；回到页面后可继续。`
       : current.first_stable.disturbance_eligibility === 'eligible'
         ? `${config.preset === 'simple' ? '简单' : '标准'}工况：已有合格快照，可运行水平外力与关节力矩实验。`
         : `${config.preset === 'simple' ? '简单' : '标准'}工况：水平外力阻塞；关节力矩阻塞（无已确认合格快照）。`,
@@ -357,7 +387,12 @@ worker.onmessage = ({ data }: MessageEvent<Reply>) => {
   if (data.type === 'disturbance-status') {
     disturbanceRunning = data.running
     disturbancePaused = data.running && data.paused
-    if (disturbancePaused) write('disturbance-current', '扰动实验已暂停；回到页面后可继续。')
+    disturbanceTime = data.sim_time_s
+    if (disturbancePaused)
+      write(
+        'disturbance-current',
+        `扰动实验已暂停（${disturbanceTime?.toFixed(3) ?? '等待开始'} s）；回到页面后可继续。`,
+      )
     updateControls()
   }
   if (data.type === 'snapshot') {
@@ -434,7 +469,8 @@ function renderDisturbances() {
   const labels: Record<string, string> = {
     suppressed: '抑扰成功',
     recovered: '失稳恢复成功',
-    failed: '失败或违规',
+    failed: '未恢复',
+    violation: '违规',
     error: '异常',
     running: '证据不完整',
   }
@@ -449,7 +485,7 @@ function renderDisturbances() {
                 `${item.condition} ${item.start_time_s.toFixed(3)}–${item.end_time_s?.toFixed(3) ?? '未结束'} s`,
             )
             .join('、') || '无约束或超速区间'
-        return `${result.snapshot.config.preset === 'simple' ? '简单' : '标准'}工况 · ${result.kind === 'horizontal' ? '水平外力' : '关节外力矩'} · ${result.experiment_id}\n状态：${labels[result.disturbance?.status ?? 'running']}；脉冲 ${result.disturbance?.pulse_start_s.toFixed(3)}–${result.disturbance?.pulse_end_s.toFixed(3)} s；恢复截止 ${result.disturbance?.deadline_s.toFixed(3)} s\n限制：${conditions}；资格原因：${result.qualification_reasons.join('、') || '无'}`
+        return `${result.snapshot.config.preset === 'simple' ? '简单' : '标准'}工况 · ${result.kind === 'horizontal' ? '水平外力' : '关节外力矩'} · ${result.experiment_id}\n状态：${labels[result.disturbance?.status ?? 'running']}；脉冲起点 ${result.disturbance?.pulse_start_s.toFixed(3)} s、计划终点 ${result.disturbance?.pulse_end_s.toFixed(3)} s、实际终点 ${result.disturbance?.pulse_actual_end_s?.toFixed(3) ?? '未记录'} s；恢复截止 ${result.disturbance?.deadline_s.toFixed(3)} s\n限制：${conditions}；资格原因：${result.qualification_reasons.join('、') || '无'}`
       })
       .join('\n\n') + `\n\n扰动证据${disturbanceSaved ? '已导出并校验' : '尚未导出校验'}`,
   )
@@ -460,6 +496,8 @@ runDisturbances.onclick = () =>
     const reply = await call({ type: 'run-disturbances' })
     if (reply.type !== 'disturbances') throw new Error('未收到扰动结果')
     disturbanceResults = [...(disturbanceResults ?? []), ...reply.results]
+    disturbanceRevision++
+    clearPreparedDisturbances()
     disturbanceSaved = false
     renderDisturbances()
   })
@@ -468,20 +506,45 @@ saveDisturbances.onclick = () =>
     if (!disturbanceResults) return
     if (!window.showSaveFilePicker)
       throw new Error('当前浏览器无法保存扰动证据，请使用支持保存对话框的桌面 Chrome。')
-    const text =
-      JSON.stringify(
-        {
-          schema_version: 1,
-          limitation: '内存研究证据；不承诺崩溃恢复或正式工作区验收。',
-          results: disturbanceResults,
-        },
-        null,
-        2,
-      ) + '\n'
+    const text = disturbanceEvidence()
     const name = await saveEvidenceFile(async () => text, 'pendulum-disturbances.json')
     disturbanceSaved = true
     renderDisturbances()
     exportMessage.textContent = `扰动证据已写入并读回校验：${name}`
+  })
+prepareDisturbanceDownload.onclick = () =>
+  void action(async () => {
+    const text = disturbanceEvidence()
+    clearPreparedDisturbances()
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+    preparedDisturbances = {
+      hash: await sha256(text),
+      url,
+      revision: disturbanceRevision,
+      byteLength: new TextEncoder().encode(text).byteLength,
+    }
+    downloadDisturbances.href = url
+    downloadDisturbances.download = 'pendulum-disturbances.json'
+    downloadDisturbances.hidden = false
+    write('disturbance-save-message', '证据副本已生成；下载后选择实际文件进行校验。')
+  })
+downloadDisturbances.onclick = () => {
+  write('disturbance-save-message', '下载已发起；请选择实际文件进行校验。')
+}
+verifyDisturbances.onchange = () =>
+  void action(async () => {
+    const file = verifyDisturbances.files?.[0]
+    const prepared = preparedDisturbances
+    if (!file || !prepared) return
+    if (
+      file.size !== prepared.byteLength ||
+      (await sha256(await file.text())) !== prepared.hash ||
+      prepared.revision !== disturbanceRevision
+    )
+      throw new Error('文件与当前扰动证据不一致，请重新下载并校验。')
+    disturbanceSaved = true
+    renderDisturbances()
+    write('disturbance-save-message', `已读回校验：${file.name}`)
   })
 start.onclick = () => void action(() => call({ type: 'start' }))
 pause.onclick = () =>

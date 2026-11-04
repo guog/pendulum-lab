@@ -12,7 +12,13 @@ export type Command =
 export type Request = { request_id: number; command: Command }
 export type Reply =
   | { type: 'snapshot'; output: SessionOutput; running_wall_ms: number; request_id?: number }
-  | { type: 'disturbance-status'; paused: boolean; running: boolean; request_id?: never }
+  | {
+      type: 'disturbance-status'
+      paused: boolean
+      running: boolean
+      sim_time_s: number | null
+      request_id?: never
+    }
   | { type: 'disturbances'; results: DisturbanceOutput[]; request_id: number }
   | { type: 'evidence'; bundle: EvidenceBundle; request_id: number }
   | { type: 'error'; message: string; request_id?: number }

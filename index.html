@@ -345,6 +345,32 @@
         >
           保存扰动证据
         </button>
+        <details>
+          <summary>下载扰动证据与文件校验</summary>
+          <button
+            id="prepare-disturbance-download"
+            type="button"
+            disabled
+          >
+            生成扰动证据副本
+          </button>
+          <a
+            id="download-disturbances"
+            hidden
+            >下载扰动 JSON 证据</a
+          >
+          <label for="verify-disturbances">校验已下载的扰动证据</label>
+          <input
+            id="verify-disturbances"
+            type="file"
+            accept=".json,application/json"
+            disabled
+          />
+        </details>
+        <p
+          id="disturbance-save-message"
+          role="status"
+        ></p>
         <pre id="disturbance-result">阻塞：等待已确认的合格快照。</pre>
       </section>
       <section
